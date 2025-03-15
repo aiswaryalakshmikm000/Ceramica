@@ -34,7 +34,7 @@ const categories = [
 
 const Categories = () => {
   return (
-    <section className="py-12 px-4 md:px-6 bg-ceramic-beige">
+    <section className="py-12 px-4 md:px-6 bg-ceramic-beige ">
       <div className="container mx-auto">
         <h2 className="text-center text-2xl md:text-3xl lg:text-4xl font-serif font-medium text-ceramic-dark mb-4">
           Explore our categories
