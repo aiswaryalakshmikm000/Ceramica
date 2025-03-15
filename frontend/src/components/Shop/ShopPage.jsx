@@ -6,7 +6,6 @@ import ColorFilter from './filter/ColorFilter';
 import SortFilter from './filter/SortFilter';
 import ProductsGrid from './ProductGrid';
 import ShopHeader from './ShopHeader';
-import Categories from '../../components/common/Categories';
 
 const Shop = () => {
   // Define initial filter state
@@ -74,7 +73,6 @@ const Shop = () => {
       <div className="container mx-auto px-4 md:px-8">
         {/* Breadcrumbs */}
         <Breadcrumbs items={breadcrumbItems} />
-        <Categories />
 
         <ShopHeader/>
         

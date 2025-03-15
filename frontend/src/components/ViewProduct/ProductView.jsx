@@ -31,7 +31,7 @@ const ProductView = () => {
       setBreadcrumbItems([
         { label: 'Home', href: '/' },
         { label: 'Shop', href: '/shop' },
-        { label: data.product.categoryId?.name || 'Category', href: `/shop/category/${data.product.categoryId?._id}` },
+        // { label: data.product.categoryId?.name || 'Category', href: `/shop/category/${data.product.categoryId?._id}` },
         { label: data.product.name },
       ]);
       document.title = `${data.product.name} | Shop Galleria`;

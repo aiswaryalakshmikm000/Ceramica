@@ -10,25 +10,25 @@ const categories = [
     id: 1,
     name: "Mugs",
     image: mugs,
-    link: "/shop/mugs",
+    link: "/shop",
   },
   {
     id: 2,
     name: "Pots",
     image: pots,
-    link: "/shop/pots",
+    link: "/shop",
   },
   {
     id: 3,
     name: "Plates",
     image: plates,
-    link: "/shop/plates",
+    link: "/shop",
   },
   {
     id: 4,
     name: "Bowls",
     image: bowls,
-    link: "/shop/bowls",
+    link: "/shop",
   },
 ];
 
