@@ -30,6 +30,12 @@ const userProductSlice = createSlice({
     removeFromWishlist: (state, action) => {
       state.wishlist = state.wishlist.filter((id) => id !== action.payload);
     },
+    addToCart: (state, action) => {
+      state.cart.push(action.payload);
+    },
+    removeFromCart: (state, action) => {
+      state.cart = state.cart.filter(item => item.id !== action.payload);
+    },
   },
 });
 

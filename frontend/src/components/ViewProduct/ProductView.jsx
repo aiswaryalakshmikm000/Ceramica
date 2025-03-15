@@ -1,0 +1,220 @@
+
+
+// import React, { useEffect, useState } from 'react';
+// import { useParams } from 'react-router-dom';
+// import { useViewProductQuery } from '../../features/products/userProductApislice';
+// import Breadcrumbs from '../../components/common/BreadCrumbs';
+// import ProductGallery from '../ViewProduct/ProductGallery';
+// import ProductInfo from '../ViewProduct/ProductInfo';
+// import ProductFeatures from '../ViewProduct/ProductFeatures';
+// import ReviewForm from '../ViewProduct/ReviewForm';
+// import RelatedProducts from '../ViewProduct/RelatedProduct';
+// import { Loader2 } from 'lucide-react';
+
+// const ProductView = () => {
+//   const { id } = useParams();
+//   const { data, isLoading, error } = useViewProductQuery(id);
+
+//   useEffect(() => {
+//     console.log("ID from URL:", id);
+//     console.log("Raw API Data:", JSON.stringify(data, null, 2));
+//     console.log("Is Loading:", isLoading);
+//     console.log("Error:", error ? JSON.stringify(error) : "No error");
+//   }, [data, isLoading, error, id]);
+
+//   const [breadcrumbItems, setBreadcrumbItems] = useState([
+//     { label: 'Home', href: '/' },
+//     { label: 'Shop', href: '/shop' },
+//   ]);
+
+//   useEffect(() => {
+//     if (data?.product) {
+//       console.log("Product data received:", JSON.stringify(data.product, null, 2));
+//       setBreadcrumbItems([
+//         { label: 'Home', href: '/' },
+//         { label: 'Shop', href: '/shop' },
+//         { label: data.product.categoryId?.name || 'Category', href: `/shop/category/${data.product.categoryId?._id}` },
+//         { label: data.product.name },
+//       ]);
+//       document.title = `${data.product.name} | Shop Galleria`;
+//     }
+//   }, [data]);
+
+//   if (isLoading) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center">
+//         <Loader2 className="h-8 w-8 animate-spin text-ceramic-accent" />
+//       </div>
+//     );
+//   }
+
+//   if (error) {
+//     return (
+//       <div className="min-h-screen flex flex-col items-center justify-center p-4">
+//         <h2 className="text-2xl font-bold text-ceramic-red mb-4">Error Loading Product</h2>
+//         <p className="text-ceramic-dark mb-6">{error.message || 'There was an error loading the product.'}</p>
+//         <a href="/shop" className="text-ceramic-accent hover:underline">Return to Shop</a>
+//       </div>
+//     );
+//   }
+
+//   if (!data?.product) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center">
+//         <p className="text-ceramic-dark">Product not found.</p>
+//       </div>
+//     );
+//   }
+
+//   const product = data.product;
+//   const relatedProducts = data.relatedProducts || [];
+
+//   const allImages = product.colors && product.colors.length > 0
+//     ? product.colors.reduce((acc, color) => {
+//         return color.images && color.images.length > 0 ? [...acc, ...color.images] : acc;
+//       }, [])
+//     : (product.images && product.images.length > 0 ? product.images : []);
+//   console.log("All Images:", allImages);
+//   console.log("Primary Image:", product.primaryImage);
+//   console.log("Standalone Images:", product.images);
+
+//   const galleryImages = allImages.length > 0 
+//   ? allImages 
+//   : (product.primaryImage ? [product.primaryImage] : []);
+
+//   return (
+//     <div className="container mx-auto px-4 py-8 max-w-6xl">
+//       <Breadcrumbs items={breadcrumbItems} />
+//       <div className="flex flex-col lg:flex-row gap-8 mt-6">
+//         <ProductGallery 
+//           images={galleryImages}
+//           isNew={new Date(product.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)}
+//           discount={product.discount}
+//         />
+//         <ProductInfo product={product} />
+//       </div>
+//       {/* <div className="mt-12 animate-fade-in">
+//         <h3 className="text-xl font-medium text-ceramic-dark mb-4">Description</h3>
+//         <div className="prose prose-lg max-w-none text-ceramic-dark/80">
+//           <p>{product.description}</p>
+//         </div>
+//       </div> */}
+//       <ProductFeatures />
+//       <ReviewForm productId={product._id} />
+//       {relatedProducts.length > 0 && <RelatedProducts products={relatedProducts} />}
+//     </div>
+//   );
+// };
+
+// export default ProductView;
+
+
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useViewProductQuery } from '../../features/products/userProductApislice';
+import Breadcrumbs from '../../components/common/BreadCrumbs';
+import ProductGallery from '../ViewProduct/ProductGallery';
+import ProductInfo from '../ViewProduct/ProductInfo';
+import ProductFeatures from '../ViewProduct/ProductFeatures';
+import ReviewForm from '../ViewProduct/ReviewForm';
+import RelatedProducts from '../ViewProduct/RelatedProduct';
+import { Loader2 } from 'lucide-react';
+
+const ProductView = () => {
+  const { id } = useParams();
+  const { data, isLoading, error } = useViewProductQuery(id);
+
+  useEffect(() => {
+    console.log("ID from URL:", id);
+    console.log("Raw API Data:", JSON.stringify(data, null, 2));
+    console.log("Is Loading:", isLoading);
+    console.log("Error:", error ? JSON.stringify(error) : "No error");
+  }, [data, isLoading, error, id]);
+
+  const [breadcrumbItems, setBreadcrumbItems] = useState([
+    { label: 'Home', href: '/' },
+    { label: 'Shop', href: '/shop' },
+  ]);
+
+  useEffect(() => {
+    if (data?.product) {
+      console.log("Product data received:", JSON.stringify(data.product, null, 2));
+      setBreadcrumbItems([
+        { label: 'Home', href: '/' },
+        { label: 'Shop', href: '/shop' },
+        { label: data.product.categoryId?.name || 'Category', href: `/shop/category/${data.product.categoryId?._id}` },
+        { label: data.product.name },
+      ]);
+      document.title = `${data.product.name} | Shop Galleria`;
+    }
+  }, [data]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-ceramic-accent" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+        <h2 className="text-2xl font-bold text-ceramic-red mb-4">Error Loading Product</h2>
+        <p className="text-ceramic-dark mb-6">{error.message || 'There was an error loading the product.'}</p>
+        <a href="/shop" className="text-ceramic-accent hover:underline">Return to Shop</a>
+      </div>
+    );
+  }
+
+  if (!data?.product) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-ceramic-dark">Product not found.</p>
+      </div>
+    );
+  }
+
+  const product = data.product;
+  const relatedProductsRaw = data.relatedProducts || [];
+
+  // Format related products to match FeaturedProducts structure
+  const relatedProducts = relatedProductsRaw.map(product => ({
+    id: product._id,
+    name: product.name,
+    price: product.price,
+    discount: product.discount,
+    discountedPrice: product.discountedPrice,
+    image: product.colors?.[0]?.images?.[0] || product.images?.[0] || product.primaryImage,
+    inStock: product.totalStock > 0,
+  }));
+
+  const allImages = product.colors && product.colors.length > 0
+    ? product.colors.reduce((acc, color) => {
+        return color.images && color.images.length > 0 ? [...acc, ...color.images] : acc;
+      }, [])
+    : (product.images && product.images.length > 0 ? product.images : []);
+
+  const galleryImages = allImages.length > 0 
+    ? allImages 
+    : (product.primaryImage ? [product.primaryImage] : []);
+
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <Breadcrumbs items={breadcrumbItems} />
+      <div className="flex flex-col lg:flex-row gap-8 mt-6">
+        <ProductGallery 
+          images={galleryImages}
+          isNew={new Date(product.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)}
+          discount={product.discount}
+        />
+        <ProductInfo product={product} />
+      </div>
+      <ProductFeatures />
+      <ReviewForm productId={product._id} />
+      {relatedProducts.length > 0 && <RelatedProducts products={relatedProducts} />}
+    </div>
+  );
+};
+
+export default ProductView;

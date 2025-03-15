@@ -5,6 +5,7 @@ import UserHome from "./pages/user/UserHome";
 import UserShop from "./pages/user/UserShop";
 import ScrollToTop from "./components/common/ScrollToTop";
 import NotFound from "./pages/NotFound";
+import UserViewProduct from "./pages/user/UserViewProduct";
 
 // import UserTokenRefresher from "./routes/UserTokenRefresher";
 // import AdminTokenRefresher from "./routes/AdminTokenRefresher";
@@ -28,7 +29,7 @@ function App() {
         <Route path="/register" element={<UserRegister />} />
         <Route path="/login" element={<UserLogin />} />
         <Route path="/shop" element={<UserShop />} />
-         {/* <Route path="/product/:id" element={<ProductView />} /> */}
+         <Route path="/shop/:id" element={<UserViewProduct />} />
         {/* <Route path="user/home" element={<Home />} /> */}
 
         

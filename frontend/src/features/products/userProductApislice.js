@@ -25,6 +25,13 @@ export const userProductApiSlice = userApi.injectEndpoints({
     // Get single product by ID - User view
     viewProduct: builder.query({
       query: (id) => `/products/${id}`,
+      transformResponse: (response) => {
+        // Transform response to extract product and relatedProducts
+        return {
+          product: response.product,
+          relatedProducts: response.relatedProducts || []
+        };
+      },
       providesTags: (result, error, id) => [{ type: "Product", id }]
     })
   })

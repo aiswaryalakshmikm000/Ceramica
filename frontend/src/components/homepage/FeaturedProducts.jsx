@@ -3,6 +3,7 @@ import ProductCard from '../common/ProductCard';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useFetchFeaturedProductsQuery } from '../../features/products/userProductApislice';
+import { Loader2 } from 'lucide-react';
 
 const FeaturedProducts = () => {
   const { 
@@ -13,17 +14,15 @@ const FeaturedProducts = () => {
   } = useFetchFeaturedProductsQuery({ limit: 8 });
 
   console.log(response);
-  
+
 
   if (isLoading) {
-    return (
-      <div className="py-16 md:py-24">
-        <div className="container mx-auto px-4 md:px-8">
-          <div className="text-center">Loading featured products...</div>
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-ceramic-accent" />
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
   if (isError || !response?.success) {
     return (

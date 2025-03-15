@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useFetchProductsQuery } from '../../features/products/userProductApislice';
-import Breadcrumbs from './BreadCrumbs';
+import Breadcrumbs from '../common/BreadCrumbs';
 import PriceRangeFilter from './filter/PriceRangeFilter';
 import ColorFilter from './filter/ColorFilter';
 import SortFilter from './filter/SortFilter';

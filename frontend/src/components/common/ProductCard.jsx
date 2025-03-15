@@ -13,6 +13,8 @@ const ProductCard = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  console.log("Product ID:", product.id);
+
   const handleAddToCart = () => {
     console.log(`Added ${product.name} to cart`);
     setShowSuccess(true);
@@ -56,12 +58,24 @@ const ProductCard = ({ product }) => {
             isHovered ? "opacity-100" : "opacity-0"
           }`}
         >
-          <Link
-            to={`/shop/${product.id}`}
+          {/* <Link
+            to={`/products/${product.id}`}
             className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-ceramic-dark hover:bg-ceramic-accent hover:text-white transition-colors"
           >
             <Eye size={18} />
+          </Link> */}
+
+          <Link
+            to={`/shop/${product.id}`}
+            className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-ceramic-dark hover:bg-ceramic-accent hover:text-white transition-colors"
+            onClick={(e) => {
+              console.log("Navigating to:", `/shop/${product.id}`);
+              // e.preventDefault(); // Uncomment to test without navigation
+            }}
+          >
+            <Eye size={18} />
           </Link>
+
           <button
             className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-ceramic-dark hover:bg-ceramic-accent hover:text-white transition-colors"
             onClick={handleAddToCart}

@@ -34,7 +34,7 @@ const viewProduct = async (req, res) => {
   
     res
       .status(200)
-      .json({ success: true, message: "product fetched", product:product,relatedProducts });
+      .json({ success: true, message: "product fetched", product: product, relatedProducts: relatedProducts });
   } catch (error) {
     console.log("Error in viewProduct:", error);
     res.status(500).json({
