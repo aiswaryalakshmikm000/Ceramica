@@ -91,85 +91,58 @@ const addProduct = async (req, res) => {
   }
 };
 
-
-// Fetch all products with search, filter, sort, pagination, and reset
+// Fetch all products with search, category, status, stock filter, and pagination
 const showProducts = async (req, res) => {
   try {
-    let { search, categoryIds, minPrice, maxPrice, sort, page = 1, limit = 10, reset, isListed, stockFilter } = req.query;
-
-    // If reset is true, return all products without filters
-    if (reset === "true") {
-      search = categoryIds = minPrice = maxPrice = sort = null;
-    }
+    const { search, categoryIds, isListed, stockFilter, page = 1, limit = 10 } = req.query;
 
     let filter = {};
 
     // Search by name, description, or tags
     if (search) {
       filter.$or = [
-        { name: { $regex: new RegExp(search, "i") } }, // Search by name
-        { description: { $regex: new RegExp(search, "i") } }, // Search by description
-        { tags: { $regex: new RegExp(search, "i") } }, // Search by tags (assuming `tags` is an array)
+        { name: { $regex: new RegExp(search, "i") } },
+        { description: { $regex: new RegExp(search, "i") } },
+        { tags: { $regex: new RegExp(search, "i") } },
       ];
     }
 
     // Filter by multiple categories (expects comma-separated categoryIds)
     if (categoryIds) {
-      const categoriesArray = categoryIds.split(","); // Convert comma-separated IDs to array
+      const categoriesArray = categoryIds.split(",");
       filter.categoryId = { $in: categoriesArray };
     }
 
-    // Filter by price range
-    if (minPrice || maxPrice) {
-      filter.price = {};
-      if (minPrice) filter.price.$gte = parseFloat(minPrice);
-      if (maxPrice) filter.price.$lte = parseFloat(maxPrice);
-    }
-
     // Filter by listing status
-    if (isListed !== undefined) { // Check for undefined explicitly since 'false' is a valid value
-      filter.isListed = isListed === "true"; // Convert string 'true'/'false' to boolean
+    if (isListed !== undefined) {
+      filter.isListed = isListed === "true";
     }
 
     // Filter by stock status
     if (stockFilter) {
       if (stockFilter === "inStock") {
-        filter.totalStock = { $gt: 0 }; // Products with stock > 0
+        filter.totalStock = { $gt: 0 };
       } else if (stockFilter === "outOfStock") {
-        filter.totalStock = 0; // Products with stock = 0
+        filter.totalStock = 0;
       }
     }
-    
-    // Sorting logic
-    let sortOptions = {};
-    if (sort === "priceLowHigh") sortOptions.price = 1;
-    if (sort === "priceHighLow") sortOptions.price = -1;
-    if (sort === "nameAZ") sortOptions.name = 1;
-    if (sort === "nameZA") sortOptions.name = -1;
-    if (sort === "popularity") sortOptions.totalStock = -1; // Assuming popularity is based on stock
-    if (sort === "averageRating") sortOptions["reviews.rating"] = -1; // Sort by highest rating
-    if (sort === "newArrivals") sortOptions.createdAt = -1;
-    if (sort === "featured") sortOptions.isFeatured = -1;
 
     // Pagination
-    page = parseInt(page);
-    limit = parseInt(limit);
-    const skip = (page - 1) * limit;
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
 
     const totalProducts = await Product.countDocuments(filter);
-
-    // ✅ Fetch products with filters, sorting, and pagination
     const products = await Product.find(filter)
-      .populate("categoryId", "name") // Populate category name
-      .sort(sortOptions)
+      .populate("categoryId", "name")
       .skip(skip)
-      .limit(limit);
+      .limit(limitNum);
 
     res.status(200).json({
       success: true,
       totalProductsCount: totalProducts,
-      page,
-      totalPages: Math.ceil(totalProducts / limit),
+      page: pageNum,
+      totalPages: Math.ceil(totalProducts / limitNum),
       products,
     });
   } catch (error) {
@@ -177,8 +150,6 @@ const showProducts = async (req, res) => {
     res.status(500).json({ message: "Something went wrong while fetching products." });
   }
 };
-
-
 
 //to list or unlist products
 const updateProductStatus = async (req, res) => {
