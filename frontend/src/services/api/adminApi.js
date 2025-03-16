@@ -8,9 +8,12 @@ const baseQuery = fetchBaseQuery({
 
 // Custom query with token refresh logic
 const baseQueryWithReauth = async (args, api, extraOptions) => {
+  console.log("RTK Query request args:", args); // Log the full request
+  
   let result = await baseQuery(args, api, extraOptions);
 
   if (result.error && result.error.status === 401) {
+    
     console.log("Access token expired. Attempting to refresh...");
 
     const refreshResult = await baseQuery(

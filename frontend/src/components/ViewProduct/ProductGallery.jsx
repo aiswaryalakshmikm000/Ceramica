@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 
@@ -34,19 +33,19 @@ const ProductGallery = ({ images, isNew, discount }) => {
     if (!mainImageRef.current) return;
     
     const rect = mainImageRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100 + '%';
-    const y = ((e.clientY - rect.top) / rect.height) * 100 + '%';
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
     
-    setZoomPosition({ x, y });
-    
-    if (!zoomed) {
-      document.documentElement.style.setProperty('--x', x);
-      document.documentElement.style.setProperty('--y', y);
-    }
+    setZoomPosition({ x: `${x}%`, y: `${y}%` });
   };
 
-  const toggleZoom = () => {
-    setZoomed(!zoomed);
+  const handleMouseEnter = () => {
+    setZoomed(true);
+  };
+
+  const handleMouseLeave = () => {
+    setZoomed(false);
+    setZoomPosition({ x: '50%', y: '50%' }); // Reset position when leaving
   };
   
   const nextImage = () => {
@@ -66,17 +65,22 @@ const ProductGallery = ({ images, isNew, discount }) => {
 
   return (
     <div className="w-full lg:w-1/2 animate-fade-in">
-      <div className="relative rounded-lg overflow-hidden mb-4 product-zoom-container h-[400px] md:h-[500px]"
-           onMouseMove={zoomed ? handleZoom : undefined}
-           onClick={toggleZoom}
-           ref={mainImageRef}>
-        
+      <div 
+        className="relative rounded-lg overflow-hidden mb-4 product-zoom-container h-[400px] md:h-[500px]"
+        onMouseMove={handleZoom} // Always update position while hovering
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        ref={mainImageRef}
+      >
         {/* Main Image */}
         <img 
           src={images[activeIndex]} 
           alt={`Product view ${activeIndex + 1}`}
-          className={`w-full h-full object-cover transition-all duration-500 ${zoomed ? 'zoomed' : ''} ${imagesLoaded[activeIndex] ? 'image-loaded' : 'image-loading'}`}
-          style={{ transformOrigin: `${zoomPosition.x} ${zoomPosition.y}` }}
+          className={`w-full h-full object-cover transition-transform duration-100 ${zoomed ? 'zoomed' : ''} ${imagesLoaded[activeIndex] ? 'image-loaded' : 'image-loading'}`}
+          style={{ 
+            transformOrigin: `${zoomPosition.x} ${zoomPosition.y}`,
+            transform: zoomed ? 'scale(2)' : 'scale(1)', // Apply transform directly
+          }}
         />
         
         {/* Zoom Icon */}

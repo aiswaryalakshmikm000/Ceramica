@@ -1,7 +1,7 @@
 // src/features/categories/categoryApiSlice.js
-import { baseApi } from '../../services/api/userApi';
+import { adminApi } from '../../services/api/adminApi';
 
-export const categoryApiSlice = baseApi.injectEndpoints({
+export const categoryApiSlice = adminApi.injectEndpoints({
   endpoints: (builder) => ({
     getCategories: builder.query({
       query: () => '/categories',

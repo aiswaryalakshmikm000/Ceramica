@@ -12,6 +12,7 @@ import { Loader2 } from 'lucide-react';
 const ProductView = () => {
   const { id } = useParams();
   const { data, isLoading, error } = useViewProductQuery(id);
+  const [selectedColor, setSelectedColor] = useState(null);
 
   useEffect(() => {
     console.log("ID from URL:", id);
@@ -20,23 +21,26 @@ const ProductView = () => {
     console.log("Error:", error ? JSON.stringify(error) : "No error");
   }, [data, isLoading, error, id]);
 
-  const [breadcrumbItems, setBreadcrumbItems] = useState([
-    { label: 'Home', href: '/' },
-    { label: 'Shop', href: '/shop' },
-  ]);
-
   useEffect(() => {
     if (data?.product) {
       console.log("Product data received:", JSON.stringify(data.product, null, 2));
       setBreadcrumbItems([
         { label: 'Home', href: '/' },
         { label: 'Shop', href: '/shop' },
-        // { label: data.product.categoryId?.name || 'Category', href: `/shop/category/${data.product.categoryId?._id}` },
         { label: data.product.name },
       ]);
       document.title = `${data.product.name} | Shop Galleria`;
+      // Set initial selected color if not already set
+      if (data.product.colors.length > 0 && !selectedColor) {
+        setSelectedColor(data.product.colors[0].name);
+      }
     }
-  }, [data]);
+  }, [data, selectedColor]); // Add selectedColor to dependency array to prevent re-setting
+
+  const [breadcrumbItems, setBreadcrumbItems] = useState([
+    { label: 'Home', href: '/' },
+    { label: 'Shop', href: '/shop' },
+  ]);
 
   if (isLoading) {
     return (
@@ -73,7 +77,6 @@ const ProductView = () => {
   const product = data.product;
   const relatedProductsRaw = data.relatedProducts || [];
 
-  // Format related products to match FeaturedProducts structure
   const relatedProducts = relatedProductsRaw.map(product => ({
     id: product._id,
     name: product.name,
@@ -84,15 +87,9 @@ const ProductView = () => {
     inStock: product.totalStock > 0,
   }));
 
-  const allImages = product.colors && product.colors.length > 0
-    ? product.colors.reduce((acc, color) => {
-        return color.images && color.images.length > 0 ? [...acc, ...color.images] : acc;
-      }, [])
-    : (product.images && product.images.length > 0 ? product.images : []);
-
-  const galleryImages = allImages.length > 0 
-    ? allImages 
-    : (product.primaryImage ? [product.primaryImage] : []);
+  const galleryImages = selectedColor
+    ? product.colors.find(color => color.name === selectedColor)?.images || []
+    : product.colors[0]?.images || [];
 
   return (
     <div className="py-16 md:py-12">
@@ -104,7 +101,11 @@ const ProductView = () => {
             isNew={new Date(product.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)}
             discount={product.discount}
           />
-          <ProductInfo product={product} />
+          <ProductInfo 
+            product={product} 
+            onColorSelect={setSelectedColor}
+            selectedColor={selectedColor}
+          />
         </div>
         <ProductFeatures />
         <ReviewForm productId={product._id} />

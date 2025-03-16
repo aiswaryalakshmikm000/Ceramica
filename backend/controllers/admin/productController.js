@@ -10,64 +10,88 @@ const cloudinaryDeleteImages = require('../../utils/cloudinary/deleteImages')
 
 // Add product function
 const addProduct = async (req, res) => {
-  
+
+  console.log("req.body", req.body)
+  console.log("req.files", req.files)
+
   const { name, description, price, discount, offerId, categoryId, tags, colors } = req.body;
 
-  console.log(req.body);
-
   
-  // Validate request body
-  // const { error } = productValidationSchema.validate(req.body);
-  // if (error) {
-
-  //   const errorMessages = error.details.map((err) => err.message);
-  //   console.log("error in validation", errorMessages);
-
-  //   return res.status(400).json({ message: "Validation error", errors: error.details.map(err => err.message) });
-  // }
-
   try {
-    
+    // Check for existing product
     const productExist = await Product.findOne({ name: { $regex: new RegExp(`^${name}$`, "i") } });
-    console.log(1);
+    console.log("existing product:",  productExist)
     if (productExist) {
       return res.status(400).json({ message: "Product already exists" });
     }
 
-    if (!req.files || req.files.length < 3) {
-      return res.status(400).json({ message: "At least 3 images are required." });
+    console.log(2);
+    
+
+    
+    // Parse colors (JSON string from FormData)
+    const parsedColors = JSON.parse(colors);
+    console.log("parsedColors:",parsedColors)
+
+    // Validate images (at least 3 total across all variants)
+    if (!req.files || Object.keys(req.files).length === 0) {
+      console.log("images are required for color varient")
+      return res.status(400).json({ message: "Images are required for color variants." });
     }
-    const files = req.files;
-    const imageUrls = []
+
    
-    
-    // Handle image upload
-    for (const file of files) {
-  
-      const imageUrl = await cloudinaryImageUploadMethod(file.buffer); // Upload the buffer
-      imageUrls.push(imageUrl);
+
+    let totalImages = 0;
+    const colorsWithImages = await Promise.all(
+      parsedColors.map(async (color, index) => {
+        const fieldName = `color${index}Images`; // Expecting images as color0Images, color1Images, etc.
+        const files = req.files[fieldName];
+
+        if (!files || files.length === 0) {
+          throw new Error(`No images provided for color variant: ${color.name}`);
+        }
+
+        totalImages += files.length;
+
+        // Upload images for this variant to Cloudinary
+        const imageUrls = await Promise.all(
+          files.map((file) => cloudinaryImageUploadMethod(file.buffer))
+        );
+
+        return {
+          name: color.name,
+          stock: Number(color.stock),
+          images: imageUrls,
+        };
+      })
+    );
+
+    // Enforce minimum 3 images total
+    if (totalImages < 3) {
+      return res.status(400).json({ message: "At least 3 images are required across all color variants." });
     }
-    console.log(imageUrls);
-    
+
     // Create new product
     const newProduct = new Product({
       name,
       description,
-      price,
-      discount,
-      offerId,
+      price: Number(price),
+      discount: Number(discount) || 0,
+      offerId: offerId || null,
       categoryId,
-      tags,
-      colors,
-      images: imageUrls,
+      tags: tags ? JSON.parse(tags) : [],
+      colors: colorsWithImages,
     });
 
     await newProduct.save();
 
     res.status(201).json({ message: "Product added successfully", product: newProduct });
   } catch (error) {
-    console.error("Error adding product:", error.message);
-    res.status(500).json({ message: "Something went wrong while adding the product." });
+    console.error("Error adding product:", error);
+    res.status(500).json({
+      message: "Something went wrong while adding the product.",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
   }
 };
 

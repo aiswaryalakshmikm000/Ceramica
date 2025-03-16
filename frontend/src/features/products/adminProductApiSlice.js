@@ -22,34 +22,17 @@ export const adminProductApiSlice = adminApi.injectEndpoints({
     // Add new product
     addProduct: builder.mutation({
       query: (productData) => {
-        // Handle FormData for image uploads instaed of json
-        const formData = new FormData();
-        
-        // Add text fields
-        Object.keys(productData).forEach(key => {
-          if (key !== 'images') {
-            formData.append(key, 
-              typeof productData[key] === 'object' ? 
-              JSON.stringify(productData[key]) : productData[key]);   // FormData only supports text and files, not objects.
-          }
-        });
-        
-        // Add image files
-        if (productData.images) {
-          productData.images.forEach(image => {
-            formData.append('images', image);
-          });
+        console.log("FormData being sent:", productData); // Log FormData
+        for (let [key, value] of productData.entries()) {
+          console.log(`FormData entry - ${key}:`, value instanceof File ? `[File: ${value.name}]` : value);
         }
-        
         return {
           url: "/products",
           method: "POST",
-          body: formData,
-          // Don't set Content-Type - browser will set it with boundary for FormData
-          formData: true
+          body: productData,
         };
       },
-      invalidatesTags: ["Product"]
+      invalidatesTags: ["Product"],
     }),
     
     // Update product status (list/unlist)

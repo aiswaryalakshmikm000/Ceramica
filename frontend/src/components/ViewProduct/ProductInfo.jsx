@@ -1,15 +1,10 @@
-
-
 import React, { useState } from 'react';
 import { Heart, ShoppingCart, Check, Plus, Minus } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToWishlist, removeFromWishlist } from '../../features/products/userProductSlice';
 import { toast } from 'sonner';
 
-const ProductInfo = ({ product }) => {
-  const [selectedColor, setSelectedColor] = useState(
-    product.colors.length > 0 ? product.colors[0].name : null
-  );
+const ProductInfo = ({ product, onColorSelect, selectedColor }) => {
   const [quantity, setQuantity] = useState(1);
   const dispatch = useDispatch();
   const wishlist = useSelector((state) => state.userProduct.wishlist);
@@ -19,7 +14,7 @@ const ProductInfo = ({ product }) => {
   const currentStock = currentColorItem.stock || 0;
 
   const handleColorSelect = (colorName) => {
-    setSelectedColor(colorName);
+    onColorSelect(colorName); // Update parent state
     const newColorStock = product.colors.find((c) => c.name === colorName)?.stock || 0;
     if (quantity > newColorStock) {
       setQuantity(newColorStock > 0 ? 1 : 0);

@@ -20,6 +20,7 @@ const authenticateAdminToken = (req, res, next) => {
             console.log("Invalid token or token expired:", error);
             return res.status(401).json({ message: 'Invalid or expired admin token' });
         }
+        console.log("ADmin authenticated")
         req.user = decoded.user; // Attach decoded user data to the request object
         next(); // Proceed to the next middleware/route
     });
