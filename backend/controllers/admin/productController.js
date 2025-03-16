@@ -25,10 +25,6 @@ const addProduct = async (req, res) => {
       return res.status(400).json({ message: "Product already exists" });
     }
 
-    console.log(2);
-    
-
-    
     // Parse colors (JSON string from FormData)
     const parsedColors = JSON.parse(colors);
     console.log("parsedColors:",parsedColors)
@@ -99,7 +95,7 @@ const addProduct = async (req, res) => {
 // Fetch all products with search, filter, sort, pagination, and reset
 const showProducts = async (req, res) => {
   try {
-    let { search, categoryIds, minPrice, maxPrice, sort, page = 1, limit = 10, reset } = req.query;
+    let { search, categoryIds, minPrice, maxPrice, sort, page = 1, limit = 10, reset, isListed, stockFilter } = req.query;
 
     // If reset is true, return all products without filters
     if (reset === "true") {
@@ -108,7 +104,7 @@ const showProducts = async (req, res) => {
 
     let filter = {};
 
-    // Search by name
+    // Search by name, description, or tags
     if (search) {
       filter.$or = [
         { name: { $regex: new RegExp(search, "i") } }, // Search by name
@@ -130,6 +126,20 @@ const showProducts = async (req, res) => {
       if (maxPrice) filter.price.$lte = parseFloat(maxPrice);
     }
 
+    // Filter by listing status
+    if (isListed !== undefined) { // Check for undefined explicitly since 'false' is a valid value
+      filter.isListed = isListed === "true"; // Convert string 'true'/'false' to boolean
+    }
+
+    // Filter by stock status
+    if (stockFilter) {
+      if (stockFilter === "inStock") {
+        filter.totalStock = { $gt: 0 }; // Products with stock > 0
+      } else if (stockFilter === "outOfStock") {
+        filter.totalStock = 0; // Products with stock = 0
+      }
+    }
+    
     // Sorting logic
     let sortOptions = {};
     if (sort === "priceLowHigh") sortOptions.price = 1;

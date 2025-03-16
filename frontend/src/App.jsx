@@ -15,6 +15,8 @@ import './index.css'
 import AdminLogin from "./components/admin/AdminLogin"
 import AdminRegister from "./components/admin/AdminRegister";
 import AdminAddProductPage from "./components/admin/AdminAddProduct";
+import AdminEditProductPage from "./components/admin/AdminEditProduct";
+import AdminShowProductsPage from "./components/admin/AdminShowProducts"
 
 function App() {
   return (
@@ -37,7 +39,10 @@ function App() {
 
         <Route path="/admin/register" element={<AdminRegister />} />
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/addProducts" element={<AdminAddProductPage />} />
+        <Route path="/admin/products/add" element={<AdminAddProductPage />} />
+        <Route path="/admin/products/edit/:id" element={<AdminEditProductPage />} />
+        <Route path="/admin/products" element={<AdminShowProductsPage />} />
+
 
 
         <Route path="*" element={<NotFound />} />

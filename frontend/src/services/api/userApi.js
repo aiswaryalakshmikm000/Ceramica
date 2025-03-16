@@ -4,7 +4,7 @@ import { logoutUser, setUserCredentials } from "../../features/auth/userAuthSlic
 
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://localhost:5001/api/user",
+  baseUrl: "http://localhost:5000/api/user",
   credentials: "include", // Automatically include cookies in requests
 });
 

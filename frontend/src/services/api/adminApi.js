@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logoutAdmin, setAdminCredentials } from "../../features/auth/adminAuthSlice";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://localhost:5001/api/admin",
+  baseUrl: "http://localhost:5000/api/admin",
   credentials: "include", // Ensures cookies (tokens) are sent with every request
 });
 
