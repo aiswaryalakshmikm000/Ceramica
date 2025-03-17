@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useRegisterMutation } from '../../features/auth/userApiSlice';
 import { Link, useNavigate } from 'react-router-dom';
 import banner1 from "../../assets/Banners/banner1.jpg";
+import GoogleIcon from "../../assets/google-icon.png";
 
 const UserRegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -62,6 +63,10 @@ const UserRegisterPage = () => {
       console.error('Registration error:', err); 
     }
   };
+
+  const handleGoogleSignIn = () => {
+    window.location.href = 'http://localhost:5000/api/auth/google';
+  };
   
   return (
     <div 
@@ -72,7 +77,7 @@ const UserRegisterPage = () => {
     >
       <div className="max-w-md w-full space-y-8 p-8 bg-white/20 rounded-xl shadow-xl backdrop-blur-sm">
         <div className="text-center">
-          <h2 className="mt-6 text-4xl font-bold text-gray-900 tracking-tight">Ceramica</h2>
+          <h2 className="mt-6 text-4xl font-bold text-gray-900 tracking-tight">Register</h2>
           <p className="mt-2 text-sm text-gray-600">Create your account</p>
         </div>
         
@@ -173,6 +178,24 @@ const UserRegisterPage = () => {
             </button>
           </div>
         </form>
+
+        {/* Add OR separator */}
+        <div className="mt-6 flex items-center justify-center">
+          <div className="border-t border-gray-300 w-1/4"></div>
+          <span className="px-3 text-gray-600 text-sm">OR</span>
+          <div className="border-t border-gray-300 w-1/4"></div>
+        </div>
+
+        {/* Google Sign-In button */}
+        <div className="mt-4 flex items-center justify-center">
+          <button
+            onClick={handleGoogleSignIn}
+            className="group relative w-full flex justify-center py-3 px-4 border border-gray-200 bg-white/50 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
+          >
+            <img src={GoogleIcon} alt="Google" className="w-5 h-5 mr-2" />
+            Sign up with Google
+          </button>
+        </div>
       </div>
     </div>
   );

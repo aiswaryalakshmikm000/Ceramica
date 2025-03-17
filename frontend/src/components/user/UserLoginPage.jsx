@@ -37,12 +37,12 @@ const UserLoginPage = () => {
     <div 
       className="min-h-screen flex items-center justify-center bg-cover bg-center"
       style={{
-        backgroundImage: `url(${banner1})`, // Use the same banner as register page
+        backgroundImage: `url(${banner1})`,
       }}
     >
       <div className="max-w-md w-full space-y-8 p-8 bg-white/30 rounded-xl shadow-xl backdrop-blur-sm">
         <div className="text-center">
-          <h2 className="mt-6 text-4xl font-bold text-gray-900 tracking-tight">Ceramica</h2>
+          <h2 className="mt-6 text-4xl font-bold text-gray-900 tracking-tight">Login</h2>
           <p className="mt-2 text-sm text-gray-600">Sign in to your account</p>
         </div>
         
@@ -123,6 +123,13 @@ const UserLoginPage = () => {
             </button>
           </div>
         </form>
+
+        {/* Add OR separator */}
+        <div className="mt-6 flex items-center justify-center">
+          <div className="border-t border-gray-300 w-1/4"></div>
+          <span className="px-3 text-gray-600 text-sm">OR</span>
+          <div className="border-t border-gray-300 w-1/4"></div>
+        </div>
 
         <div className="mt-4 flex items-center justify-center">
           <button

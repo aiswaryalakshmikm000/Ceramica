@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const {OAuth2Client}= require('google-auth-library')
 
 //models
 const User = require("../../models/userModel");
@@ -7,10 +8,11 @@ const RefreshToken = require("../../models/refreshTokenModel");
 //utils
 const hashPassword = require("../../utils/hashPassword");
 const setCookie = require("../../utils/jwt/setCookie");
-const {
-  generateAccessToken,
-  generateRefreshToken,
-} = require("../../utils/jwt/generateToken");
+const { generateAccessToken, generateRefreshToken } = require("../../utils/jwt/generateToken");
+
+
+//create instance of OAuth
+const client =new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
 //signup function
 const register = async (req, res) => {
