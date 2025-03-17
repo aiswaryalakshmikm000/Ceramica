@@ -3,6 +3,9 @@ import { useRegisterMutation } from '../../features/auth/userApiSlice';
 import { Link, useNavigate } from 'react-router-dom';
 import banner1 from "../../assets/Banners/banner1.jpg";
 import GoogleIcon from "../../assets/google-icon.png";
+import { useEffect } from 'react';
+
+
 
 const UserRegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -64,6 +67,19 @@ const UserRegisterPage = () => {
     }
   };
 
+  useEffect(() => {
+    // Check if redirected back from Google with success parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const googleSuccess = urlParams.get('success');
+    const message = urlParams.get('message');
+  
+    if (googleSuccess === 'true') {
+      navigate('/login', { state: { message: message || 'Google registration successful! Please log in.' } });
+    } else if (googleSuccess === 'false' && message) {
+      setErrorMsg(message);
+    }
+  }, [navigate]);
+  
   const handleGoogleSignIn = () => {
     window.location.href = 'http://localhost:5000/api/auth/google';
   };

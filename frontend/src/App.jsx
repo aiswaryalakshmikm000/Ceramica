@@ -1,11 +1,12 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route,Navigate } from "react-router-dom";
 import UserRegister from "./pages/user/UserRegister.jsx";
-import UserLogin from "./components/user/UserLoginPage.jsx";
+import UserLogin from "./pages/user/UserLogin.jsx";
 import UserHome from "./pages/user/UserHome";
 import UserShop from "./pages/user/UserShop";
 import ScrollToTop from "./components/common/ScrollToTop";
 import NotFound from "./pages/NotFound";
 import UserViewProduct from "./pages/user/UserViewProduct";
+import AdminDashboard from "./components/admin/AdminDashboard.jsx";
 
 // import UserTokenRefresher from "./routes/UserTokenRefresher";
 // import AdminTokenRefresher from "./routes/AdminTokenRefresher";
@@ -40,7 +41,7 @@ function App() {
         {/* <Route path="user/home" element={<Home />} /> */}
 
         
-
+        
         <Route path="/admin/register" element={<AdminRegister />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/products/add" element={<AdminAddProductPage />} />
@@ -48,6 +49,7 @@ function App() {
         <Route path="/admin/products" element={<AdminShowProductsPage />} />
         <Route path="/admin/categories" element={<AdminCategoryManagement />} />
         <Route path="/admin/customers" element={<AdminShowCustomers />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
 
 
