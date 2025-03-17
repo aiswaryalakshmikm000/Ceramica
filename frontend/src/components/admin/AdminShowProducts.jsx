@@ -1,7 +1,7 @@
 // src/components/AdminShowProducts.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import { useShowProductsQuery, useUpdateProductStatusMutation } from '../../features/products/adminProductApiSlice';
-import { useGetCategoriesQuery } from '../../features/categories/categoryApiSlice';
+import { useGetCategoriesQuery } from '../../features/categories/AdminCategoryApiSlice';
 import { Link } from 'react-router-dom';
 import Breadcrumbs from '../common/BreadCrumbs';
 import Pagination from '../common/Pagination'; // Import the new Pagination component

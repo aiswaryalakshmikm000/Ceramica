@@ -1,7 +1,7 @@
 // src/features/categories/categoryApiSlice.js
 import { adminApi } from '../../services/api/adminApi';
 
-export const categoryApiSlice = adminApi.injectEndpoints({
+export const AdminCategoryApiSlice = adminApi.injectEndpoints({
   endpoints: (builder) => ({
     getCategories: builder.query({
       query: () => ({
@@ -57,4 +57,4 @@ export const {
   useUpdateCategoryMutation,
   useListCategoryMutation,
   useDeleteCategoryMutation,
-} = categoryApiSlice;
+} = AdminCategoryApiSlice;

@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  admin: null, // Holds admin data after login
+  admin: localStorage.getItem("AdminData") || null, // Holds admin data after login
   isAdminAuthenticated: false, // Admin authentication status flag
 };
 
@@ -10,12 +10,14 @@ const adminAuthSlice = createSlice({
   initialState,
   reducers: {
     setAdminCredentials: (state, action) => {
+      localStorage.setItem("AdminData",JSON.stringify(action.payload.admin))
       state.admin = action.payload.admin;
       state.isAdminAuthenticated = true;
     },
     logoutAdmin: (state) => {
       state.admin = null;
       state.isAdminAuthenticated = false;
+      localStorage.removeItem("AdminData")
     },
   },
 });

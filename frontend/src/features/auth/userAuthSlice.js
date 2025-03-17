@@ -2,7 +2,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  user: null,             // Holds user data after login
+  user: localStorage.getItem("UserData") ||  null,             // Holds user data after login
   isAuthenticated: false, // Authentication status flag
 };
 
@@ -14,11 +14,13 @@ const userAuthSlice = createSlice({
     setUserCredentials: (state, action) => {
       state.user = action.payload.user; 
       state.isAuthenticated = true;
+      localStorage.setItem("UserData",JSON.stringify(action.payload.user))
     },
     // Clears the user state when logging out.
     logoutUser: (state) => {
       state.user = null;
       state.isAuthenticated = false;
+      localStorage.removeItem("UserData")
     },
   },
 });

@@ -16,6 +16,8 @@ const {
 const register = async (req, res) => {
   const { name, email, phone, password } = req.body;
 
+  console.log(req.body)
+
   // Validate required fields
   if (!name || !email || !phone || !password) {
     return res.status(400).json({
@@ -65,6 +67,8 @@ const register = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
+
 
 //login function
 const login = async (req, res) => {
@@ -171,7 +175,6 @@ const login = async (req, res) => {
     });
   }
 };
-
 
 
 const logout = async (req, res) => {

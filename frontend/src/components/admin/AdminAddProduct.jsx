@@ -298,7 +298,7 @@
 // src/pages/admin/AdminAddProductPage.jsx
 import React from "react";
 import { useAddProductMutation } from "../../features/products/adminProductApiSlice";
-import { useGetCategoriesQuery } from "../../features/categories/categoryApiSlice";
+import { useGetCategoriesQuery } from "../../features/categories/AdminCategoryApiSlice";
 import { useNavigate } from "react-router-dom";
 import ProductForm from "../../components/admin/ProductForm"; // Adjust path as needed
 

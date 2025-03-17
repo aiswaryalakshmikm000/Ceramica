@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import UserRegister from "./components/user/UserRegister";
-import UserLogin from "./components/user/UserLogin";
+import UserRegister from "./pages/user/UserRegister.jsx";
+import UserLogin from "./components/user/UserLoginPage.jsx";
 import UserHome from "./pages/user/UserHome";
 import UserShop from "./pages/user/UserShop";
 import ScrollToTop from "./components/common/ScrollToTop";
@@ -17,8 +17,8 @@ import AdminRegister from "./components/admin/AdminRegister";
 import AdminAddProductPage from "./components/admin/AdminAddProduct";
 import AdminEditProductPage from "./components/admin/AdminEditProduct";
 import AdminShowProductsPage from "./components/admin/AdminShowProducts";
-import AdminShowCategoriesPage from "./components/admin/CategoryManagement";
-
+import AdminCategoryManagement from "./components/admin/AdminCategoryManagement.jsx"
+import AdminShowCustomers from "./components/admin/AdminShowCustomers.jsx";
 
 
 
@@ -46,7 +46,9 @@ function App() {
         <Route path="/admin/products/add" element={<AdminAddProductPage />} />
         <Route path="/admin/products/edit/:id" element={<AdminEditProductPage />} />
         <Route path="/admin/products" element={<AdminShowProductsPage />} />
-        <Route path="/admin/categories" element={<AdminShowCategoriesPage />} />
+        <Route path="/admin/categories" element={<AdminCategoryManagement />} />
+        <Route path="/admin/customers" element={<AdminShowCustomers />} />
+
 
 
 

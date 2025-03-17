@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { 
   useGetCategoriesQuery, 
   useAddCategoryMutation,
-  useUpdateCategoryMutation, // Add this
+  useUpdateCategoryMutation, 
   useListCategoryMutation 
-} from '../../features/categories/categoryApiSlice';
-import { setCategories, setLoading, setError } from '../../features/categories/categorySlice';
-import Breadcrumbs from '../../components/common/BreadCrumbs';
-import Pagination from '../../components/common/Pagination';
+} from '../../features/categories/AdminCategoryApiSlice';
+import { setCategories, setLoading, setError } from '../../features/categories/AdminCategorySlice';
+import Breadcrumbs from '../common/BreadCrumbs';
+import Pagination from '../common/Pagination';
 import { Pencil, ToggleLeft, ToggleRight, X } from 'lucide-react'; // Added X for close button
 import { Link } from 'react-router-dom';
 

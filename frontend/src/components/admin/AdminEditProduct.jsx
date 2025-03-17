@@ -452,7 +452,7 @@ import {
   setError,
 } from "../../features/products/adminProductSlice";
 import { useEditProductMutation, useShowProductQuery } from "../../features/products/adminProductApiSlice";
-import { useGetCategoriesQuery } from "../../features/categories/categoryApiSlice";
+import { useGetCategoriesQuery } from "../../features/categories/AdminCategoryApiSlice";
 import ProductForm from "../../components/admin/ProductForm";
 
 const AdminEditProductPage = () => {

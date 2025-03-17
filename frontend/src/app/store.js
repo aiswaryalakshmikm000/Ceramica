@@ -9,7 +9,10 @@ import { userApi } from "../services/api/userApi";
 import { adminApi } from "../services/api/adminApi";
 import { userProductApiSlice } from "../features/products/userProductApislice";
 import { adminProductApiSlice } from "../features/products/adminProductApiSlice";
-import categoryReducer from '../features/categories/categorySlice';
+import categoryReducer from '../features/categories/AdminCategorySlice';
+import { AdminCategoryApiSlice } from "../features/categories/AdminCategoryApiSlice";
+import { adminCustomerApiSlice } from "../features/customers/AdminCustomerApiSlice";
+import customerReducer from "../features/customers/AdminCustomerSlice"
 
 const store = configureStore({
   reducer: {
@@ -18,10 +21,13 @@ const store = configureStore({
     userProduct: userProductReducer,
     adminProduct: adminProductReducer,
     categories: categoryReducer,
+    customers: customerReducer,
     [userApi.reducerPath]: userApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
     [userProductApiSlice.reducerPath]: userProductApiSlice.reducer,
     [adminProductApiSlice.reducerPath]: adminProductApiSlice.reducer,
+    [AdminCategoryApiSlice.reducerPath]: AdminCategoryApiSlice.reducer,
+    [adminCustomerApiSlice.reducerPath]: adminCustomerApiSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(userApi.middleware, adminApi.middleware),

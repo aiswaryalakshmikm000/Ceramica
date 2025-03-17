@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const getCustomerDetails = async (req, res) => {
   try {
     const page = Number(req.query.page) || 1;
-    const limit = Math.max(1, Number(req.query.limit) || 10); //limit is never less than 1.
+    const limit = Math.max(1, Number(req.query.limit) || 10);
     const skip = limit * (page - 1);
     const term = req.query.term;
 
@@ -18,11 +18,11 @@ const getCustomerDetails = async (req, res) => {
       ];
     }
 
-    console.log("user", await User.findOne());
-
     const users = await User.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit);
-    const totalUsers = await User.countDocuments(query); // Use filtered count
+    const totalUsers = await User.countDocuments(query);
     console.log("Total users in DB:", totalUsers);
+    // Optional: Log the fetched users
+    console.log("Fetched users:", users);
 
     res.status(200).json({
       success: true,
