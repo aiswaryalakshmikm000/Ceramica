@@ -16,7 +16,11 @@ import AdminLogin from "./components/admin/AdminLogin"
 import AdminRegister from "./components/admin/AdminRegister";
 import AdminAddProductPage from "./components/admin/AdminAddProduct";
 import AdminEditProductPage from "./components/admin/AdminEditProduct";
-import AdminShowProductsPage from "./components/admin/AdminShowProducts"
+import AdminShowProductsPage from "./components/admin/AdminShowProducts";
+import AdminShowCategoriesPage from "./components/admin/CategoryManagement";
+
+
+
 
 function App() {
   return (
@@ -42,6 +46,7 @@ function App() {
         <Route path="/admin/products/add" element={<AdminAddProductPage />} />
         <Route path="/admin/products/edit/:id" element={<AdminEditProductPage />} />
         <Route path="/admin/products" element={<AdminShowProductsPage />} />
+        <Route path="/admin/categories" element={<AdminShowCategoriesPage />} />
 
 
 

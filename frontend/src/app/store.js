@@ -9,7 +9,7 @@ import { userApi } from "../services/api/userApi";
 import { adminApi } from "../services/api/adminApi";
 import { userProductApiSlice } from "../features/products/userProductApislice";
 import { adminProductApiSlice } from "../features/products/adminProductApiSlice";
-
+import categoryReducer from '../features/categories/categorySlice';
 
 const store = configureStore({
   reducer: {
@@ -17,6 +17,7 @@ const store = configureStore({
     adminAuth: adminAuthReducer,
     userProduct: userProductReducer,
     adminProduct: adminProductReducer,
+    categories: categoryReducer,
     [userApi.reducerPath]: userApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
     [userProductApiSlice.reducerPath]: userProductApiSlice.reducer,

@@ -4,29 +4,45 @@ import { adminApi } from '../../services/api/adminApi';
 export const categoryApiSlice = adminApi.injectEndpoints({
   endpoints: (builder) => ({
     getCategories: builder.query({
-      query: () => '/categories',
+      query: () => ({
+        url: '/categories',
+        method: 'GET'
+      }),
       providesTags: ['Category'],
     }),
-    // Admin endpoints
+    getCategory: builder.query({
+      query: (catId) => ({
+        url: `/categories/${catId}`,
+        method: 'GET'
+      }),
+      providesTags: (result, error, catId) => [{ type: 'Category', id: catId }],
+    }),
     addCategory: builder.mutation({
       query: (category) => ({
-        url: '/admin/categories',
+        url: '/categories',
         method: 'POST',
         body: category,
       }),
       invalidatesTags: ['Category'],
     }),
     updateCategory: builder.mutation({
-      query: ({ id, ...category }) => ({
-        url: `/admin/categories/${id}`,
+      query: ({ catId, ...category }) => ({
+        url: `/categories/${catId}`,
         method: 'PUT',
         body: category,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Category', id }],
+      invalidatesTags: ['Category'],
+    }),
+    listCategory: builder.mutation({
+      query: (categoryId) => ({
+        url: `/categories/list/${categoryId}`,
+        method: 'PATCH',
+      }),
+      invalidatesTags: ['Category'], // Changed to invalidate the generic 'Category' tag
     }),
     deleteCategory: builder.mutation({
-      query: (id) => ({
-        url: `/admin/categories/${id}`,
+      query: (catId) => ({
+        url: `/categories/${catId}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['Category'],
@@ -36,7 +52,9 @@ export const categoryApiSlice = adminApi.injectEndpoints({
 
 export const {
   useGetCategoriesQuery,
+  useGetCategoryQuery,
   useAddCategoryMutation,
   useUpdateCategoryMutation,
+  useListCategoryMutation,
   useDeleteCategoryMutation,
 } = categoryApiSlice;
