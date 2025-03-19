@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
+import Badge from '.././ui/Badge';
 
 const ProductGallery = ({ images, isNew, discount }) => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -82,6 +83,20 @@ const ProductGallery = ({ images, isNew, discount }) => {
             transform: zoomed ? 'scale(2)' : 'scale(1)', // Apply transform directly
           }}
         />
+
+        {/* Badges Container */}
+        <div className="absolute top-4 left-4 flex flex-col gap-2">
+          {isNew && (
+            <Badge variant="new" className="animate-fade-in">
+              NEW
+            </Badge>
+          )}
+          {discount > 0 && (
+            <Badge variant="discount" className="animate-fade-in">
+              {discount}% OFF
+            </Badge>
+          )}
+        </div>
         
         {/* Zoom Icon */}
         <div className="absolute bottom-4 right-4 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-md

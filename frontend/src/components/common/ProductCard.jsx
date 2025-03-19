@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Eye, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
+import Badge from "../ui/Badge";
 
 // Currency formatter for INR
 const formatter = new Intl.NumberFormat("en-IN", {
@@ -38,13 +39,13 @@ const ProductCard = ({ product }) => {
           loading="lazy"
         />
 
-        {/* Discount Badge */}
+        {/* Discount Badge using the reusable Badge component */}
         {product.discount > 0 && (
-          <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
+          <Badge variant="discount" className="absolute top-2 left-2">
             {product.discount}% OFF
-          </span>
+          </Badge>
         )}
-
+        
         {/* Success Message - Positioned above bottom of image */}
         {showSuccess && (
           <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 z-10 bg-orange-500/50 text-white px-1 py-1 rounded-md shadow-md transition-opacity duration-300 text-sm">

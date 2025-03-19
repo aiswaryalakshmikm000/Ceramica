@@ -121,7 +121,7 @@ import {
 import { useEditProductMutation, useShowProductQuery } from "../../features/products/adminProductApiSlice";
 import { useGetCategoriesQuery } from "../../features/categories/AdminCategoryApiSlice";
 import ProductForm from "../../components/admin/ProductForm";
-import Sidebar from "../../components/admin/SideBar"; // Import Sidebar (adjust path as needed)
+import Sidebar from "../../components/admin/SideBar"; 
 
 const AdminEditProductPage = () => {
   const { id } = useParams();
@@ -215,8 +215,9 @@ const AdminEditProductPage = () => {
     description: product.description || "",
     price: product.price || "",
     discount: product.discount || "0",
-    categoryId: product.categoryId || "", // Ensure this is a string matching a category _id
+    categoryId: product.categoryId || "", 
     tags: product.tags ? product.tags.join(", ") : "",
+    isFeatured: product.isFeatured || false,
     colors: product.colors.length > 0
       ? product.colors.map((color) => ({
           name: color.name,
@@ -226,7 +227,6 @@ const AdminEditProductPage = () => {
       : [{ name: "", stock: "", images: [] }],
   };
 
-  // Debugging: Log the initial categoryId and available categories
   console.log("Product categoryId:", product.categoryId);
   console.log("Available categories:", categories);
 

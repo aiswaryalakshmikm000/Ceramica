@@ -119,12 +119,12 @@ const ProductInfo = ({ product, onColorSelect, selectedColor }) => {
                 <button
                   className={`w-8 h-8 rounded-full border-2 transition-all relative ${
                     selectedColor === color.name
-                      ? 'border-blue-500 scale-110'
-                      : 'border-gray-300'
+                      ? 'border-red-500 scale-110'
+                      : 'border-white-300'
                   } ${color.stock === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-500'}`}
                   style={{ backgroundColor: color.name.toLowerCase() }}
                   onClick={() => handleColorSelect(color.name)}
-                  disabled={color.stock === 0}
+                  // disabled={color.stock === 0}
                   aria-label={`Select color: ${color.name}`}
                   title={color.stock === 0 ? `${color.name} - Out of stock` : color.name}
                 >

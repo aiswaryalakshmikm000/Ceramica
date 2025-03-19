@@ -39,7 +39,11 @@ if (isLoading) {
         <div className="flex flex-wrap justify-center -mx-2 px-8">
           {categories.map((category) => (
             <div key={category._id || category.id} className="w-1/2 md:w-1/4 px-2 mb-0">
-              <Link to={category.link || "/shop"} className="block category-item group">
+              <Link to={{
+                  pathname: "/shop",
+                  search: `?categoryId=${category._id}` // Pass category ID as query parameter
+                }} 
+                className="block category-item group">
                 <div className="relative aspect-[3/2] overflow-hidden rounded-lg">
                   <img
                     src={category.images}

@@ -83,7 +83,7 @@ const Footer = () => {
             <ul className="space-y-2">
               <li>
                 <Link
-                  to="/products/new-arrivals"
+                  to="/"
                   className="text-[#e0dedc] hover:text-[#a96446] transition-colors"
                 >
                   Home
@@ -91,7 +91,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/products/best-sellers"
+                  to="/shop"
                   className="text-[#e0dedc] hover:text-[#a96446] transition-colors"
                 >
                   Shop
@@ -99,7 +99,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/products/discounted"
+                  to="/about"
                   className="text-[#e0dedc] hover:text-[#a96446] transition-colors"
                 >
                   About Me
@@ -149,16 +149,16 @@ const Footer = () => {
                   className="text-[#a96446] flex-shrink-0 mt-1"
                 />
                 <span className="text-[#e0dedc]">
-                  123 Commerce St, Shopping City, SC 12345
+                  5th Avenue, Kochi, Ernakulam
                 </span>
               </li>
               <li className="flex items-center space-x-3">
                 <Phone size={20} className="text-[#a96446] flex-shrink-0" />
-                <span className="text-[#e0dedc]">(123) 456-7890</span>
+                <span className="text-[#e0dedc]">9249957098</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Mail size={20} className="text-[#a96446] flex-shrink-0" />
-                <span className="text-[#e0dedc]">support@shopease.com</span>
+                <span className="text-[#e0dedc]">support@ceramica.com</span>
               </li>
             </ul>
           </div>

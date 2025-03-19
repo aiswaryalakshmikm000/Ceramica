@@ -20,7 +20,6 @@ userRoute.post('/refreshToken',refreshUserToken)
 userRoute.get('/categories',showCategories)
 
 //products
-userRoute.get('/products/bestsellers',fetchBestProducts)
 userRoute.get('/products/featured',fetchFeaturedProducts)
 userRoute.get('/products',fetchProducts)
 userRoute.get('/products/:id',viewProduct)

@@ -36,7 +36,7 @@ const FeaturedProducts = () => {
     );
   }
 
-  const featuredProducts = response.featuredProducts || [];
+  const featuredProducts = response.filteredFeaturedProducts || [];
 
   return (
     <div className="py-16 md:py-12">

@@ -12,7 +12,7 @@ const addProduct = async (req, res) => {
   console.log("req.body", req.body)
   console.log("req.files", req.files)
 
-  const { name, description, price, discount, offerId, categoryId, tags, colors } = req.body;
+  const { name, description, price, discount, offerId, categoryId, tags, colors, isFeatured } = req.body;
 
   
   try {
@@ -75,6 +75,7 @@ const addProduct = async (req, res) => {
       categoryId,
       tags: tags ? JSON.parse(tags) : [],
       colors: colorsWithImages,
+      isFeatured: isFeatured === "true" || false,
     });
 
     await newProduct.save();
@@ -96,12 +97,10 @@ const showProducts = async (req, res) => {
 
     let filter = {};
 
-    // Search by name, description, or tags
+  
     if (search) {
       filter.$or = [
         { name: { $regex: new RegExp(search, "i") } },
-        { description: { $regex: new RegExp(search, "i") } },
-        { tags: { $regex: new RegExp(search, "i") } },
       ];
     }
 
@@ -225,7 +224,7 @@ const editProduct = async (req, res) => {
   console.log("Request body:", req.body);
   console.log("Request files:", req.files || "No files received");
 
-  let { name, description, price, discount, categoryId, tags, colors, updatedUrls, deletedImages } = req.body;
+  let { name, description, price, discount, categoryId, tags, colors, updatedUrls, deletedImages, isFeatured } = req.body;
   const files = req.files || {};
 
   try {
@@ -289,6 +288,7 @@ const editProduct = async (req, res) => {
       categoryId: categoryId || productExist.categoryId,
       tags: tags ? JSON.parse(tags) : productExist.tags,
       colors: colorsWithImages,
+      isFeatured: isFeatured !== undefined ? isFeatured === "true" : productExist.isFeatured,
     };
 
     Object.assign(productExist, updatedProduct);

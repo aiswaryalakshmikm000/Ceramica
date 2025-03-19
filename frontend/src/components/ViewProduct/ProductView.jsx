@@ -11,15 +11,18 @@ import { Loader2 } from 'lucide-react';
 
 const ProductView = () => {
   const { id } = useParams();
-  const { data, isLoading, error } = useViewProductQuery(id);
+  const { data, isLoading, error, refetch } = useViewProductQuery(id);
   const [selectedColor, setSelectedColor] = useState(null);
+  const [breadcrumbItems, setBreadcrumbItems] = useState([
+    { label: 'Home', href: '/' },
+    { label: 'Shop', href: '/shop' },
+  ]);
 
-  useEffect(() => {
-    console.log("ID from URL:", id);
-    console.log("Raw API Data:", JSON.stringify(data, null, 2));
-    console.log("Is Loading:", isLoading);
-    console.log("Error:", error ? JSON.stringify(error) : "No error");
-  }, [data, isLoading, error, id]);
+// Reset state and refetch when id changes
+useEffect(() => {
+  refetch(); // Explicitly refetch data when id changes
+  setSelectedColor(null); // Reset selectedColor
+}, [id, refetch]);
 
   useEffect(() => {
     if (data?.product) {
@@ -29,18 +32,13 @@ const ProductView = () => {
         { label: 'Shop', href: '/shop' },
         { label: data.product.name },
       ]);
-      document.title = `${data.product.name} | Shop Galleria`;
       // Set initial selected color if not already set
       if (data.product.colors.length > 0 && !selectedColor) {
         setSelectedColor(data.product.colors[0].name);
       }
     }
-  }, [data, selectedColor]); // Add selectedColor to dependency array to prevent re-setting
+  }, [data]); // Add selectedColor to dependency array to prevent re-setting
 
-  const [breadcrumbItems, setBreadcrumbItems] = useState([
-    { label: 'Home', href: '/' },
-    { label: 'Shop', href: '/shop' },
-  ]);
 
   if (isLoading) {
     return (

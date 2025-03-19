@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 
 const Badge = ({ 
   children, 
@@ -11,15 +10,11 @@ const Badge = ({
   const getVariantClasses = () => {
     switch (variant) {
       case "new":
-        return "bg-ceramic-accent text-white";
-      case "sale":
-        return "bg-ceramic-danger text-white";
-      case "outOfStock":
-        return "bg-ceramic-muted text-ceramic-dark";
+        return "bg-blue-500/80 text-white"; // Test with a standard color
       case "discount":
-        return "bg-ceramic-warning text-ceramic-dark";
+        return "bg-red-500/90 text-black"; // Test with a standard color
       default:
-        return "bg-ceramic-dark text-white";
+        return "bg-gray-800/70 text-white"; // Test with a standard color
     }
   };
 

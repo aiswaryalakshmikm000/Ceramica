@@ -2,9 +2,9 @@ import React from "react";
 import { useAddProductMutation } from "../../features/products/adminProductApiSlice";
 import { useGetCategoriesQuery } from "../../features/categories/AdminCategoryApiSlice";
 import { useNavigate } from "react-router-dom";
-import ProductForm from "../../components/admin/ProductForm"; // Adjust path as needed
-import Sidebar from "./SideBar"; // Adjust path as needed
-import Breadcrumbs from "../common/BreadCrumbs"; // Assuming you have this component
+import ProductForm from "../../components/admin/ProductForm"; 
+import Sidebar from "./SideBar"; 
+import Breadcrumbs from "../common/BreadCrumbs"; 
 
 const AdminAddProductPage = () => {
   const [addProduct, { isLoading, error }] = useAddProductMutation();
