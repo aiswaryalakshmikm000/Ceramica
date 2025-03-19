@@ -29,7 +29,7 @@ const AdminAddProductPage = () => {
 
   // Breadcrumbs for navigation
   const breadcrumbItems = [
-    { label: "Admin", href: "/admin" },
+    { label: "Admin" },
     { label: "Products", href: "/admin/products" },
     { label: "Add Product", href: "/admin/products/add" },
   ];

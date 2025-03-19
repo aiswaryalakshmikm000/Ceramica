@@ -68,6 +68,8 @@ const fetchProducts = async (req, res) => {
 
     // ✅ Filter by multiple categories (expects comma-separated categoryIds)
     if (categoryIds) {
+      console.log("categoryIds:" , categoryIds);
+      
       const categoriesArray = categoryIds.split(","); 
       filter.categoryId = { $in: categoriesArray };
     }

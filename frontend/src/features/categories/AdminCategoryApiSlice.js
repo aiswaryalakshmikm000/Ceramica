@@ -18,18 +18,18 @@ export const AdminCategoryApiSlice = adminApi.injectEndpoints({
       providesTags: (result, error, catId) => [{ type: 'Category', id: catId }],
     }),
     addCategory: builder.mutation({
-      query: (category) => ({
+      query: (formData) => ({
         url: '/categories',
         method: 'POST',
-        body: category,
+        body: formData,
       }),
       invalidatesTags: ['Category'],
     }),
     updateCategory: builder.mutation({
-      query: ({ catId, ...category }) => ({
+      query: ({ catId, formData }) => ({
         url: `/categories/${catId}`,
         method: 'PUT',
-        body: category,
+        body: formData,
       }),
       invalidatesTags: ['Category'],
     }),
@@ -38,7 +38,7 @@ export const AdminCategoryApiSlice = adminApi.injectEndpoints({
         url: `/categories/list/${categoryId}`,
         method: 'PATCH',
       }),
-      invalidatesTags: ['Category'], // Changed to invalidate the generic 'Category' tag
+      invalidatesTags: ['Category'],
     }),
     deleteCategory: builder.mutation({
       query: (catId) => ({

@@ -27,4 +27,4 @@ const cloudinaryDeleteImages = async (imageUrls) => {
     return Promise.all(deletePromises);
   };
   
-module.exports =cloudinaryDeleteImages
+module.exports = {cloudinaryDeleteImages}

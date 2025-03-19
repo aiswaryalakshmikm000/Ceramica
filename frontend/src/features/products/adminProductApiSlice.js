@@ -46,46 +46,16 @@ export const adminProductApiSlice = adminApi.injectEndpoints({
         "Product"
       ]
     }),
-    
-    // Edit product
     editProduct: builder.mutation({
       query: ({ _id, productData }) => {
-        // Handle FormData for image uploads
-        const formData = new FormData();
-        
-        // Add text fields
-        Object.keys(productData).forEach(key => {
-          if (key !== 'images' && key !== 'deletedImages' && key !== 'updatedUrls') {
-            formData.append(key, 
-              typeof productData[key] === 'object' ? 
-              JSON.stringify(productData[key]) : productData[key]);
-          }
-        });
-        
-        // Add deleted images array if exists
-        if (productData.deletedImages) {
-          formData.append('deletedImages', JSON.stringify(productData.deletedImages));
+        console.log("FormData being sent:", productData);
+        for (let [key, value] of productData.entries()) {
+          console.log(`FormData entry - ${key}:`, value instanceof File ? `[File: ${value.name}]` : value);
         }
-        
-        // Add updated URLs array if exists
-        if (productData.updatedUrls) {
-          formData.append('updatedUrls', JSON.stringify(productData.updatedUrls));
-        }
-        
-        // Add new image files
-        if (productData.images) {
-          productData.images.forEach(image => {
-            if (image instanceof File) { // Only append File objects
-              formData.append('images', image);
-            }
-          });
-        }
-        
         return {
           url: `/products/${_id}`,
           method: "PUT",
-          body: formData,
-          formData: true
+          body: productData, // Use the original FormData directly
         };
       },
       invalidatesTags: (result, error, { _id }) => [

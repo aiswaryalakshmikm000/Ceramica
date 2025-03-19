@@ -1,4 +1,6 @@
 const Category = require("../../models/categoryModel");
+const { cloudinaryImageUploadMethod } = require("../../utils/cloudinary/cloudinaryUpload");
+const {cloudinaryDeleteImages} = require("../../utils/cloudinary/deleteImages");
 const categoryValidationSchema = require("../../utils/validation/categoryValidation");
 
 const mongoose = require("mongoose");
@@ -26,45 +28,45 @@ const showCategories = async (req, res) => {
     }
   };
   
-
+  
 const addCategory = async (req, res) => {
-  const { name, description } = req.body;
   try {
+    const { name, description } = req.body;
+    const file = req.file;
 
     if (!name || !description) {
-        return res.status(400).json({ success: false, message: "All fields are required" });
+      return res.status(400).json({ success: false, message: "Name and description are required" });
     }
 
-    //check if category exist
-    const { error } = categoryValidationSchema.validate(req.body);
-    if (error) {
-      console.log("error in category req body", error);
-
-      return res.status(400).json({
-        success: false,
-        message: "validation error",
-        errors: error.details.map((details) => details.message),
-      });
-    }
     const categoryExist = await Category.findOne({
       name: { $regex: new RegExp(`^${name}$`, "i") },
     });
     if (categoryExist) {
-      return res
-        .status(409)
-        .json({ success: false, message: "Category already exist!" });
+      return res.status(409).json({ success: false, message: "Category already exists!" });
     }
+
+    let imageUrl = "";
+    if (file) {
+      imageUrl = await cloudinaryImageUploadMethod(file.buffer);
+    }
+
     const newCategory = await Category.create({
       name,
       description,
+      images: imageUrl || "",
     });
-    console.log("Category added");
-    res.status(200).json({ success: true, message: "Category added successfully", category: newCategory });
+
+    res.status(200).json({
+      success: true,
+      message: "Category added successfully",
+      category: newCategory,
+    });
   } catch (error) {
     console.log("error in adding category", error.message);
-    res
-      .status(error?.status || 500)
-      .json({ message: error.message || "Something went wrong" });
+    res.status(500).json({
+      success: false,
+      message: error.message || "Something went wrong",
+    });
   }
 };
 
@@ -100,63 +102,51 @@ const listCategory = async (req, res) => {
   }
 };
 
+
 const editCategory = async (req, res) => {
   try {
     const { catId } = req.params;
-    const data = req.body; //updated category information
-    const { name } = req.body;
+    const { name, description } = req.body;
+    const file = req.file;
 
+    console.log("id:", req.params.catId)
 
-    // Validate MongoDB ObjectId
-    if (!mongoose.Types.ObjectId.isValid(catId)) {
-        return res.status(400).json({ success: false, message: "Invalid category ID" });
-    }
-    
-    // Validate input data
-    const { error } = categoryValidationSchema.validate(req.body);
-    if (error) {
-      console.log("Error in category req body", error);
-
-      return res.status(400).json({
-        success: false,
-        message: "Validation error",
-        errors: error.details.map((detail) => detail.message),
-      });
+    const category = await Category.findById(catId);
+    if (!category) {
+      return res.status(404).json({ success: false, message: "Category not found" });
     }
 
-     // Check if category exists before updating
-     const existingCategory = await Category.findById(catId);
-     if (!existingCategory) {
-       return res
-         .status(404)
-         .json({ success: false, message: "Category not found!" });
-     }
 
-    // Check if category name already exists (excluding the current category)
-    const categoryExist = await Category.findOne({
-      name: { $regex: new RegExp(`^${name}$`, "i") },
+    let imageUrl = category.images;
+    if (file) {
+      // Delete old image if it exists
+      if (category.images) {
+        await cloudinaryDeleteImages([category.images]);
+      }
+      imageUrl = await cloudinaryImageUploadMethod(file.buffer);
+    }
+
+    const updatedCategory = await Category.findByIdAndUpdate(
+      catId,
+      {
+        name,
+        description,
+        images: imageUrl,
+      },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Category updated successfully",
+      category: updatedCategory,
     });
-    if (categoryExist && categoryExist._id != catId) {
-      return res
-        .status(409)
-        .json({ success: false, message: "Category already exist!" });
-    }
-
-    // Update category
-    const updatedData = await Category.findByIdAndUpdate(catId, data, {  //finf by id and updates with data
-      new: true,  //true ensures the response contains the updated document.
-    });
-
-    // Handle case where category is not found
-    if (updatedData) {
-      res
-        .status(200)
-        .json({ success: true, message: "Category updated successfully", updatedData });
-    }
   } catch (error) {
-    res
-      .status(error?.status || 500)
-      .json({ message: error.message || "Something went wrong" });
+    console.log("error in editing category", error.message);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Something went wrong",
+    });
   }
 };
 

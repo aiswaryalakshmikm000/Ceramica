@@ -85,7 +85,7 @@ const AdminShowProducts = () => {
   if (categoriesError) return <div>Error: {categoriesError.message}</div>;
 
   const breadcrumbItems = [
-    { label: 'Admin', href: '/admin' },
+    { label: 'Admin' },
     { label: 'Products', href: '/admin/products' }
   ];
 

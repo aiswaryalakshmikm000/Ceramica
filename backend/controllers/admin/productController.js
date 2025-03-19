@@ -6,8 +6,6 @@ const mongoose = require("mongoose");
 const { cloudinaryImageUploadMethod } = require("../../utils/cloudinary/cloudinaryUpload");
 const cloudinaryDeleteImages = require('../../utils/cloudinary/deleteImages')
 
-
-
 // Add product function
 const addProduct = async (req, res) => {
 
@@ -135,6 +133,7 @@ const showProducts = async (req, res) => {
     const totalProducts = await Product.countDocuments(filter);
     const products = await Product.find(filter)
       .populate("categoryId", "name")
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limitNum);
 
@@ -220,77 +219,88 @@ const showProduct = async (req, res) => {
   }
 };
 
+
 const editProduct = async (req, res) => {
   const { _id } = req.params;
-  let { name, categoryId, updatedUrls, deletedImages } = req.body;
+  console.log("Request body:", req.body);
+  console.log("Request files:", req.files || "No files received");
 
-  const files = req.files || [];
-  const updatedProduct = req.body;
-
-  console.log(`Editing product with _id: ${_id}`);
+  let { name, description, price, discount, categoryId, tags, colors, updatedUrls, deletedImages } = req.body;
+  const files = req.files || {};
 
   try {
-    // Check if _id is valid
     if (!mongoose.Types.ObjectId.isValid(_id)) {
       return res.status(400).json({ error: "Invalid product ID" });
     }
 
-    // Parse JSON fields from FormData
-    deletedImages = deletedImages ? JSON.parse(deletedImages) : [];
-    updatedUrls = updatedUrls ? JSON.parse(updatedUrls) : [];
-
-    // Find the product
     const productExist = await Product.findOne({ _id });
     if (!productExist) {
       return res.status(404).json({ error: "Product not found" });
     }
-    console.log("exist", productExist);
 
-    // Check for duplicate product name
     const productWithSameName = await Product.findOne({
-      _id: { $ne: new mongoose.Types.ObjectId(_id) },
-      name
+      _id: { $ne: _id },
+      name: { $regex: new RegExp(`^${name}$`, "i") },
+    });
+    if (productWithSameName) {
+      return res.status(400).json({ message: "Product with same name already exists" });
+    }
+
+    // Parse incoming data
+    const parsedColors = colors ? JSON.parse(colors) : productExist.colors;
+    updatedUrls = updatedUrls ? JSON.parse(updatedUrls) : [];
+    deletedImages = deletedImages ? JSON.parse(deletedImages) : [];
+
+    // Handle new image uploads per color variant
+    const imageUploads = {};
+    for (let fieldName in files) {
+      const uploadedFiles = files[fieldName];
+      const imageUrls = await Promise.all(
+        uploadedFiles.map(file => cloudinaryImageUploadMethod(file.buffer))
+      );
+      imageUploads[fieldName] = imageUrls;
+    }
+
+    // Update colors with images
+    const colorsWithImages = parsedColors.map((color, index) => {
+      const existingColor = productExist.colors.find(c => c.name === color.name) || {};
+      const fieldName = `color${index}Images`;
+      const newImages = imageUploads[fieldName] || []; // New images for this variant
+      const existingImages = existingColor.images || [];
+
+      // Filter out deleted images and retain only those in updatedUrls for this variant
+      const retainedImages = existingImages.filter(img => 
+        !deletedImages.includes(img) && (updatedUrls.includes(img) || newImages.includes(img))
+      );
+
+      return {
+        name: color.name,
+        stock: Number(color.stock),
+        images: [...retainedImages, ...newImages],
+      };
     });
 
-    if (productWithSameName) {
-      return res.status(400).json({
-        message: "Product with same name already exists.",
-        productWithSameName
-      });
-    }
+    // Update product fields
+    const updatedProduct = {
+      name: name || productExist.name,
+      description: description || productExist.description,
+      price: price ? Number(price) : productExist.price,
+      discount: discount ? Number(discount) : productExist.discount,
+      categoryId: categoryId || productExist.categoryId,
+      tags: tags ? JSON.parse(tags) : productExist.tags,
+      colors: colorsWithImages,
+    };
 
-    // Delete previous images
-    if (deletedImages.length > 0) {
-      try {
-        const deleteResults = await cloudinaryDeleteImages(deletedImages);
-        console.log("del", deleteResults);
-      } catch (error) {
-        console.log("Error deleting images:", error);
-      }
-    }
-
-    // Handle new image uploads
-    const imageUrls = [];
-    for (let file of files) {
-      const imageUrl = await cloudinaryImageUploadMethod(file.buffer);
-      imageUrls.push(imageUrl);
-    }
-
-    // Merge new images with existing ones
-    updatedProduct.images = [...(updatedUrls || []), ...imageUrls];
-
-    // Update the product
     Object.assign(productExist, updatedProduct);
     const editedProduct = await productExist.save();
 
     console.log("Updated product successfully:", editedProduct);
     res.status(200).json({ message: "Product edited successfully", product: editedProduct });
-
   } catch (error) {
     console.error("Error editing product:", error.message);
     res.status(500).json({
       message: "Something went wrong while editing the product.",
-      error: error.message
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };

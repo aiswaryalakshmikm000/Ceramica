@@ -11,6 +11,10 @@ const categorySchema = new mongoose.Schema(
       type: String,
       required: [true, "Category description is required"],
     },
+    images: {
+      type: String,
+      required: true
+    },
     isListed: {
       type: Boolean,
       default: true, // Determines whether the category is visible to users

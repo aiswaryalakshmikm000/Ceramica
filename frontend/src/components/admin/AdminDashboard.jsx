@@ -21,7 +21,7 @@ const AdminDashboard = () => {
 
   // Breadcrumbs logic based on current route
   const breadcrumbItems = [
-    { label: 'Admin', href: '/admin' },
+    { label: 'Admin' },
     { label: 'Dashboard', href: '/admin/dashboard' },
   ];
 
