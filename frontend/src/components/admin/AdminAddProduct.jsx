@@ -1,13 +1,16 @@
+
 import React from "react";
 import { useAddProductMutation } from "../../features/products/adminProductApiSlice";
 import { useGetCategoriesQuery } from "../../features/categories/AdminCategoryApiSlice";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import ProductForm from "../../components/admin/ProductForm"; 
 import Sidebar from "./SideBar"; 
 import Breadcrumbs from "../common/BreadCrumbs"; 
 
 const AdminAddProductPage = () => {
-  const [addProduct, { isLoading, error }] = useAddProductMutation();
+  const [addProduct, { isLoading }] = useAddProductMutation();
   const { data, isLoading: categoriesLoading, error: categoriesError } = useGetCategoriesQuery();
   const navigate = useNavigate();
 
@@ -16,18 +19,35 @@ const AdminAddProductPage = () => {
   const handleSubmit = async (productData) => {
     try {
       const response = await addProduct(productData).unwrap();
-      console.log("Product added successfully:", response);
-      const productId = response._id || response.id;
-      navigate(productId ? `/admin/products/${productId}` : "/admin/products");
+      const productId = response.product?._id || response.id;
+      toast.success(response.message); // "Product added successfully"
+      navigate("/admin/products");
     } catch (err) {
       console.error("RTK Query error:", err);
+      const errorMessage = err?.data?.message || "Something went wrong while adding the product.";
+      toast.error(errorMessage); // Uses exact backend messages
     }
   };
 
-  if (categoriesLoading) return <div className="flex h-screen bg-gray-100"><Sidebar /><main className="flex-1 p-8">Loading categories...</main></div>;
-  if (categoriesError) return <div className="flex h-screen bg-gray-100"><Sidebar /><main className="flex-1 p-8">Error loading categories: {categoriesError.message}</main></div>;
+  if (categoriesLoading)
+    return (
+      <div className="flex h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-8">Loading categories...</main>
+      </div>
+    );
+    
+  if (categoriesError) {
+    const errorMessage = `Error loading categories: ${categoriesError.message}`;
+    toast.error(errorMessage);
+    return (
+      <div className="flex h-screen bg-gray-100">
+        <Sidebar />
+        <main className="flex-1 p-8">{errorMessage}</main>
+      </div>
+    );
+  }
 
-  // Breadcrumbs for navigation
   const breadcrumbItems = [
     { label: "Admin" },
     { label: "Products", href: "/admin/products" },
@@ -36,20 +56,13 @@ const AdminAddProductPage = () => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
       <Sidebar />
-
-      {/* Main Content */}
       <main className="flex-1 p-8 overflow-y-auto">
-        {/* Breadcrumbs */}
         <Breadcrumbs items={breadcrumbItems} />
-
-        {/* Product Form */}
         <ProductForm
           categories={categories}
           onSubmit={handleSubmit}
           isLoading={isLoading}
-          error={error}
         />
       </main>
     </div>

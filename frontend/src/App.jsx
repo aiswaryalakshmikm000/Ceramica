@@ -1,4 +1,8 @@
 import { BrowserRouter as Router, Routes, Route,Navigate } from "react-router-dom";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
 import UserRegister from "./pages/user/UserRegister.jsx";
 import UserLogin from "./pages/user/UserLogin.jsx";
 import UserHome from "./pages/user/UserHome";
@@ -6,7 +10,7 @@ import UserShop from "./pages/user/UserShop";
 import ScrollToTop from "./components/common/ScrollToTop";
 import NotFound from "./pages/NotFound";
 import UserViewProduct from "./pages/user/UserViewProduct";
-import AdminDashboard from "./components/admin/AdminDashboard.jsx";
+
 
 // import UserTokenRefresher from "./routes/UserTokenRefresher";
 // import AdminTokenRefresher from "./routes/AdminTokenRefresher";
@@ -20,12 +24,25 @@ import AdminEditProductPage from "./components/admin/AdminEditProduct";
 import AdminShowProductsPage from "./components/admin/AdminShowProducts";
 import AdminCategoryManagement from "./components/admin/AdminCategoryManagement.jsx"
 import AdminShowCustomers from "./components/admin/AdminShowCustomers.jsx";
+import AdminDashboard from "./components/admin/AdminDashboard.jsx";
 
 
 
 function App() {
   return (
     <Router>
+      <ToastContainer
+        position="top-left"
+        autoClose={1500}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
       {/* Ensure Token Refreshers are always active */}
       {/* <UserTokenRefresher />
       <AdminTokenRefresher /> */}

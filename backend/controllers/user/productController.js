@@ -58,10 +58,9 @@ const viewProduct = async (req, res) => {
   }
 };
 
-
 const fetchProducts = async (req, res) => {
   try {
-    let { search, categoryId, minPrice, maxPrice, colors, sort, page = 1, limit, reset, } = req.query;
+    let { search, categoryId, minPrice, maxPrice, colors, sort, page = 1, limit, reset } = req.query;
 
     if (reset === "true") {
       search = categoryId = minPrice = maxPrice = sort = null;
@@ -77,8 +76,16 @@ const fetchProducts = async (req, res) => {
       ];
     }
 
+    // Convert categoryId to ObjectId if provided
     if (categoryId) {
-      filter.categoryId = categoryId;
+      try {
+        filter.categoryId = new mongoose.Types.ObjectId(categoryId);
+      } catch (err) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid categoryId format",
+        });
+      }
     }
 
     if (minPrice || maxPrice) {
@@ -88,7 +95,7 @@ const fetchProducts = async (req, res) => {
     }
 
     if (colors) {
-      const colorArray = colors.split(',').map(color => color.trim());
+      const colorArray = colors.split(",").map((color) => color.trim());
       filter["colors.name"] = { $in: colorArray };
     }
 
@@ -111,16 +118,16 @@ const fetchProducts = async (req, res) => {
 
     // Aggregation pipeline to count and fetch products
     const aggregatePipeline = [
-      { $match: { ...filter, categoryId: { $exists: true, $ne: null } } },
+      { $match: filter }, // Use the filter object directly
       {
         $lookup: {
-          from: "categories", // Adjust to your actual collection name
+          from: "categories",
           localField: "categoryId",
           foreignField: "_id",
           as: "category",
         },
       },
-      { $unwind: "$category" }, // Flatten the category array
+      { $unwind: "$category" },
       { $match: { "category.isListed": true } }, // Only listed categories
     ];
 
@@ -138,9 +145,17 @@ const fetchProducts = async (req, res) => {
       { $skip: skip },
       { $limit: limit },
       {
-        $project: { name: 1, price: 1, discount: 1, discountedPrice: 1, colors: 1, 
-          totalStock: 1, categoryId: "$category._id", categoryName: "$category.name", 
-          categoryIsListed: "$category.isListed", isFeatured: 1,
+        $project: {
+          name: 1,
+          price: 1,
+          discount: 1,
+          discountedPrice: 1,
+          colors: 1,
+          totalStock: 1,
+          categoryId: "$category._id",
+          categoryName: "$category.name",
+          categoryIsListed: "$category.isListed",
+          isFeatured: 1,
         },
       },
     ]);
@@ -163,6 +178,37 @@ const fetchProducts = async (req, res) => {
   }
 };
 
+
+const fetchBestProducts = async (req, res) => {
+  try {
+    const { limit = 10 } = req.query; // Default to 10 best products
+
+    // ✅ Define sorting criteria for best products
+    const sortOptions = {
+      isFeatured: -1, // Show featured products first
+      avgRating: -1, // Highest-rated products
+      totalStock: -1, // Most popular based on stock availability
+      createdAt: -1, // New arrivals as fallback
+    };
+
+    // ✅ Fetch best products (only listed products)
+    const bestProducts = await Product.find({ isListed: true })
+      .sort(sortOptions)
+      .limit(parseInt(limit))
+      .populate("categoryId", "name"); // Populate category name
+
+    res.status(200).json({
+      success: true,
+      bestProducts,
+    });
+  } catch (error) {
+    console.error("Error fetching best products:", error);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong while fetching best products.",
+    });
+  }
+};
 
 const fetchFeaturedProducts = async (req, res) => {
   try {

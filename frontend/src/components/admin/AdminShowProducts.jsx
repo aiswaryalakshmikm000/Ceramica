@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useShowProductsQuery, useUpdateProductStatusMutation } from '../../features/products/adminProductApiSlice';
 import { useGetCategoriesQuery } from '../../features/categories/AdminCategoryApiSlice';
@@ -5,7 +6,9 @@ import { Link } from 'react-router-dom';
 import Breadcrumbs from '../common/BreadCrumbs';
 import Pagination from '../common/Pagination';
 import { ChevronDown, ChevronRight, Check } from 'lucide-react';
-import Sidebar from './SideBar'; 
+import Sidebar from './SideBar';
+import { toast } from 'react-toastify'; // Import toast
+import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
 
 const AdminShowProducts = () => {
   const [filter, setFilter] = useState({
@@ -59,13 +62,15 @@ const AdminShowProducts = () => {
     });
     setPage(1);
     setOpenSubMenu(null);
+    toast.info("Filters reset successfully");
   };
 
   const toggleProductStatus = async (productId, currentStatus) => {
     try {
-      await updateProductStatus(productId).unwrap();
+      const response = await updateProductStatus(productId).unwrap();
+      toast.success(response.message || `Product ${currentStatus ? 'unlisted' : 'listed'} successfully`);
     } catch (err) {
-      console.error('Failed to update product status:', err);
+      toast.error(err?.data?.message || 'Failed to update product status');
     }
   };
 
@@ -80,9 +85,17 @@ const AdminShowProducts = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  if (productsLoading || categoriesLoading) return <div>Loading...</div>;
-  if (productsError) return <div>Error: {productsError.message}</div>;
-  if (categoriesError) return <div>Error: {categoriesError.message}</div>;
+  if (productsLoading || categoriesLoading) return <div className="text-center py-10">Loading...</div>;
+
+  if (productsError) {
+    toast.error(productsError?.data?.message || "Failed to load products");
+    return <div className="text-center py-10 text-red-500">Error: {productsError?.data?.message || productsError.message}</div>;
+  }
+
+  if (categoriesError) {
+    toast.error(categoriesError?.data?.message || "Failed to load categories");
+    return <div className="text-center py-10 text-red-500">Error: {categoriesError?.data?.message || categoriesError.message}</div>;
+  }
 
   const breadcrumbItems = [
     { label: 'Admin' },
