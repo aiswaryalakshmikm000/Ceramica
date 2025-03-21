@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [false],
+      required: false,
     },
     phone: {
       type: String,
@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      default: "user", // Default role for regular users
+      default: "user", 
     },
     googleId: {
       type: String,

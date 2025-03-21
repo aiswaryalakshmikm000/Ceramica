@@ -10,6 +10,7 @@ import UserShop from "./pages/user/UserShop";
 import ScrollToTop from "./components/common/ScrollToTop";
 import NotFound from "./pages/NotFound";
 import UserViewProduct from "./pages/user/UserViewProduct";
+import UserForgetPassword from "./pages/user/UserForgetPasswrod.jsx";
 
 
 // import UserTokenRefresher from "./routes/UserTokenRefresher";
@@ -33,7 +34,7 @@ function App() {
     <Router>
       <ToastContainer
         position="top-left"
-        autoClose={1500}
+        autoClose={5000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
@@ -55,8 +56,7 @@ function App() {
         <Route path="/login" element={<UserLogin />} />
         <Route path="/shop" element={<UserShop />} />
          <Route path="/shop/:id" element={<UserViewProduct />} />
-        {/* <Route path="user/home" element={<Home />} /> */}
-
+         <Route path="/forgot-password" element={<UserForgetPassword />} />
         
         
         <Route path="/admin/register" element={<AdminRegister />} />

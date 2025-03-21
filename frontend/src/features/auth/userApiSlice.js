@@ -23,7 +23,63 @@ export const userApiSlice = userApi.injectEndpoints({
         method: "POST",
       }),
     }),
+    
+    sendOTP: builder.mutation({
+      query: (data) => ({
+        url: "/send-otp",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    verifyOTP: builder.mutation({
+      query: (data) => ({
+        url: "/verify-otp",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
+    forgetPassword: builder.mutation({
+      query: (data) => ({
+        url: "/forget-password",
+        method: "POST",
+        body: data, // { email }
+      }),
+    }),
+    resendOTP: builder.mutation({
+      query: (data) => ({
+        url: "/resend-otp",
+        method: "POST",
+        body: data, // { email }
+      }),
+    }),
+    verifyResetOTP: builder.mutation({
+      query: (data) => ({
+        url: "/reset/verify-otp",
+        method: "POST",
+        body: data, // { email, otp }
+      }),
+    }),
+  
+    resetPassword: builder.mutation({
+      query: (data) => ({
+        url: "/reset-password",
+        method: "POST",
+        body: data, // { email, password }
+      }),
+    }),
   }),
 });
 
-export const { useRegisterMutation, useLoginMutation, useLogoutMutation } = userApiSlice;
+
+export const {
+  useRegisterMutation,
+  useLoginMutation,
+  useLogoutMutation,
+  useSendOTPMutation,
+  useVerifyOTPMutation,
+  useForgetPasswordMutation, 
+  useVerifyResetOTPMutation, 
+  useResendOTPMutation,      
+  useResetPasswordMutation,  
+} = userApiSlice;

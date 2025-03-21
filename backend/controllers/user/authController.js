@@ -1,21 +1,26 @@
 const bcrypt = require("bcrypt");
 const {OAuth2Client}= require('google-auth-library')
+const validator = require("validator");
 
 //models
 const User = require("../../models/userModel");
 const RefreshToken = require("../../models/refreshTokenModel");
+const OTP = require("../../models/otpModel");
 
 //utils
 const hashPassword = require("../../utils/hashPassword");
 const setCookie = require("../../utils/jwt/setCookie");
 const { generateAccessToken, generateRefreshToken } = require("../../utils/jwt/generateToken");
-
+const generateOTP = require("../../utils/otp/generateOTP");
+const sendVerificationEmail = require("../../utils/nodemailer/sendVarificationEmail");
+const sendResetPasswordMail = require("../../utils/nodemailer/forgetPassword");
 
 //create instance of OAuth
 const client =new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
 //signup function
 const register = async (req, res) => {
+  console.log("111111111111111111111111111")
   const { name, email, phone, password } = req.body;
 
   console.log(req.body)
@@ -33,14 +38,14 @@ const register = async (req, res) => {
     const existingUser = await User.findOne({
       $or: [{ email }, { phone }],
     });
-
+    console.log("222222222222222222222222222222222222")
     if (existingUser) {
       return res.status(409).json({
         success: false,
         message: "Email or phone number already exists",
       });
     }
-
+    console.log("33333333333333333333333333333")
     // Hash password before saving
     const securePassword = await hashPassword(password);
 
@@ -270,10 +275,203 @@ const refreshUserToken = async (req, res) => {
 };
 
 
+//generate-otp
+const sendOTP = async (req, res) => {
+
+  console.log('####################SENTOTP#######################')
+  const { email } = req.body;
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ message: "Invalid email address" });
+  }
+  try {
+    // const isUserExist = await User.findOne({ email });
+    // if (isUserExist) {
+    //   return res.status(409).json({ message: "user already exist" });
+    // }
+    const otp = generateOTP();
+    console.log("Generated OTP:", otp);
+
+    const otpEntry = await OTP.create({
+      email,
+      otp,
+    });
+    console.log("otp saved in db", otpEntry);
+
+    await sendVerificationEmail(email, otp);
+    console.log("otp sent successfully")
+    res.json({ success: true, message: "OTP sent to email successfully" });
+  } catch (error) {
+    console.log("Error in sendOTP:", error.message);
+    res.status(error.status||500).json({success:false,message:"Internal server error."})
+  }
+};
+
+
+const verifyOTP = async (req, res) => {
+  console.log('#####################VARIFYOTP######################')
+  const { otp, email } = req.body;
+  try {
+    const otpData = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1);
+    console.log("otp query", otpData);
+    //verifying otp
+    if (!otpData.length || otp !== otpData[0].otp) {
+      const errorMessage = otpData.length ? "OTP is not valid" : "OTP expired";
+      return res.status(400).json({ success: false, message: errorMessage });
+    }
+    const user = await User.findOne({ email }).select("-password");
+    console.log("user", user);
+
+    res
+      .status(200)
+      .json({ success: true, message: "OTP verified successfully. redirecting to the login page.", user });
+    console.log("otp verified");
+  } catch (error) {
+    console.log("error in otp verification", error.message);
+  }
+};
+
+
+const forgetPassword=async(req,res)=>{
+  console.log('#####################FORGETPASSWORD######################')
+  const {email}=req.body
+  if(!validator.isEmail(email)){
+    return res.status(400).json({message:"Invalid email address."})
+  }
+  try {
+    if(!email){
+      return res.status(400).json({success:false,error:"Invalid credentials"})
+    }
+    //find user exist
+   const user= await User.findOne({email})
+   if(!user){
+    return res.status(404).json({success:false, message:'User doesnot exist'})
+   }
+   const otp=generateOTP();
+  //generate otp
+  await OTP.create({
+    email,
+    otp
+   })
+    //send mail with to email
+    sendResetPasswordMail(email,otp)
+    console.log("forget password otp sent successfully")
+    res.status(201).json({ success: true, message: "OTP sent to email successfully" });
+  } catch (error) {
+    res.status(error.status||500).json({message:"Internal server error."})
+  }
+}
+
+const verifyResetOtp=async(req,res)=>{
+  console.log('#####################VARIFYRESETOTP######################')
+  const {email,otp}=req.body;
+  console.log("verifying otp",otp);
+  try {
+    //check otp with email and otp and newest otp
+   const otpData= await OTP.findOne({  email}).sort({createdAt:-1}).limit(1)
+   console.log("otpdata",otpData);
+   
+   if(otp!=otpData.otp || !otpData?.otp.length){
+    const errorMessage=!otpData?.otp.length?"OTP Expired.":"OTP is not valid."
+  return res.status(400).json({message:errorMessage})
+  }
+  res.status(200).json({success:true,message:"OTP verfied successfully."})
+  } catch (error) {
+    const errorMessage=error.message||"OTP Verification failed."
+    res.status(error.status||500).json({success:false,message:errorMessage})
+  }
+}
+
+const resetPassword=async(req,res)=>{
+  console.log('#####################RESETPASSWORD######################')
+  const{email,password}=req.body;
+  if(!email.trim()||!password.trim()||password.length<6){
+    return res.status(400).json({success:false,message:"Invalid credentials"})
+  }
+  try {
+   const user=await User.findOne({email})
+   if(!user){
+    return res.status(404).json({message:"User doesnt exist."})
+   }
+
+   const isSamePassword=await bcrypt.compare(password, user.password)
+   if(isSamePassword){
+    return res.status(400).json({
+      success: false,
+      message: "You cannot reuse your old password."
+    })
+   }
+   const securePassword=await hashPassword(password)
+   user.password=securePassword;
+   await user.save()
+   res.status(200).json({success:true,message:'Password updated successfully'})
+  } catch (error) {
+    console.log("error resdetting password",error);
+    res.status(error.status||500).json({success:false,message:"Password resetting failed."})
+  }
+}
+
+
+
+
+const verifyPassword=async(req,res)=>{
+  console.log("verifiying password");
+  const{userId}=req.params
+  const{currentPassword}=req.body;
+try {
+  if(!userId || !currentPassword){
+    return res.status(400).json({success:false, message:"Invalid credentials"})
+  }
+ const user= await User.findById(userId)
+ if(!user){
+  return res.status(404).json({success:false, message:"User not found."})
+ }
+ const isPasswordCorrect=await bcrypt.compare(currentPassword,user.password)
+ if(!isPasswordCorrect){
+  return res.status(400).json({success:false, message:"Incorrect Password"})
+ }
+ console.log("verified successfully");
+ 
+res.status(200).json({success:true, message:"Password verified."})
+} catch (error) {
+  console.log("error verifying password",error);
+  res.status(error.status||500).json({success:false, message:'Password verification failed.'})
+}
+}
+
+const changePassword=async(req,res)=>{
+  console.log("changing");
+  const {userId}=req.params
+  const {currentPassword,newPassword}=req.body;
+  if(!newPassword.trim()||newPassword.length<6||!userId){
+    return res.status(400).json({success:false,message:"Invalid credentials"})
+  }
+if(currentPassword===newPassword){
+  return res.status(400).json({success:false, message:"New password cannot be the old password."})
+}
+  try {
+    const user=await User.findById(userId)
+    if(!user){
+      return res.status(404).json({success:false, message:"User not found"})
+    }
+    const securePassword= await hashPassword(newPassword)
+    await User.findOneAndUpdate({_id:userId},{$set:{password:securePassword}})
+    res.status(200).json({success:true,message:"Password updated"})
+  } catch (error) {
+    console.log("Error CHANGING PASSWORD",error);
+    res.status(error.status||500).json({success:true, message:"Failed to update password"})
+  }
+}
 
 module.exports = {
   register,
   login,
   logout,
   refreshUserToken,
+  verifyOTP,
+  sendOTP,
+  forgetPassword,
+  verifyResetOtp,
+  resetPassword,
+  verifyPassword,
+  changePassword,
 };

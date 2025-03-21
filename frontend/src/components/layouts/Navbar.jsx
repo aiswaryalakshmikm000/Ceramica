@@ -59,6 +59,7 @@ const Navbar = () => {
   };
 
   const userName = user ? `${user.name || ''}`.trim() || user.username || 'User' : '';
+  const userInitial = userName.charAt(0).toUpperCase();
 
   return (
     <header
@@ -104,9 +105,14 @@ const Navbar = () => {
                 </button>
               </form>
               {isAuthenticated ? (
-                <span className="text-ceramic-charcoal font-medium text-lg">
+                <div className="relative group">
+                <div className="w-7 h-7 bg-orange-500/40 rounded-full flex items-center justify-center text-white font-medium">
+                  {userInitial}
+                </div>
+                <span className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 hidden group-hover:block bg-gray-300 text-white text-m rounded py-1 px-2 whitespace-nowrap">
                   {userName}
                 </span>
+              </div>
               ) : (
                 <Link to="/login" className="p-2 text-ceramic-charcoal hover:text-ceramic-earth transition-colors">
                   <User size={25} />
