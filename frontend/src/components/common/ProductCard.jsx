@@ -46,32 +46,22 @@ const ProductCard = ({ product }) => {
           </Badge>
         )}
         
-        {/* Success Message - Positioned above bottom of image */}
         {showSuccess && (
           <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 z-10 bg-orange-500/50 text-white px-1 py-1 rounded-md shadow-md transition-opacity duration-300 text-sm">
             Added to Cart!
           </div>
         )}
 
-        {/* Overlay with actions on hover */}
         <div
           className={`absolute inset-0 bg-ceramic-dark/30 backdrop-blur-sm flex items-center justify-center gap-4 transition-opacity duration-300 ${
             isHovered ? "opacity-100" : "opacity-0"
           }`}
         >
-          {/* <Link
-            to={`/products/${product.id}`}
-            className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-ceramic-dark hover:bg-ceramic-accent hover:text-white transition-colors"
-          >
-            <Eye size={18} />
-          </Link> */}
-
           <Link
             to={`/shop/${product.id}`}
             className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-ceramic-dark hover:bg-ceramic-accent hover:text-white transition-colors"
             onClick={(e) => {
               console.log("Navigating to:", `/shop/${product.id}`);
-              // e.preventDefault(); // Uncomment to test without navigation
             }}
           >
             <Eye size={18} />

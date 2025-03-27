@@ -17,11 +17,10 @@ const viewProduct = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Invalid product id." });
     }
-    // Fetch the product only if it is listed
     let product = await Product.findOne({ _id: id, isListed: true }).populate({
       path: "categoryId",
       select: "name isListed",
-      match: { isListed: true }, // Only include if category is listed
+      match: { isListed: true }, 
     });
 
     if (!product || !product.categoryId) {
@@ -30,8 +29,6 @@ const viewProduct = async (req, res) => {
         message: "Product not found or not listed, or category not listed.",
       });
     }
-
-    // Fetch related products from the same category (excluding the current product)
     const relatedProducts = await Product.find({
       categoryId: product.categoryId,
       _id: { $ne: id },
@@ -60,10 +57,10 @@ const viewProduct = async (req, res) => {
 
 const fetchProducts = async (req, res) => {
   try {
-    let { search, categoryId, minPrice, maxPrice, colors, sort, page = 1, limit, reset } = req.query;
+    let { search, categoryIds, minPrice, maxPrice, colors, sort, page = 1, limit, reset } = req.query;
 
     if (reset === "true") {
-      search = categoryId = minPrice = maxPrice = sort = null;
+      search = categoryIds = minPrice = maxPrice = sort = null;
     }
 
     let filter = { isListed: true };
@@ -76,16 +73,15 @@ const fetchProducts = async (req, res) => {
       ];
     }
 
-    // Convert categoryId to ObjectId if provided
-    if (categoryId) {
-      try {
-        filter.categoryId = new mongoose.Types.ObjectId(categoryId);
-      } catch (err) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid categoryId format",
-        });
-      }
+    if(categoryIds){
+      const categoryArray = categoryIds.split(",").map(id => {
+        try{
+          return new mongoose.Types.ObjectId(id.trim())
+        }catch{
+          throw new Error (`invalid categoryId: ${id}`)
+        }
+      })
+      filter.categoryId = {$in: categoryArray}
     }
 
     if (minPrice || maxPrice) {
@@ -118,7 +114,7 @@ const fetchProducts = async (req, res) => {
 
     // Aggregation pipeline to count and fetch products
     const aggregatePipeline = [
-      { $match: filter }, // Use the filter object directly
+      { $match: filter }, 
       {
         $lookup: {
           from: "categories",
@@ -128,17 +124,15 @@ const fetchProducts = async (req, res) => {
         },
       },
       { $unwind: "$category" },
-      { $match: { "category.isListed": true } }, // Only listed categories
+      { $match: { "category.isListed": true } }, 
     ];
 
-    // Get total count
     const totalResult = await Product.aggregate([
       ...aggregatePipeline,
       { $count: "total" },
     ]);
     const totalProducts = totalResult.length > 0 ? totalResult[0].total : 0;
 
-    // Fetch paginated products
     const products = await Product.aggregate([
       ...aggregatePipeline,
       { $sort: sortOptions },
@@ -181,21 +175,19 @@ const fetchProducts = async (req, res) => {
 
 const fetchBestProducts = async (req, res) => {
   try {
-    const { limit = 10 } = req.query; // Default to 10 best products
+    const { limit = 10 } = req.query; 
 
-    // ✅ Define sorting criteria for best products
     const sortOptions = {
-      isFeatured: -1, // Show featured products first
-      avgRating: -1, // Highest-rated products
-      totalStock: -1, // Most popular based on stock availability
-      createdAt: -1, // New arrivals as fallback
+      isFeatured: -1, 
+      avgRating: -1,
+      totalStock: -1, 
+      createdAt: -1, 
     };
 
-    // ✅ Fetch best products (only listed products)
     const bestProducts = await Product.find({ isListed: true })
       .sort(sortOptions)
       .limit(parseInt(limit))
-      .populate("categoryId", "name"); // Populate category name
+      .populate("categoryId", "name"); 
 
     res.status(200).json({
       success: true,
@@ -212,9 +204,8 @@ const fetchBestProducts = async (req, res) => {
 
 const fetchFeaturedProducts = async (req, res) => {
   try {
-    const { limit = 10 } = req.query; // Default to 10 featured products
+    const { limit = 10 } = req.query; 
 
-    // ✅ Fetch only featured and listed products
     const featuredProducts = await Product.find({
       isFeatured: true,
       isListed: true,
@@ -223,8 +214,8 @@ const fetchFeaturedProducts = async (req, res) => {
       .limit(parseInt(limit))
       .populate({
         path: "categoryId",
-        select: "name isListed", // Only fetch necessary fields
-        match: { isListed: true }, // Filter to include only listed categories
+        select: "name isListed", 
+        match: { isListed: true }, 
       });
 
     const filteredFeaturedProducts = featuredProducts.filter(

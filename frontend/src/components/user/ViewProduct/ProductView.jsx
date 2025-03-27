@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useViewProductQuery } from '../../features/products/userProductApislice';
-import Breadcrumbs from '../../components/common/BreadCrumbs';
-import ProductGallery from '../ViewProduct/ProductGallery';
-import ProductInfo from '../ViewProduct/ProductInfo';
-import ProductFeatures from '../ViewProduct/ProductFeatures';
-import ReviewForm from '../ViewProduct/ReviewForm';
-import RelatedProducts from '../ViewProduct/RelatedProduct';
+import { useViewProductQuery } from '../../../features/products/userProductApislice';
+import Breadcrumbs from '../../common/BreadCrumbs';
+import ProductGallery from './ProductGallery';
+import ProductInfo from './ProductInfo';
+import ProductFeatures from './ProductFeatures';
+import ReviewForm from './ReviewForm';
+import RelatedProducts from './RelatedProduct';
 import { Loader2 } from 'lucide-react';
 
 const ProductView = () => {
@@ -20,8 +20,8 @@ const ProductView = () => {
 
 // Reset state and refetch when id changes
 useEffect(() => {
-  refetch(); // Explicitly refetch data when id changes
-  setSelectedColor(null); // Reset selectedColor
+  refetch(); 
+  setSelectedColor(null); 
 }, [id, refetch]);
 
   useEffect(() => {

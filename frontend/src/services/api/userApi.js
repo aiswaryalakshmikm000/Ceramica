@@ -1,11 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logoutUser, setUserCredentials } from "../../features/auth/userAuthSlice";
-
+import { toast } from "react-toastify";
 
 
 const baseQuery = fetchBaseQuery({
   baseUrl: "http://localhost:5000/api/user",
-  credentials: "include", // Automatically include cookies in requests
+  credentials: "include", 
 });
 
 // Custom query with token refresh logic
@@ -24,6 +24,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 
     if (refreshResult.data && refreshResult.data.success) {
       console.log("Access token refreshed successfully");
+      console.log("Refresh result:", refreshResult.data);
 
       api.dispatch(setUserCredentials({ user: refreshResult.data.user }));
       // Retry the original request after refresh
@@ -31,6 +32,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     } else {
       console.log("Refresh token failed, logging out user");
       api.dispatch(logoutUser());
+      toast.error("Session expired. Please log in again.");
     }
   }
 

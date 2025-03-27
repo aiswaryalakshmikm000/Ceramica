@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import ProductCard from "../common/ProductCard";
+import ProductCard from "../../common/ProductCard";
 
 const RelatedProducts = ({ products }) => {
   const scrollContainerRef = useRef(null);

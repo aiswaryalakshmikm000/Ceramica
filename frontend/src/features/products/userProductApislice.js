@@ -2,7 +2,6 @@ import { userApi } from "../../services/api/userApi";
 
 export const userProductApiSlice = userApi.injectEndpoints({
   endpoints: (builder) => ({
-    // Get all products (with filters) - User view
     fetchProducts: builder.query({
       query: (params) => ({
         url: "/products",
@@ -12,7 +11,6 @@ export const userProductApiSlice = userApi.injectEndpoints({
       providesTags: ["Product"]
     }),
     
-    // Get featured products
     fetchFeaturedProducts: builder.query({
       query: (params) => ({
         url: "/products/featured",
@@ -22,7 +20,6 @@ export const userProductApiSlice = userApi.injectEndpoints({
       providesTags: ["Product"]
     }),
     
-    // Get single product by ID - User view
     viewProduct: builder.query({
       query: (id) => `/products/${id}`,
       transformResponse: (response) => {
@@ -33,12 +30,63 @@ export const userProductApiSlice = userApi.injectEndpoints({
         };
       },
       providesTags: (result, error, id) => [{ type: "Product", id }]
-    })
+    }),
+
+    fetchWishlist: builder.query({
+      query: () => "/wishlist",
+      providesTags: ["Wishlist"],
+    }),
+    
+    addToWishlist: builder.mutation({
+      query: (productId) => ({
+        url: "/wishlist",
+        method: "POST",
+        body: { productId },
+      }),
+      invalidatesTags: ["Wishlist"],
+    }),
+
+    removeFromWishlist: builder.mutation({
+      query: (productId) => ({
+        url: `/wishlist/${productId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Wishlist"],
+    }),
+
+
+    fetchCart: builder.query({
+      query: () => "/cart",
+      providesTags: ["Cart"],
+    }),
+    addToCart: builder.mutation({
+      query: ({ productId, quantity, color }) => ({
+        url: "/cart",
+        method: "POST",
+        body: { productId, quantity, color },
+      }),
+      invalidatesTags: ["Cart"],
+    }),
+    removeFromCart: builder.mutation({
+      query: (itemId) => ({
+        url: `/cart/${itemId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Cart"],
+    }),
+
   })
 });
 
 export const {
   useFetchProductsQuery,
   useFetchFeaturedProductsQuery,
-  useViewProductQuery
+  useViewProductQuery,
+  useFetchWishlistQuery,
+  useAddToWishlistMutation,
+  useRemoveFromWishlistMutation,
+  useFetchCartMutation,
+  useAddToCartMutation,
+  useRemoveFromCartMutation,
+
 } = userProductApiSlice;

@@ -23,7 +23,6 @@ const register = async (req, res) => {
   }
 
   try {
-    // Check if the admin already exists by email OR phone
     const existingAdmin = await Admin.findOne({
       $or: [{ email }, { phone }],
     });
@@ -35,7 +34,6 @@ const register = async (req, res) => {
       });
     }
 
-    // Hash the password before saving it to the database
     const securePassword = await hashPassword(password);
 
     // Create a new admin
@@ -116,14 +114,14 @@ const login = async (req, res) => {
       token: adminRefreshToken,
       user: admin._id,
       role: admin.role,
-      expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     });
 
     await newRefreshToken.save();
 
     // Set tokens in cookies
-    setCookie("adminAccessToken", adminAccessToken, 30 * 60 * 1000, res); // Expires in 30 min
-    setCookie("adminRefreshToken", adminRefreshToken, 14 * 24 * 60 * 60 * 1000, res); // Expires in 14 days
+    setCookie("adminAccessToken", adminAccessToken, 30 * 60 * 1000, res);
+    setCookie("adminRefreshToken", adminRefreshToken, 15 * 24 * 60 * 60 * 1000, res); 
 
     console.log("Admin logged in successfully.");
 
@@ -197,7 +195,9 @@ const refreshAccessToken = async (req, res) => {
   try {
     // Verify the refresh token
     const decoded = jwt.verify(refreshToken, process.env.ADMIN_REFRESH_TOKEN_KEY);
+    console.log('DECODED', decoded)
     const admin_id = decoded.user.id;
+    console.log("decoded role",decoded.user.role)
 
     // Check if the refresh token exists in the database and is valid
     const storedToken = await RefreshToken.findOne({
@@ -209,25 +209,34 @@ const refreshAccessToken = async (req, res) => {
 
     if (!storedToken) {
       console.log("Invalid refresh token in database");
-
       return res
         .status(403)
         .json({ success: false, error: "Invalid refresh token" });
     }
 
-    // Generate a new access token
-    const newAccessToken = await generateAccessToken({
+    // Fetch admin from the database
+    const adminDoc = await Admin.findById(admin_id).select("email role name"); // Error: Admin model not defined?
+    if (!adminDoc) {
+      return res.status(404).json({ success: false, error: "Admin not found" });
+    }
+
+    // Construct the admin object
+    const admin = {
       id: admin_id,
-      email: decoded.user.email,
-      role: decoded.user.role,
-    });
+      email: adminDoc.email,
+      role: adminDoc.role,
+      name: adminDoc.name,
+    };
+
+    // Generate a new access token
+    const newAccessToken = await generateAccessToken(admin);
 
     // Use setCookie function to store the new access token
     setCookie("adminAccessToken", newAccessToken, 30 * 60 * 1000, res);
 
     console.log("New admin access token generated and set in cookie.");
 
-    res.status(200).json({ success: true, message: "Access token refreshed" });
+    res.status(200).json({ success: true, message: "Access token refreshed", admin });
 
   } catch (error) {
     console.log("Error in refreshing token", error.message);

@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const tokenKey = process.env.TOKEN_KEY;
 const accessExpiration = process.env.ACCESS_TOKEN_EXPIRATION;
-const refreshTokenKey = process.env.REFRESH_TOKEN_KEY; // Use a separate secret key for refresh tokens
+const refreshTokenKey = process.env.REFRESH_TOKEN_KEY; 
 const refreshExpiration = process.env.REFRESH_TOKEN_EXPIRATION;
 
 const adminTokenKey = process.env.ADMIN_TOKEN_KEY;
@@ -26,7 +26,6 @@ const generateRefreshToken = (user) => {
         console.log("Generating refresh token for user");
         return jwt.sign({ user }, refreshTokenKey, { expiresIn: refreshExpiration });
     }
-    // Generate refresh token for admin
     console.log("Generating refresh token for admin");
     return jwt.sign({ user }, adminRefreshTokenKey, { expiresIn: adminRefreshExpiration });
 };

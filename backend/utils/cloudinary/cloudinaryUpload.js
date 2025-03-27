@@ -5,7 +5,7 @@ const cloudinaryImageUploadMethod = async (fileBuffer) => {
     return new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
-          { folder: "products" }, // Optional: Specify a folder in Cloudinary
+          { folder: "products" }, 
           (err, result) => {
             if (err) {
               reject("Upload image error");

@@ -1,4 +1,3 @@
-// src/components/Pagination.jsx
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import PropTypes from 'prop-types';
@@ -22,7 +21,6 @@ const Pagination = ({ currentPage, totalPages, totalItems, itemsPerPage, onPageC
     }
   };
 
-  // Generate page numbers (basic version, can be enhanced with ellipsis)
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (

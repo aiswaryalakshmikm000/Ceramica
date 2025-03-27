@@ -1,7 +1,6 @@
 const Joi = require("joi");
 const mongoose = require("mongoose");
 
-// Helper function to validate MongoDB ObjectId
 const objectIdSchema = Joi.string().regex(/^[0-9a-fA-F]{24}$/).message("Invalid ObjectId format.");
 
 const productSchema = Joi.object({

@@ -5,7 +5,6 @@ const categoryValidationSchema = require("../../utils/validation/categoryValidat
 
 const mongoose = require("mongoose");
 
-
 const showCategories = async (req, res) => {
     try {
       const categories = await Category.find({});
@@ -15,7 +14,6 @@ const showCategories = async (req, res) => {
           .status(404)
           .json({ success: false, message: "No categories available." });
       }
-  
       res
         .status(200)
         .json({ success: true, message: "Categories fetched successfully.", categories });

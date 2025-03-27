@@ -1,14 +1,14 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useShowProductsQuery, useUpdateProductStatusMutation } from '../../features/products/adminProductApiSlice';
-import { useGetCategoriesQuery } from '../../features/categories/AdminCategoryApiSlice';
+import { useShowProductsQuery, useUpdateProductStatusMutation } from '../../../features/products/adminProductApiSlice';
+import { useGetCategoriesQuery } from '../../../features/categories/AdminCategoryApiSlice';
 import { Link } from 'react-router-dom';
-import Breadcrumbs from '../common/BreadCrumbs';
-import Pagination from '../common/Pagination';
+import Breadcrumbs from '../../common/BreadCrumbs';
+import Pagination from '../../common/Pagination';
 import { ChevronDown, ChevronRight, Check } from 'lucide-react';
-import Sidebar from './SideBar';
-import { toast } from 'react-toastify'; // Import toast
-import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
+import Sidebar from '../SideBar';
+import { toast } from 'react-toastify'; 
+import 'react-toastify/dist/ReactToastify.css'; 
 
 const AdminShowProducts = () => {
   const [filter, setFilter] = useState({

@@ -1,27 +1,22 @@
-
-// export default PriceRangeFilter;
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 const PriceRangeFilter = ({ onChange, initialRange = { min: 0, max: 5000 }, resetTrigger }) => {
-  const DEFAULT_RANGE = { min: 0, max: 5000 }; // Define true default for reset
+  const DEFAULT_RANGE = { min: 0, max: 5000 }; 
   const [isOpen, setIsOpen] = useState(false);
-  const [range, setRange] = useState(initialRange); // Use prop for initial state only
+  const [range, setRange] = useState(initialRange); 
   const dropdownRef = useRef(null);
 
-  // Sync with resetTrigger, always reset to DEFAULT_RANGE
   useEffect(() => {
     console.log('Reset triggered:', { resetTrigger, initialRange });
-    setRange(DEFAULT_RANGE); // Always reset to 0-5000
+    setRange(DEFAULT_RANGE); 
   }, [resetTrigger]);
 
-  // Update range when initialRange changes (e.g., from parent filter update)
   useEffect(() => {
     console.log('Initial range updated:', initialRange);
     setRange(initialRange);
   }, [initialRange]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {

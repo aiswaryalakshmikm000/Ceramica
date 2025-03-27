@@ -1,11 +1,11 @@
 import React, { Fragment } from "react";
 import { Transition, Dialog } from "@headlessui/react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import PasswordInput from "./PasswordInputView"; 
 
-// Yup validation schema for password reset
 const resetPasswordSchema = Yup.object({
   password: Yup.string()
     .min(6, "Password must be at least 6 characters")
@@ -23,7 +23,7 @@ const ResetPasswordModal = ({
   closeModal,
   email,
   onResetSuccess,
-  resetPasswordMutation, // Pass your reset password mutation function here
+  resetPasswordMutation,
 }) => {
   const navigate = useNavigate();
 
@@ -33,19 +33,17 @@ const ResetPasswordModal = ({
   };
 
   const handleSubmit = async (values, { setSubmitting }) => {
-    console.log("handle submit from reset password modal")
+    console.log("handle submit from reset password modal");
     try {
-      // Assuming resetPasswordMutation is a mutation from your API slice
       const response = await resetPasswordMutation({
         email,
         password: values.password,
       }).unwrap();
-      toast.success(response.message || "Password reset successfully!");
       onResetSuccess(response);
-      console.log("reset password from reset modal")
+      console.log("reset password from reset modal");
       setTimeout(() => {
         closeModal();
-        navigate("/login"); // Redirect to login after success
+        navigate("/login");
       }, 1000);
     } catch (err) {
       const errorMessage = err?.data?.message || "Failed to reset password";
@@ -101,46 +99,20 @@ const ResetPasswordModal = ({
                   {({ isSubmitting }) => (
                     <Form className="mt-4">
                       <div className="space-y-4">
-                        <div>
-                          <label
-                            htmlFor="password"
-                            className="block text-sm font-medium text-gray-700"
-                          >
-                            New Password
-                          </label>
-                          <Field
-                            id="password"
-                            name="password"
-                            type="password"
-                            className="mt-1 w-full h-12 border-2 rounded bg-transparent outline-none px-4 font-semibold text-gray-700 border-gray-400 focus:border-gray-700 transition"
-                            placeholder="Enter new password"
-                          />
-                          <ErrorMessage
-                            name="password"
-                            component="p"
-                            className="text-red-500 text-sm mt-1"
-                          />
-                        </div>
-                        <div>
-                          <label
-                            htmlFor="confirmPassword"
-                            className="block text-sm font-medium text-gray-700"
-                          >
-                            Confirm Password
-                          </label>
-                          <Field
-                            id="confirmPassword"
-                            name="confirmPassword"
-                            type="password"
-                            className="mt-1 w-full h-12 border-2 rounded bg-transparent outline-none px-4 font-semibold text-gray-700 border-gray-400 focus:border-gray-700 transition"
-                            placeholder="Confirm new password"
-                          />
-                          <ErrorMessage
-                            name="confirmPassword"
-                            component="p"
-                            className="text-red-500 text-sm mt-1"
-                          />
-                        </div>
+
+                        <PasswordInput
+                          id="password"
+                          name="password"
+                          label="New Password"
+                          placeholder="Enter new password"
+                        />
+                        
+                        <PasswordInput
+                          id="confirmPassword"
+                          name="confirmPassword"
+                          label="Confirm Password"
+                          placeholder="Confirm new password"
+                        />
                       </div>
 
                       <div className="mt-4">

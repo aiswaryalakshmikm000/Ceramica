@@ -6,13 +6,10 @@ const SortFilter = ({ onChange, initialSort = 'featured', resetTrigger }) => {
   const [selectedSort, setSelectedSort] = useState(initialSort);
   const dropdownRef = useRef(null);
 
-
-  // Reset when trigger changes
   useEffect(() => {
     setSelectedSort(initialSort);
   }, [resetTrigger, initialSort]);
   
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {

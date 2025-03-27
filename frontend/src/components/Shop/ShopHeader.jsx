@@ -9,7 +9,9 @@ const ShopHeader = ({ productCount }) => {
             </h2>
       <p className="text-ceramic-text/70">
         Discover our handcrafted ceramic pieces, each one unique and made with passion.
-        {productCount && <span className="ml-1">Showing {productCount} products</span>}
+        {productCount !== undefined && (
+           <span className="ml-1">Showing {productCount} products</span>
+           )}
       </p>
     </div>
   );

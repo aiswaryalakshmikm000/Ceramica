@@ -1,33 +1,38 @@
-import { BrowserRouter as Router, Routes, Route,Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Removed Suspense, lazy from here
+import { Suspense, lazy } from "react"; // Correct import for Suspense and lazy
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import './index.css';
 
+// Lazy-loaded components
+const UserRegister = lazy(() => import("./pages/user/UserRegister.jsx"));
+const UserLogin = lazy(() => import("./pages/user/UserLogin.jsx"));
+const UserHome = lazy(() => import("./pages/user/UserHome"));
+const UserShop = lazy(() => import("./pages/user/UserShop"));
+const UserViewProduct = lazy(() => import("./pages/user/UserViewProduct"));
+const UserForgetPassword = lazy(() => import("./pages/user/UserForgetPasswrod.jsx"));
 
-import UserRegister from "./pages/user/UserRegister.jsx";
-import UserLogin from "./pages/user/UserLogin.jsx";
-import UserHome from "./pages/user/UserHome";
-import UserShop from "./pages/user/UserShop";
+const AdminLogin = lazy(() => import("./components/admin/AdminLogin"));
+const AdminRegister = lazy(() => import("./components/admin/AdminRegister"));
+const AdminAddProductPage = lazy(() => import("./components/admin/product/AdminAddProduct"));
+const AdminEditProductPage = lazy(() => import("./components/admin/product/AdminEditProduct"));
+const AdminShowProductsPage = lazy(() => import("./components/admin/product/AdminShowProducts.jsx"));
+const AdminCategoryManagement = lazy(() => import("./components/admin/category/AdminCategoryManagement.jsx"));
+const AdminShowCustomers = lazy(() => import("./components/admin/customer/AdminShowCustomers.jsx"));
+const AdminDashboard = lazy(() => import("./components/admin/dashboard/AdminDashboard.jsx"));
+
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+// Non-lazy-loaded components (lightweight)
 import ScrollToTop from "./components/common/ScrollToTop";
-import NotFound from "./pages/NotFound";
-import UserViewProduct from "./pages/user/UserViewProduct";
-import UserForgetPassword from "./pages/user/UserForgetPasswrod.jsx";
+import { IsUserLogin, IsUserLogout, IsAdminLogin, IsAdminLogout } from './routes/ProtectedRoutes';
 
-
-// import UserTokenRefresher from "./routes/UserTokenRefresher";
-// import AdminTokenRefresher from "./routes/AdminTokenRefresher";
-
-import './index.css'
-
-import AdminLogin from "./components/admin/AdminLogin"
-import AdminRegister from "./components/admin/AdminRegister";
-import AdminAddProductPage from "./components/admin/AdminAddProduct";
-import AdminEditProductPage from "./components/admin/AdminEditProduct";
-import AdminShowProductsPage from "./components/admin/AdminShowProducts";
-import AdminCategoryManagement from "./components/admin/AdminCategoryManagement.jsx"
-import AdminShowCustomers from "./components/admin/AdminShowCustomers.jsx";
-import AdminDashboard from "./components/admin/AdminDashboard.jsx";
-
-
+// Loading Spinner component
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="w-16 h-16 border-4 border-indigo-600 border-solid rounded-full border-t-transparent animate-spin"></div>
+  </div>
+);
 
 function App() {
   return (
@@ -44,36 +49,39 @@ function App() {
         pauseOnHover
         theme="dark"
       />
-      {/* Ensure Token Refreshers are always active */}
-      {/* <UserTokenRefresher />
-      <AdminTokenRefresher /> */}
       <ScrollToTop />
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          {/* Public User Routes */}
+          <Route path="/" element={<UserHome />} />
+          <Route path="/register" element={<IsUserLogout><UserRegister /></IsUserLogout>} />
+          <Route path="/login" element={<IsUserLogout><UserLogin /></IsUserLogout>} />
+          <Route path="/forgot-password" element={<IsUserLogout><UserForgetPassword /></IsUserLogout>} />
+          <Route path="/shop" element={<UserShop />} /> {/* Made public */}
+          <Route path="/shop/:id" element={<UserViewProduct />} /> {/* Made public */}
 
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<UserHome />} />
-        <Route path="/register" element={<UserRegister />} />
-        <Route path="/login" element={<UserLogin />} />
-        <Route path="/shop" element={<UserShop />} />
-         <Route path="/shop/:id" element={<UserViewProduct />} />
-         <Route path="/forgot-password" element={<UserForgetPassword />} />
-        
-        
-        <Route path="/admin/register" element={<AdminRegister />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/products/add" element={<AdminAddProductPage />} />
-        <Route path="/admin/products/edit/:id" element={<AdminEditProductPage />} />
-        <Route path="/admin/products" element={<AdminShowProductsPage />} />
-        <Route path="/admin/categories" element={<AdminCategoryManagement />} />
-        <Route path="/admin/customers" element={<AdminShowCustomers />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          {/* Protected User Routes (Commented as in your code) */}
+          {/* <Route path="/cart" element={<IsUserLogin><UserViewProduct /></IsUserLogin>} /> */}
+          {/* <Route path="/checkout" element={<IsUserLogin><UserViewProduct /></IsUserLogin>} /> */}
+          {/* <Route path="/wishlist" element={<IsUserLogin><UserViewProduct /></IsUserLogin>} /> */}
+          {/* <Route path="/order" element={<IsUserLogin><UserViewProduct /></IsUserLogin>} /> */}
 
+          {/* Public Admin Routes */}
+          <Route path="/admin/register" element={<IsAdminLogout><AdminRegister /></IsAdminLogout>} />
+          <Route path="/admin/login" element={<IsAdminLogout><AdminLogin /></IsAdminLogout>} />
 
+          {/* Protected Admin Routes */}
+          <Route path="/admin/products/add" element={<IsAdminLogin><AdminAddProductPage /></IsAdminLogin>} />
+          <Route path="/admin/products/edit/:id" element={<IsAdminLogin><AdminEditProductPage /></IsAdminLogin>} />
+          <Route path="/admin/products" element={<IsAdminLogin><AdminShowProductsPage /></IsAdminLogin>} />
+          <Route path="/admin/categories" element={<IsAdminLogin><AdminCategoryManagement /></IsAdminLogin>} />
+          <Route path="/admin/customers" element={<IsAdminLogin><AdminShowCustomers /></IsAdminLogin>} />
+          <Route path="/admin/dashboard" element={<IsAdminLogin><AdminDashboard /></IsAdminLogin>} />
 
-
-        <Route path="*" element={<NotFound />} />
-
-      </Routes>
+          {/* 404 Route */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
     </Router>
   );
 }

@@ -3,7 +3,6 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { X } from "lucide-react";
 
-// Yup validation schema aligned with Mongoose schema
 const categorySchema = Yup.object().shape({
   name: Yup.string()
     .trim()
@@ -13,7 +12,7 @@ const categorySchema = Yup.object().shape({
     .trim()
     .required("Category description is required")
     .min(10, "Description must be at least 10 characters"),
-  image: Yup.mixed().required("Category image is required"),
+    image: Yup.mixed().required("Category image is required"),
 });
 
 const CategoryForm = ({
@@ -134,3 +133,5 @@ const CategoryForm = ({
 };
 
 export default CategoryForm;
+
+

@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
-const {OAuth2Client}= require('google-auth-library')
 const validator = require("validator");
+const jwt = require('jsonwebtoken');
 
 //models
 const User = require("../../models/userModel");
@@ -15,17 +15,13 @@ const generateOTP = require("../../utils/otp/generateOTP");
 const sendVerificationEmail = require("../../utils/nodemailer/sendVarificationEmail");
 const sendResetPasswordMail = require("../../utils/nodemailer/forgetPassword");
 
-//create instance of OAuth
-const client =new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
 //signup function
 const register = async (req, res) => {
-  console.log("111111111111111111111111111")
   const { name, email, phone, password } = req.body;
 
   console.log(req.body)
 
-  // Validate required fields
   if (!name || !email || !phone || !password) {
     return res.status(400).json({
       success: false,
@@ -34,19 +30,15 @@ const register = async (req, res) => {
   }
 
   try {
-    // Check if user already exists by email OR phone
     const existingUser = await User.findOne({
       $or: [{ email }, { phone }],
     });
-    console.log("222222222222222222222222222222222222")
     if (existingUser) {
       return res.status(409).json({
         success: false,
         message: "Email or phone number already exists",
       });
     }
-    console.log("33333333333333333333333333333")
-    // Hash password before saving
     const securePassword = await hashPassword(password);
 
     const newUser = await User.create({
@@ -54,13 +46,14 @@ const register = async (req, res) => {
       email,
       phone,
       password: securePassword,
+      isVerified: false,
     });
 
     console.log("User registered successfully");
 
     res.json({
       success: true,
-      message: "User Registered Successfully",
+      message: "User created. Please verify your email with OTP.",
       newUser: {
         _id: newUser._id,
         name: newUser.name,
@@ -81,7 +74,6 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
 
-  // Validate required fields
   if (!email || !password) {
     return res.status(400).json({
       success: false,
@@ -92,7 +84,6 @@ const login = async (req, res) => {
   try {
     console.log("Checking if user exists...");
 
-    // Check if the user exists
     const userExist = await User.findOne({ email });
 
     if (!userExist) {
@@ -102,7 +93,6 @@ const login = async (req, res) => {
       });
     }
 
-    // Check if the user is blocked
     if (userExist.isBlocked) {
       console.log("User is blocked");
       return res.status(403).json({
@@ -111,7 +101,6 @@ const login = async (req, res) => {
       });
     }
 
-    // Check if the user signed up via Google and does not have a password
     if (!userExist.password) {
       return res.status(400).json({
         success: false,
@@ -119,9 +108,15 @@ const login = async (req, res) => {
       });
     }
 
+    if(!userExist.isVerified){
+      console.log("user is not verified")
+      return res.status(403).json({
+        success: false,
+        message: "Please verify your email with OTP before logging in."
+      })
+    }
     console.log("Verifying password...");
 
-    // Check password
     const isPasswordCorrect = await bcrypt.compare(
       password,
       userExist.password
@@ -132,7 +127,6 @@ const login = async (req, res) => {
         message: "Incorrect password",
       });
     }
-
     console.log("Generating tokens...");
 
     // Generate tokens
@@ -151,17 +145,17 @@ const login = async (req, res) => {
     const newRefreshToken = new RefreshToken({
       token: refreshToken,
       user: userExist._id,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 day expiry
+      role: userExist.role,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 
     });
     await newRefreshToken.save();
 
     // Use setCookie function to store tokens
-    setCookie("userAccessToken", accessToken, 15 * 60 * 1000, res); // 15 mins expiry  15 * 60 * 1000
-    setCookie("userRefreshToken", refreshToken, 7 * 24 * 60 * 60 * 1000, res); // 7 day expiry
+    setCookie("userAccessToken", accessToken, 15 * 60 * 1000, res); 
+    setCookie("userRefreshToken", refreshToken, 7 * 24 * 60 * 60 * 1000, res); 
 
     console.log("User logged in successfully!");
 
-    // Send response (excluding tokens since they are in cookies)
     return res.status(200).json({
       success: true,
       message: "Login successful",
@@ -194,7 +188,6 @@ const logout = async (req, res) => {
 
     console.log("Logging out user with refreshToken:", refreshToken);
 
-    // Remove the refresh token from the database
     const deletedToken = await RefreshToken.findOneAndDelete({
       token: refreshToken,
     });
@@ -203,7 +196,6 @@ const logout = async (req, res) => {
       return res.status(400).json({ message: "Token not found in database" });
     }
 
-    // Clear access and refresh tokens from cookies for security
     res.clearCookie("userAccessToken", {
       httpOnly: true,
       secure: true,
@@ -236,37 +228,48 @@ const refreshUserToken = async (req, res) => {
   }
 
   try {
-    // Verify refresh token
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_KEY);
+    console.log("decoded User", decoded)
     const userId = decoded.user.id;
+    console.log("Role decoded", userId, decoded.user.role)
 
     console.log("Decoded data:", decoded, "User ID:", userId, "Refresh Token:", refreshToken);
 
-    // Check if the refresh token exists in the database and is valid
     const storedToken = await RefreshToken.findOne({
       token: refreshToken,
       user: userId,
+      role: "user",
       expiresAt: { $gt: new Date() },
     });
+    console.log("Stored token from DB:", storedToken);
 
     if (!storedToken) {
       console.log("Invalid refresh token in database");
       return res.status(403).json({ success: false, error: "Invalid refresh token" });
     }
 
-    // Generate new access token
-    const newAccessToken = generateAccessToken({
+    // Fetch user from the database
+    const userDoc = await User.findById(userId).select("email role name");
+    if (!userDoc) {
+      return res.status(404).json({ success: false, error: "User not found" });
+    }
+
+    const user = {
       id: userId,
-      email: decoded.user.email,
-      role: decoded.user.role
-    });
+      email: userDoc.email,
+      role: userDoc.role,
+      name: userDoc.name 
+    };
+
+    // Generate new access token
+    const newAccessToken = generateAccessToken(user);
 
     // Set new access token in a cookie
     setCookie("userAccessToken", newAccessToken, 15 * 60 * 1000, res); // 15 minutes
 
     console.log("New access token generated and set in cookie");
 
-    res.status(200).json({ success: true, message: "Access token refreshed" });
+    res.status(200).json({ success: true, message: "Access token refreshed", user: user });
 
   } catch (error) {
     console.log("Error in refreshing token:", error.message);
@@ -277,17 +280,13 @@ const refreshUserToken = async (req, res) => {
 
 //generate-otp
 const sendOTP = async (req, res) => {
-
-  console.log('####################SENTOTP#######################')
   const { email } = req.body;
   if (!validator.isEmail(email)) {
     return res.status(400).json({ message: "Invalid email address" });
   }
+
+
   try {
-    // const isUserExist = await User.findOne({ email });
-    // if (isUserExist) {
-    //   return res.status(409).json({ message: "user already exist" });
-    // }
     const otp = generateOTP();
     console.log("Generated OTP:", otp);
 
@@ -308,7 +307,6 @@ const sendOTP = async (req, res) => {
 
 
 const verifyOTP = async (req, res) => {
-  console.log('#####################VARIFYOTP######################')
   const { otp, email } = req.body;
   try {
     const otpData = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1);
@@ -318,12 +316,14 @@ const verifyOTP = async (req, res) => {
       const errorMessage = otpData.length ? "OTP is not valid" : "OTP expired";
       return res.status(400).json({ success: false, message: errorMessage });
     }
-    const user = await User.findOne({ email }).select("-password");
-    console.log("user", user);
+    
+    const user = await User.findOneAndUpdate(
+      {email},
+      {isVerified: true},
+      {new: true},
+    ).select("-password")
 
-    res
-      .status(200)
-      .json({ success: true, message: "OTP verified successfully. redirecting to the login page.", user });
+    res.status(200).json({ success: true, message: "OTP verified successfully. redirecting to the login page.", user });
     console.log("otp verified");
   } catch (error) {
     console.log("error in otp verification", error.message);
@@ -332,7 +332,6 @@ const verifyOTP = async (req, res) => {
 
 
 const forgetPassword=async(req,res)=>{
-  console.log('#####################FORGETPASSWORD######################')
   const {email}=req.body
   if(!validator.isEmail(email)){
     return res.status(400).json({message:"Invalid email address."})
@@ -346,7 +345,15 @@ const forgetPassword=async(req,res)=>{
    if(!user){
     return res.status(404).json({success:false, message:'User doesnot exist'})
    }
-   const otp=generateOTP();
+
+   if (!user.password) {
+    return res.status(404).json({
+      success: false,
+      message: "This account was created using Google login. Password reset is not available.",
+    });
+  }
+
+  const otp=generateOTP();
   //generate otp
   await OTP.create({
     email,
@@ -362,7 +369,6 @@ const forgetPassword=async(req,res)=>{
 }
 
 const verifyResetOtp=async(req,res)=>{
-  console.log('#####################VARIFYRESETOTP######################')
   const {email,otp}=req.body;
   console.log("verifying otp",otp);
   try {
@@ -382,7 +388,6 @@ const verifyResetOtp=async(req,res)=>{
 }
 
 const resetPassword=async(req,res)=>{
-  console.log('#####################RESETPASSWORD######################')
   const{email,password}=req.body;
   if(!email.trim()||!password.trim()||password.length<6){
     return res.status(400).json({success:false,message:"Invalid credentials"})
@@ -461,6 +466,8 @@ if(currentPassword===newPassword){
     res.status(error.status||500).json({success:true, message:"Failed to update password"})
   }
 }
+
+
 
 module.exports = {
   register,

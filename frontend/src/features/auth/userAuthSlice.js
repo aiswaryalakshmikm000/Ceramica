@@ -1,26 +1,37 @@
-// src/features/auth/userAuthSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  user: localStorage.getItem("UserData") ||  null,             // Holds user data after login
-  isAuthenticated: false, // Authentication status flag
+  user: null, 
+  isAuthenticated: false, 
 };
+
+// Safely initialize from localStorage
+const storedUserData = localStorage.getItem("UserData");
+if (storedUserData) {
+  try {
+    initialState.user = JSON.parse(storedUserData);
+    initialState.isAuthenticated = !!initialState.user; 
+  } catch (error) {
+    console.error("Failed to parse UserData from localStorage:", error);
+    localStorage.removeItem("UserData"); 
+  }
+}
 
 const userAuthSlice = createSlice({
   name: 'userAuth',
   initialState,
   reducers: {
-    // Stores the logged-in user's data.
     setUserCredentials: (state, action) => {
-      state.user = action.payload.user; 
+      state.user = action.payload.user;
       state.isAuthenticated = true;
-      localStorage.setItem("UserData",JSON.stringify(action.payload.user))
+      localStorage.setItem("UserData", JSON.stringify(action.payload.user));
+      console.log("UserData set in localStorage:", localStorage.getItem("UserData"));
     },
-    // Clears the user state when logging out.
     logoutUser: (state) => {
+      console.log("Logging out user");
       state.user = null;
       state.isAuthenticated = false;
-      localStorage.removeItem("UserData")
+      localStorage.removeItem("UserData");
     },
   },
 });
@@ -28,6 +39,7 @@ const userAuthSlice = createSlice({
 export const { setUserCredentials, logoutUser } = userAuthSlice.actions;
 export default userAuthSlice.reducer;
 
-// Selectors
 export const selectUser = (state) => state.userAuth.user;
 export const selectIsUserAuthenticated = (state) => state.userAuth.isAuthenticated;
+export const selectUserRole = (state) => state.userAuth.user?.role || null;
+

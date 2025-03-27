@@ -1,8 +1,8 @@
-// src/features/categories/categoryApiSlice.js
 import { adminApi } from '../../services/api/adminApi';
 
 export const AdminCategoryApiSlice = adminApi.injectEndpoints({
   endpoints: (builder) => ({
+
     getCategories: builder.query({
       query: () => ({
         url: '/categories',
@@ -10,6 +10,7 @@ export const AdminCategoryApiSlice = adminApi.injectEndpoints({
       }),
       providesTags: ['Category'],
     }),
+
     getCategory: builder.query({
       query: (catId) => ({
         url: `/categories/${catId}`,
@@ -17,6 +18,7 @@ export const AdminCategoryApiSlice = adminApi.injectEndpoints({
       }),
       providesTags: (result, error, catId) => [{ type: 'Category', id: catId }],
     }),
+
     addCategory: builder.mutation({
       query: (formData) => ({
         url: '/categories',
@@ -25,6 +27,7 @@ export const AdminCategoryApiSlice = adminApi.injectEndpoints({
       }),
       invalidatesTags: ['Category'],
     }),
+
     updateCategory: builder.mutation({
       query: ({ catId, formData }) => ({
         url: `/categories/${catId}`,
@@ -40,6 +43,7 @@ export const AdminCategoryApiSlice = adminApi.injectEndpoints({
       }),
       invalidatesTags: ['Category'],
     }),
+
     deleteCategory: builder.mutation({
       query: (catId) => ({
         url: `/categories/${catId}`,
@@ -49,6 +53,7 @@ export const AdminCategoryApiSlice = adminApi.injectEndpoints({
     }),
   }),
 });
+
 
 export const {
   useGetCategoriesQuery,

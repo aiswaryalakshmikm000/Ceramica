@@ -1,20 +1,43 @@
 import React, { useState } from 'react';
-import { Heart, ShoppingCart, Check, Plus, Minus } from 'lucide-react';
-import { useDispatch, useSelector } from 'react-redux';
-import { addToWishlist, removeFromWishlist } from '../../features/products/userProductSlice';
+import { useNavigate } from 'react-router-dom';
+import { Heart, ShoppingCart, Check, Plus, Minus, ArrowRight } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import {
+  useFetchWishlistQuery,
+  useAddToWishlistMutation,
+  useRemoveFromWishlistMutation,
+  // useFetchCartMutation,
+  useAddToCartMutation,
+  useRemoveFromCartMutation,
+} from "../../../features/products/userProductApislice";
+import { selectIsUserAuthenticated } from '../../../features/auth/userAuthSlice';
 import { toast } from 'sonner';
+import LoginPromptModal from '../../ui/LoginPromptModal';
 
 const ProductInfo = ({ product, onColorSelect, selectedColor }) => {
   const [quantity, setQuantity] = useState(1);
-  const dispatch = useDispatch();
-  const wishlist = useSelector((state) => state.userProduct.wishlist);
+  const [isAddedToCart, setIsAddedToCart] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // State for modal
+  // const dispatch = useDispatch();
+  const navigate = useNavigate();
+  // const wishlist = useSelector((state) => state.userProduct.wishlist);
+  const isAuthenticated = useSelector(selectIsUserAuthenticated);
+
+  const { data: wishlistData, isLoading: wishlistLoading } = useFetchWishlistQuery(undefined, {
+    skip: !isAuthenticated, // Skip if not authenticated
+  });
+  const [addToWishlist] = useAddToWishlistMutation();
+  const [removeFromWishlist] = useRemoveFromWishlistMutation();
+  const [addToCart] = useAddToCartMutation();
+
+  const wishlist = wishlistData?.wishlist || []; 
   const isInWishlist = wishlist.includes(product._id);
 
   const currentColorItem = product.colors.find((c) => c.name === selectedColor) || {};
   const currentStock = currentColorItem.stock || 0;
 
   const handleColorSelect = (colorName) => {
-    onColorSelect(colorName); // Update parent state
+    onColorSelect(colorName);
     const newColorStock = product.colors.find((c) => c.name === colorName)?.stock || 0;
     if (quantity > newColorStock) {
       setQuantity(newColorStock > 0 ? 1 : 0);
@@ -53,25 +76,46 @@ const ProductInfo = ({ product, onColorSelect, selectedColor }) => {
     }
   };
 
-  const toggleWishlist = () => {
-    if (isInWishlist) {
-      dispatch(removeFromWishlist(product._id));
-      toast('Removed from wishlist', {
-        description: `${product.name} has been removed from your wishlist.`,
-      });
-    } else {
-      dispatch(addToWishlist(product._id));
-      toast('Added to wishlist', {
-        description: `${product.name} has been added to your wishlist.`,
-      });
+  const toggleWishlist = async () => {
+    if (!isAuthenticated) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+
+    try {
+      if (isInWishlist) {
+        await removeFromWishlist(product._id).unwrap();
+        toast("Removed from wishlist", {
+          description: `${product.name} has been removed from your wishlist.`,
+        });
+      } else {
+        await addToWishlist(product._id).unwrap();
+        toast("Added to wishlist", {
+          description: `${product.name} has been added to your wishlist.`,
+        });
+      }
+    } catch (err) {
+      toast.error("Failed to update wishlist");
     }
   };
 
-  const handleAddToCart = () => {
-    toast('Added to cart', {
-      description: `${quantity} × ${product.name} (${selectedColor}) added to your cart.`,
-    });
+  const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      setIsLoginModalOpen(true); 
+      return;
+    }
+    try {
+      await addToCart({ productId: product._id, quantity, color: selectedColor }).unwrap();
+      toast("Added to cart", {
+        description: `${quantity} × ${product.name} (${selectedColor}) added to your cart.`,
+      });
+      setIsAddedToCart(true);
+    } catch (err) {
+      toast.error("Failed to add to cart");
+    }
   };
+
+  if (wishlistLoading) return <div>Loading wishlist...</div>;
 
   return (
     <div className="w-full lg:w-1/2 pl-0 lg:pl-8 mt-8 lg:mt-0 animate-fade-in-up">
@@ -124,7 +168,6 @@ const ProductInfo = ({ product, onColorSelect, selectedColor }) => {
                   } ${color.stock === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-500'}`}
                   style={{ backgroundColor: color.name.toLowerCase() }}
                   onClick={() => handleColorSelect(color.name)}
-                  // disabled={color.stock === 0}
                   aria-label={`Select color: ${color.name}`}
                   title={color.stock === 0 ? `${color.name} - Out of stock` : color.name}
                 >
@@ -169,15 +212,25 @@ const ProductInfo = ({ product, onColorSelect, selectedColor }) => {
         </div>
       </div>
 
-      {/* Add to Cart Button */}
-      <button
-        className="w-full flex items-center justify-center py-3 bg-orange-800 text-white rounded-md hover:bg-orange-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-        onClick={handleAddToCart}
-        disabled={currentStock === 0}
-      >
-        <ShoppingCart className="mr-2" size={20} />
-        Add to Cart
-      </button>
+      {/* Add to Cart / Go to Cart Button */}
+      {isAddedToCart && isAuthenticated ? (
+        <button
+          className="w-full flex items-center justify-center py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+          onClick={() => navigate('/cart')}
+        >
+          <ArrowRight className="mr-2" size={20} />
+          Go to Cart
+        </button>
+      ) : (
+        <button
+          className="w-full flex items-center justify-center py-3 bg-orange-800 text-white rounded-md hover:bg-orange-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+          onClick={handleAddToCart}
+          disabled={currentStock === 0}
+        >
+          <ShoppingCart className="mr-2" size={20} />
+          Add to Cart
+        </button>
+      )}
 
       {/* Brief Description */}
       <div className="mt-8 prose prose-sm max-w-none">
@@ -187,6 +240,12 @@ const ProductInfo = ({ product, onColorSelect, selectedColor }) => {
             : product.description}
         </p>
       </div>
+
+      {/* Login Prompt Modal */}
+      <LoginPromptModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
     </div>
   );
 };

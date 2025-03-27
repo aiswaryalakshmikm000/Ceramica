@@ -16,7 +16,6 @@ const addProduct = async (req, res) => {
 
   
   try {
-    // Check for existing product
     const productExist = await Product.findOne({ name: { $regex: new RegExp(`^${name}$`, "i") } });
     console.log("existing product:",  productExist)
     if (productExist) {
@@ -38,7 +37,7 @@ const addProduct = async (req, res) => {
     let totalImages = 0;
     const colorsWithImages = await Promise.all(
       parsedColors.map(async (color, index) => {
-        const fieldName = `color${index}Images`; // Expecting images as color0Images, color1Images, etc.
+        const fieldName = `color${index}Images`; 
         const files = req.files[fieldName];
 
         if (!files || files.length === 0) {
@@ -60,7 +59,6 @@ const addProduct = async (req, res) => {
       })
     );
 
-    // Enforce minimum 3 images total
     if (totalImages < 3) {
       return res.status(400).json({ message: "At least 3 images are required across all color variants." });
     }
@@ -90,7 +88,7 @@ const addProduct = async (req, res) => {
   }
 };
 
-// Fetch all products with search, category, status, stock filter, and pagination
+
 const showProducts = async (req, res) => {
   try {
     const { search, categoryIds, isListed, stockFilter, page = 1, limit = 10 } = req.query;
@@ -104,7 +102,6 @@ const showProducts = async (req, res) => {
       ];
     }
 
-    // Filter by multiple categories (expects comma-separated categoryIds)
     if (categoryIds) {
       const categoriesArray = categoryIds.split(",");
       filter.categoryId = { $in: categoriesArray };
@@ -264,7 +261,7 @@ const editProduct = async (req, res) => {
     const colorsWithImages = parsedColors.map((color, index) => {
       const existingColor = productExist.colors.find(c => c.name === color.name) || {};
       const fieldName = `color${index}Images`;
-      const newImages = imageUploads[fieldName] || []; // New images for this variant
+      const newImages = imageUploads[fieldName] || []; 
       const existingImages = existingColor.images || [];
 
       // Filter out deleted images and retain only those in updatedUrls for this variant

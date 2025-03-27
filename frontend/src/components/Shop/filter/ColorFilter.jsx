@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 
@@ -7,12 +6,10 @@ const ColorFilter = ({ onChange, initialColors = [], resetTrigger }) => {
   const [selectedColors, setSelectedColors] = useState(initialColors);
   const dropdownRef = useRef(null);
 
-  // Reset when trigger changes
   useEffect(() => {
     setSelectedColors(initialColors);
   }, [resetTrigger, initialColors]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {

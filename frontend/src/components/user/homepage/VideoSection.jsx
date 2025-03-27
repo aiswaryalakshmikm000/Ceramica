@@ -1,38 +1,34 @@
-import React, { useRef, useState } from 'react'; // Added useState
+import React, { useRef, useState } from 'react'; 
 import { Play } from 'lucide-react';
-import video1 from "../../assets/ThumbanilForVideo/video1.jpg";
-import video2 from "../../assets/ThumbanilForVideo/video2.jpg";
-import video3 from "../../assets/ThumbanilForVideo/video3.jpg";
-import video4 from "../../assets/ThumbanilForVideo/video4.jpg";
-import videoSrc from "../../assets/ThumbanilForVideo/videoSrc.mp4";
+import video1 from "../../../assets/ThumbanilForVideo/video1.jpg";
+import video2 from "../../../assets/ThumbanilForVideo/video2.jpg";
+import video3 from "../../../assets/ThumbanilForVideo/video3.jpg";
+import video4 from "../../../assets/ThumbanilForVideo/video4.jpg";
+import videoSrc from "../../../assets/ThumbanilForVideo/videoSrc.mp4";
 
 const videos = [
   {
     id: 1,
     title: 'The Art of Throwing',
     thumbnail: video1,
-    duration: '3:45',
     src: videoSrc,
   },
   {
     id: 2,
     title: 'Glazing Techniques',
     thumbnail: video2,
-    duration: '4:20',
     src: videoSrc,
   },
   {
     id: 3,
     title: 'Kiln Firing Process',
     thumbnail: video3,
-    duration: '5:12',
     src: videoSrc,
   },
   {
     id: 4,
     title: 'Creating Ceramic Patterns',
     thumbnail: video4,
-    duration: '3:58',
     src: videoSrc,
   },
 ];
@@ -58,9 +54,7 @@ const VideoCard = ({ video, isPlaying, onVideoClick, videoRef }) => {
           <source src={video.src} type="video/mp4" />
         </video>
 
-        <div className="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded">
-          {video.duration}
-        </div>
+        
 
         <div className="absolute inset-0 flex items-center justify-center opacity-60 group-hover:opacity-100 transition-opacity">
           <button className="w-14 h-14 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
@@ -78,22 +72,19 @@ const VideoCard = ({ video, isPlaying, onVideoClick, videoRef }) => {
 
 const VideoSection = () => {
   const [playingVideoId, setPlayingVideoId] = useState(null);
-  // Create refs for all videos
   const videoRefs = useRef(videos.map(() => React.createRef()));
 
   const handleVideoClick = (videoId) => {
-    // Pause all videos
     videoRefs.current.forEach((ref) => {
       if (ref.current) {
         ref.current.pause();
       }
     });
 
-    // If clicking the same video that's playing, stop it
+  
     if (playingVideoId === videoId) {
       setPlayingVideoId(null);
     } else {
-      // Play the new video
       const videoIndex = videos.findIndex(v => v.id === videoId);
       if (videoRefs.current[videoIndex].current) {
         videoRefs.current[videoIndex].current.play();

@@ -1,6 +1,5 @@
 const Joi = require('joi');
 
-// Validation schema for adding or editing a category
 // Joi return the object of details of error and value (validated data) ==> {error : {details: [ { message: ""}]}}
 const categoryValidationSchema = Joi.object({
   name: Joi.string()

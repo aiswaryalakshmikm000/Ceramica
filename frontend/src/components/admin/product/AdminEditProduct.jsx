@@ -1,60 +1,35 @@
-
-import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  selectProduct,
-  updateProduct,
-  setStatus,
-  setError,
-} from "../../features/products/adminProductSlice";
-import { useEditProductMutation, useShowProductQuery } from "../../features/products/adminProductApiSlice";
-import { useGetCategoriesQuery } from "../../features/categories/AdminCategoryApiSlice";
+import { useEditProductMutation, useShowProductQuery } from "../../../features/products/adminProductApiSlice";
+import { useGetCategoriesQuery } from "../../../features/categories/AdminCategoryApiSlice";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ProductForm from "../../components/admin/ProductForm";
-import Sidebar from "../../components/admin/SideBar"; 
+import ProductForm from "./ProductForm";
+import Sidebar from "../SideBar"; 
 
 const AdminEditProductPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const reduxStatus = useSelector((state) => state.adminProduct.status);
 
   const { data: productData, isLoading: productLoading, error: productError } = useShowProductQuery(id);
-  const [editProduct, { isLoading: editLoading }] = useEditProductMutation();
+  const [editProduct, { isLoading: editLoading, error: editError}] = useEditProductMutation();
   const { data: categoriesData, isLoading: categoriesLoading, error: categoriesError } = useGetCategoriesQuery();
 
   const categories = categoriesData?.categories || [];
   const product = productData?.product;
 
-  useEffect(() => {
-    if (product) {
-      dispatch(selectProduct(product));
-      dispatch(setStatus("succeeded"));
-    }
-  }, [product, dispatch]);
-
   const handleSubmit = async (productData) => {
-    dispatch(setStatus("loading"));
     try {
       const response = await editProduct({ _id: id, productData }).unwrap();
-      dispatch(updateProduct(response.product));
-      dispatch(setStatus("succeeded"));
-      toast.success(response.message); // "Product edited successfully"
+      toast.success(response.message || "Product updated successfully");
       navigate("/admin/products");
     } catch (err) {
       console.error("RTK Query error:", err);
       const errorMessage = err?.data?.message || "Something went wrong while editing the product.";
-      dispatch(setError(errorMessage));
-      dispatch(setStatus("failed"));
-      toast.error(errorMessage); // Uses exact backend error messages
+      toast.error(errorMessage); 
     }
   };
 
   if (productLoading || categoriesLoading) {
-    dispatch(setStatus("loading"));
     return (
       <div className="flex h-screen bg-gray-100">
         <Sidebar />
@@ -65,25 +40,8 @@ const AdminEditProductPage = () => {
     );
   }
 
-  if (productError) {
-    const errorMessage = productError?.data?.message || "Error loading product";
-    dispatch(setError(errorMessage));
-    dispatch(setStatus("failed"));
-    toast.error(errorMessage);
-    return (
-      <div className="flex h-screen bg-gray-100">
-        <Sidebar />
-        <main className="flex-1 p-8 overflow-y-auto flex items-center justify-center">
-          <p className="text-red-500">{errorMessage}</p>
-        </main>
-      </div>
-    );
-  }
-
-  if (categoriesError) {
-    const errorMessage = categoriesError?.data?.message || "Error loading categories";
-    dispatch(setError(errorMessage));
-    dispatch(setStatus("failed"));
+  if (productError || categoriesError) {
+    const errorMessage = productError?.data?.message || categoriesError?.data?.message || "Error loading data";
     toast.error(errorMessage);
     return (
       <div className="flex h-screen bg-gray-100">
@@ -96,7 +54,6 @@ const AdminEditProductPage = () => {
   }
 
   if (!product) {
-    dispatch(setStatus("failed"));
     toast.error("Product not found");
     return (
       <div className="flex h-screen bg-gray-100">
@@ -136,7 +93,7 @@ const AdminEditProductPage = () => {
           initialData={initialData}
           categories={categories}
           onSubmit={handleSubmit}
-          isLoading={editLoading || reduxStatus === "loading"}
+          isLoading={editLoading}
           isEditMode={true}
         />
       </main>

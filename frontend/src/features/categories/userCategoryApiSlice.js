@@ -1,4 +1,3 @@
-// src/features/categories/categoryApiSlice.js
 import { userApi } from '../../services/api/userApi';
 
 export const UserCategoryApiSlice = userApi.injectEndpoints({

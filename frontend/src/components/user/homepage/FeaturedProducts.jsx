@@ -1,8 +1,8 @@
 import React from 'react';
-import ProductCard from '../common/ProductCard';
+import ProductCard from '../../common/ProductCard';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useFetchFeaturedProductsQuery } from '../../features/products/userProductApislice';
+import { useFetchFeaturedProductsQuery } from '../../../features/products/userProductApislice';
 import { Loader2 } from 'lucide-react';
 
 const FeaturedProducts = () => {
@@ -70,7 +70,7 @@ const FeaturedProducts = () => {
                     name: product.name,
                     price: product.price,
                     discount: product.discount,
-                    discountedPrice: product.discountedPrice, // Pass precomputed discountedPrice
+                    discountedPrice: product.discountedPrice, 
                     image:  product.colors?.[0]?.images?.[0] || product.images?.[0],
                     inStock: product.totalStock > 0,
                   }} 
@@ -87,7 +87,7 @@ const FeaturedProducts = () => {
                     name: product.name,
                     price: product.price,
                     discount: product.discount,
-                    discountedPrice: product.discountedPrice, // Pass precomputed discountedPrice
+                    discountedPrice: product.discountedPrice, 
                     image:  product.colors?.[0]?.images?.[0] || product.images?.[0],
                     inStock: product.totalStock > 0,
                   }} 

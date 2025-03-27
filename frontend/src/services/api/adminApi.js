@@ -1,14 +1,15 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logoutAdmin, setAdminCredentials } from "../../features/auth/adminAuthSlice";
+import { toast } from "react-toastify";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: "http://localhost:5000/api/admin",
-  credentials: "include", // Ensures cookies (tokens) are sent with every request
+  credentials: "include", 
 });
 
 // Custom query with token refresh logic
 const baseQueryWithReauth = async (args, api, extraOptions) => {
-  console.log("RTK Query request args:", args); // Log the full request
+  console.log("RTK Query request args:", args); 
   
   let result = await baseQuery(args, api, extraOptions);
 
@@ -27,10 +28,11 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       api.dispatch(setAdminCredentials({ admin: refreshResult.data.admin }));
 
       // Retry the original request after refresh
-      result = await baseQuery(args, api, extraOptions); // Retry the original request
+      result = await baseQuery(args, api, extraOptions); 
     } else {
       console.log("Refresh token invalid. Logging out admin.");
       api.dispatch(logoutAdmin());
+      toast.error("Session expired. Please log in again.");
     }
   }
 

@@ -68,6 +68,15 @@ export const userApiSlice = userApi.injectEndpoints({
         body: data, // { email, password }
       }),
     }),
+
+    googleAuth: builder.mutation({
+      query: (credentials) => ({
+        url: "/google-auth",
+        method: "POST",
+        body: credentials, // { credential: "google-jwt-token" }
+      }),
+      invalidatesTags: ["User", "Wishlist", "Cart"],
+    }),
   }),
 });
 
@@ -81,5 +90,6 @@ export const {
   useForgetPasswordMutation, 
   useVerifyResetOTPMutation, 
   useResendOTPMutation,      
-  useResetPasswordMutation,  
+  useResetPasswordMutation,
+  useGoogleAuthMutation,  
 } = userApiSlice;

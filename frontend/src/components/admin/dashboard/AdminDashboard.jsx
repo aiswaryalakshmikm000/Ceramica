@@ -1,6 +1,6 @@
 import React from 'react';
-import Breadcrumbs from '../common/BreadCrumbs'; 
-import Sidebar from './SideBar'; 
+import Breadcrumbs from '../../common/BreadCrumbs'; 
+import Sidebar from '../SideBar'; 
 
 const AdminDashboard = () => {
     
@@ -19,7 +19,6 @@ const AdminDashboard = () => {
     ],
   };
 
-  // Breadcrumbs logic based on current route
   const breadcrumbItems = [
     { label: 'Admin' },
     { label: 'Dashboard', href: '/admin/dashboard' },
@@ -107,3 +106,6 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+
+
+

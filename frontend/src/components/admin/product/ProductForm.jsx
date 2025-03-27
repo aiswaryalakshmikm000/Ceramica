@@ -2,11 +2,10 @@
 import React, { useState } from "react";
 import { Formik, Form, Field, FieldArray, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import ImageCropper from "../common/ImageCropper";
+import ImageCropper from "../../common/ImageCropper";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// Yup validation schema aligned with Mongoose schema
 const productValidationSchema = Yup.object({
   name: Yup.string()
     .required("Product name is required")
@@ -78,7 +77,6 @@ const ProductForm = ({
   const [deletedImages, setDeletedImages] = useState([]);
 
   const handleFormSubmit = async (values, { resetForm }) => {
-    try {
       const productData = new FormData();
       productData.append("name", values.name);
       productData.append("description", values.description);
@@ -117,14 +115,15 @@ const ProductForm = ({
         }
       }
 
-      const response = await onSubmit(productData);
-      toast.success(response?.data?.message || (isEditMode ? "Product updated successfully" : "Product added successfully"));
+      try {
+        await onSubmit(productData);
       if (!isEditMode) {
         resetForm();
         setDeletedImages([]);
       }
     } catch (err) {
-      toast.error(err?.data?.message || "An error occurred while saving the product");
+      const errorMessage = err?.data?.message || "An error occurred while saving the product";
+      throw new Error(errorMessage); // Propagate error to parent
     }
   };
 

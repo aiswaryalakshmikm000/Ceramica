@@ -12,11 +12,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000; 
 
-
-// Connect to Database
 connectDB()
 
-// Custom Morgan format with date and time
 morgan.format('custom', ':method  :url  :status  :response-time ms  :date[iso] '); 
 
 // Middleware
@@ -29,13 +26,9 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-// Routes
 app.use('/api/user', userRoute);
 app.use('/api/admin', adminRoute);
 
-
-// Start Server
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });

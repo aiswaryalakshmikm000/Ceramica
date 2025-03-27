@@ -1,29 +1,28 @@
-
 import React, { useState, useEffect } from 'react';
 import { useFetchProductsQuery } from '../../features/products/userProductApislice';
 import { useShowCategoriesQuery } from '../../features/categories/userCategoryApiSlice';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from '../common/BreadCrumbs';
 import PriceRangeFilter from './filter/PriceRangeFilter';
 import ColorFilter from './filter/ColorFilter';
+import CategoryFilter from './filter/CategoryFilter';
 import SortFilter from './filter/SortFilter';
 import ProductsGrid from './ProductGrid';
 import ShopHeader from './ShopHeader';
-import Categories from '../common/Categories';
 import Pagination from '../common/Pagination';
 
 const Shop = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
-  // Define initial filter state with search included
   const initialFilters = {
-    search: '', 
+    search: '',
     priceRange: { min: 0, max: 5000 },
     colors: [],
+    categoryIds: [],
     sort: 'featured',
     page: 1,
     limit: 8,
-    categoryId: null,
   };
 
   const [filters, setFilters] = useState(initialFilters);
@@ -31,45 +30,55 @@ const Shop = () => {
 
   const { data: categoriesData, isLoading: categoriesLoading } = useShowCategoriesQuery();
 
-  // Set filters from URL on initial load (categoryId and search)
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    const categoryId = searchParams.get('categoryId');
-    const searchTerm = searchParams.get('search') || '';
-    console.log("URL Params:", { categoryId, searchTerm });
+    const categoryIdsFromUrl = searchParams.get('categoryIds')?.split(',').filter(Boolean) || [];
+    const searchTermFromUrl = searchParams.get('search') || '';
+
+    console.log("URL Params:", { categoryIds: categoryIdsFromUrl, search: searchTermFromUrl });
+
     setFilters(prev => ({
-      ...prev, 
-      categoryId: categoryId || null,
-      search: searchTerm, 
+      ...prev,
+      categoryIds: categoryIdsFromUrl.length > 0 ? categoryIdsFromUrl : prev.categoryIds, 
+      search: searchTermFromUrl || prev.search, 
       page: 1, 
     }));
   }, [location.search]);
 
-  // Map filters to API query parameters
   const queryParams = {
-    search: filters.search || undefined, 
+    search: filters.search || undefined,
     minPrice: filters.priceRange.min,
     maxPrice: filters.priceRange.max,
     sort: filters.sort,
     page: filters.page,
     limit: filters.limit,
-    categoryId: filters.categoryId || undefined,
+    ...(filters.categoryIds.length > 0 && { categoryIds: filters.categoryIds.join(',') }),
     ...(filters.colors.length > 0 && { colors: filters.colors.join(',') }),
   };
 
-  console.log("Query Params:", queryParams); // Debug log
+  console.log("Query Params:", queryParams);
 
   const { data, isLoading, isFetching, error } = useFetchProductsQuery(queryParams);
 
-  console.log("API Response:", data); // Debug log
+  console.log("API Response:", data);
 
-  // Filter handlers
   const handlePriceRangeChange = (priceRange) => {
     setFilters(prev => ({ ...prev, priceRange, page: 1 }));
   };
 
   const handleColorChange = (colors) => {
     setFilters(prev => ({ ...prev, colors, page: 1 }));
+  };
+
+  const handleCategoryChange = (categoryIds) => {
+    setFilters(prev => ({ ...prev, categoryIds, page: 1 }));
+    const newParams = new URLSearchParams(location.search);
+    if (categoryIds.length > 0) {
+      newParams.set('categoryIds', categoryIds.join(','));
+    } else {
+      newParams.delete('categoryIds');
+    }
+    navigate(`/shop?${newParams.toString()}`, { replace: true });
   };
 
   const handleSortChange = (sort) => {
@@ -87,21 +96,22 @@ const Shop = () => {
   const handleResetFilters = () => {
     setFilters(initialFilters);
     setResetTrigger(prev => prev + 1);
+    navigate('/shop');
   };
 
-  const getCategoryName = () => {
-    if (!filters.categoryId || !categoriesData?.categories) return null;
-    const category = categoriesData.categories.find(cat => cat._id === filters.categoryId);
-    return category ? category.name : 'Unknown Category';
+  const getCategoryNames = () => {
+    if (!filters.categoryIds.length || !categoriesData?.categories) return null;
+    const selected = categoriesData.categories.filter(cat => filters.categoryIds.includes(cat._id));
+    return selected.map(cat => cat.name).join(', ') || 'Unknown Categories';
   };
 
-  const categoryName = getCategoryName();
+  const categoryNames = getCategoryNames();
 
   const breadcrumbItems = [
     { label: 'Home', href: '/' },
     { label: 'Shop', href: '/shop' },
-    ...(filters.categoryId && categoryName && !categoriesLoading
-      ? [{ label: categoryName, href: location.pathname + location.search }]
+    ...(filters.categoryIds.length > 0 && categoryNames && !categoriesLoading
+      ? [{ label: categoryNames, href: location.pathname + location.search }]
       : []),
     ...(filters.search ? [{ label: `Search: "${filters.search}"`, href: null }] : []),
   ];
@@ -110,8 +120,7 @@ const Shop = () => {
     <div className="py-16 md:py-12">
       <div className="container mx-auto px-4 md:px-8">
         <Breadcrumbs items={breadcrumbItems} />
-        <Categories />
-        <ShopHeader />
+        <ShopHeader  productCount={data?.totalProductsCount}/>
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div className="flex flex-wrap gap-3 items-center">
@@ -124,6 +133,12 @@ const Shop = () => {
               onChange={handleColorChange}
               initialColors={filters.colors}
               resetTrigger={resetTrigger}
+            />
+            <CategoryFilter
+              onChange={handleCategoryChange}
+              initialCategories={filters.categoryIds}
+              resetTrigger={resetTrigger}
+              categories={categoriesData?.categories || []}
             />
             <button
               onClick={handleResetFilters}
@@ -139,12 +154,11 @@ const Shop = () => {
               resetTrigger={resetTrigger}
             />
             <div className="flex items-center gap-2">
-              <label htmlFor="limit" className="text-sm text-gray-700">Items per page:</label>
               <select
                 id="limit"
                 value={filters.limit}
                 onChange={(e) => handleLimitChange(Number(e.target.value))}
-                className="px-2 py-1 border border-gray-200 rounded-lg text-sm text-gray-700"
+                className="px-2 py-2 border border-gray-200 rounded-lg text-sm text-gray-700"
               >
                 <option value={4}>4</option>
                 <option value={8}>8</option>

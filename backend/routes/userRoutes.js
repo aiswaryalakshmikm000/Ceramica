@@ -2,14 +2,13 @@ const express = require('express')
 
 const authenticateToken =require('../middlewares/user/authMiddleware')
 
-const {sendOTP,register, verifyOTP,logout, login, googleAuth, forgetPassword, refreshUserToken, verifyResetOtp, resetPassword, verifyPassword, changePassword} = require('../controllers/user/authController')
+const { sendOTP,register, verifyOTP,logout, login, forgetPassword, refreshUserToken, verifyResetOtp, resetPassword, verifyPassword, changePassword} = require('../controllers/user/authController')
+const { googleAuth } = require("../controllers/user/googleController")
 const {showCategories} =require("../controllers/user/categoryController")
 const { fetchBestProducts, fetchFeaturedProducts, viewProduct,fetchProducts} =require('../controllers/user/productController')
 
-
 const userRoute = express()
 
-  
 //authentication
 userRoute.post('/register',register)
 userRoute.post('/login',login)
@@ -17,7 +16,7 @@ userRoute.post('/logout',logout)
 userRoute.post('/refreshToken',refreshUserToken)
 userRoute.post('/send-otp',sendOTP)
 userRoute.post('/verify-otp',verifyOTP)
-// userRoute.post('/google-auth',googleAuth)
+userRoute.post('/google-auth', googleAuth)
 
 //categories
 userRoute.get('/categories',showCategories)
@@ -26,7 +25,7 @@ userRoute.get('/categories',showCategories)
 userRoute.get('/products/bestsellers',fetchBestProducts)
 userRoute.get('/products/featured',fetchFeaturedProducts)
 userRoute.get('/products',fetchProducts)
-userRoute.get('/products/:id',viewProduct)
+userRoute.get('/products/:id',authenticateToken,viewProduct)
 
 //forget passwords
 userRoute.post('/forget-password',forgetPassword)

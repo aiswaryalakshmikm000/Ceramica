@@ -1,22 +1,21 @@
-
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   useGetCustomerDetailsQuery,
   useEditCustomerStatusMutation,
-} from "../../features/customers/AdminCustomerApiSlice";
+} from "../../../features/customers/AdminCustomerApiSlice";
 import {
   setCurrentPage,
   setLimit,
   setSearchTerm,
-} from "../../features/customers/AdminCustomerSlice";
-import Breadcrumbs from "../common/BreadCrumbs";
-import Pagination from "../common/Pagination";
+} from "../../../features/customers/AdminCustomerSlice";
+import Breadcrumbs from "../../common/BreadCrumbs";
+import Pagination from "../../common/Pagination";
 import { Eye } from "lucide-react";
-import Sidebar from "./SideBar";
+import Sidebar from "../SideBar";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify"; // Import toast
-import "react-toastify/dist/ReactToastify.css"; // Import toast styles
+import { toast } from "react-toastify"; 
+import "react-toastify/dist/ReactToastify.css"; 
 
 const AdminShowCustomers = () => {
   const dispatch = useDispatch();
@@ -31,23 +30,19 @@ const AdminShowCustomers = () => {
 
   const [editCustomerStatus] = useEditCustomerStatusMutation();
 
-  // Handle search input
   const handleSearch = (e) => {
     dispatch(setSearchTerm(e.target.value));
   };
 
-  // Handle page change from Pagination component
   const handlePageChange = (newPage) => {
     dispatch(setCurrentPage(newPage));
   };
 
-  // Handle limit change
   const handleLimitChange = (e) => {
     dispatch(setLimit(Number(e.target.value)));
     dispatch(setCurrentPage(1));
   };
 
-  // Handle status toggle with toast
   const handleToggleStatus = async (userId) => {
     try {
       const response = await editCustomerStatus(userId).unwrap();
@@ -59,12 +54,10 @@ const AdminShowCustomers = () => {
     }
   };
 
-  // Handle view details
   const handleViewDetails = (userId) => {
     navigate(`/admin/customers/${userId}`);
   };
 
-  // Show error toast if query fails
   if (error) {
     toast.error(error?.data?.message || "Failed to load customer data");
     return (

@@ -10,11 +10,11 @@ const Badge = ({
   const getVariantClasses = () => {
     switch (variant) {
       case "new":
-        return "bg-blue-500/80 text-white"; // Test with a standard color
+        return "bg-blue-500/80 text-white"; 
       case "discount":
-        return "bg-red-500/90 text-black"; // Test with a standard color
+        return "bg-red-500/90 text-black";
       default:
-        return "bg-gray-800/70 text-white"; // Test with a standard color
+        return "bg-gray-800/70 text-white"; 
     }
   };
 

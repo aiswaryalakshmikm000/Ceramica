@@ -1,11 +1,12 @@
-
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { User, Heart, ShoppingCart, Menu, X, LogOut, Search } from "lucide-react";
 import Modal from "../common/Modal";
 import { useSelector, useDispatch } from 'react-redux';
 import { selectUser, selectIsUserAuthenticated, logoutUser } from '../../features/auth/userAuthSlice';
 import { useLogoutMutation } from '../../features/auth/userApiSlice';
+import { googleLogout } from "@react-oauth/google";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -13,6 +14,7 @@ const Navbar = () => {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
 
   const user = useSelector(selectUser);
@@ -29,18 +31,24 @@ const Navbar = () => {
 
   const handleLogoutClick = (e) => {
     e.preventDefault();
+    console.log("Logout clicked");
     setIsLogoutModalOpen(true);
   };
 
   const handleLogoutConfirm = async () => {
+    console.log("Logout confirm initiated");
     try {
-      await logout().unwrap();
+      const logoutResult = await logout().unwrap();
+      console.log("Backend logout response:", logoutResult);
       dispatch(logoutUser());
+      googleLogout();
       setIsLogoutModalOpen(false);
-      navigate("/");
+      navigate("/", { replace: true });
+      toast.success(logoutResult.message || "Logged out successfully!");
     } catch (error) {
       console.error("Logout failed:", error);
       setIsLogoutModalOpen(false);
+      toast.error(error?.data?.message || "Logout failed. Please try again.");
     }
   };
 
@@ -51,7 +59,7 @@ const Navbar = () => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      console.log("Search submitted:", searchQuery); // Debug log
+      console.log("Search submitted:", searchQuery); 
       navigate(`/shop?search=${encodeURIComponent(searchQuery)}`);
       setSearchQuery("");
       setIsMenuOpen(false);
@@ -84,6 +92,7 @@ const Navbar = () => {
             </Link>
           </div>
 
+          
           <Link to="/" className="absolute left-1/2 transform -translate-x-1/2 flex items-center">
             <h1 className="text-ceramic-charcoal font-serif text-5xl font-medium">
               Ceramica
@@ -104,9 +113,9 @@ const Navbar = () => {
                   <Search size={25} />
                 </button>
               </form>
-              {isAuthenticated ? (
+              {isAuthenticated && user ? (
                 <div className="relative group">
-                <div className="w-7 h-7 bg-orange-500/40 rounded-full flex items-center justify-center text-white font-medium">
+                <div className="w-7 h-7 bg-orange-500 rounded-full flex items-center justify-center text-white font-medium">
                   {userInitial}
                 </div>
                 <span className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 hidden group-hover:block bg-gray-300 text-white text-m rounded py-1 px-2 whitespace-nowrap">

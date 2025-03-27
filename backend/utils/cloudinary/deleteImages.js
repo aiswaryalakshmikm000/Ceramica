@@ -3,9 +3,9 @@ const cloudinary = require("../../config/cloudinary");
 const cloudinaryDeleteImages = async (imageUrls) => {
     const getPublicIdFromUrl = (url) => {
       const parts = url.split('/');
-      const fileWithExtension = parts.pop(); // Get the file name with extension
-      const folderPath = parts.slice(-1)[0] === 'products' ? '' : 'products/'; // Folder name
-      const [publicId] = fileWithExtension.split('.'); // Get the public_id without extension
+      const fileWithExtension = parts.pop(); 
+      const folderPath = parts.slice(-1)[0] === 'products' ? '' : 'products/'; 
+      const [publicId] = fileWithExtension.split('.'); 
       return `${folderPath}${publicId}`;
     };
   

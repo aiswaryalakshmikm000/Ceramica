@@ -3,13 +3,10 @@ import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import userAuthReducer from "../features/auth/userAuthSlice";
 import adminAuthReducer from "../features/auth/adminAuthSlice";
-import userProductReducer from "../features/products/userProductSlice";
-import adminProductReducer from "../features/products/adminProductSlice";
 import { userApi } from "../services/api/userApi";
 import { adminApi } from "../services/api/adminApi";
 import { userProductApiSlice } from "../features/products/userProductApislice";
 import { adminProductApiSlice } from "../features/products/adminProductApiSlice";
-import categoryReducer from '../features/categories/AdminCategorySlice';
 import { AdminCategoryApiSlice } from "../features/categories/AdminCategoryApiSlice";
 import { adminCustomerApiSlice } from "../features/customers/AdminCustomerApiSlice";
 import customerReducer from "../features/customers/AdminCustomerSlice"
@@ -18,9 +15,6 @@ const store = configureStore({
   reducer: {
     userAuth: userAuthReducer,
     adminAuth: adminAuthReducer,
-    userProduct: userProductReducer,
-    adminProduct: adminProductReducer,
-    categories: categoryReducer,
     customers: customerReducer,
     [userApi.reducerPath]: userApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
@@ -34,7 +28,6 @@ const store = configureStore({
   devTools: process.env.NODE_ENV !== "production", // Enable Redux DevTools only in development
 });
 
-// Enable refetchOnFocus and refetchOnReconnect for RTK Query
 setupListeners(store.dispatch);
 
 

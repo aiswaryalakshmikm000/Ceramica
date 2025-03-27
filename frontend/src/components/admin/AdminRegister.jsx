@@ -1,4 +1,3 @@
-
 import { useRegisterMutation } from "../../features/auth/adminApiSlice";
 import { useDispatch } from "react-redux";
 import { setAdminCredentials } from "../../features/auth/adminAuthSlice";
@@ -8,7 +7,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
-// Yup validation schema
 const registerSchema = Yup.object().shape({
   name: Yup.string()
     .trim()

@@ -1,13 +1,13 @@
 
 import React from "react";
-import { useAddProductMutation } from "../../features/products/adminProductApiSlice";
-import { useGetCategoriesQuery } from "../../features/categories/AdminCategoryApiSlice";
+import { useAddProductMutation } from "../../../features/products/adminProductApiSlice";
+import { useGetCategoriesQuery } from "../../../features/categories/AdminCategoryApiSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ProductForm from "../../components/admin/ProductForm"; 
-import Sidebar from "./SideBar"; 
-import Breadcrumbs from "../common/BreadCrumbs"; 
+import ProductForm from "./ProductForm"; 
+import Sidebar from "../SideBar"; 
+import Breadcrumbs from "../../common/BreadCrumbs"; 
 
 const AdminAddProductPage = () => {
   const [addProduct, { isLoading }] = useAddProductMutation();
@@ -20,12 +20,11 @@ const AdminAddProductPage = () => {
     try {
       const response = await addProduct(productData).unwrap();
       const productId = response.product?._id || response.id;
-      toast.success(response.message); // "Product added successfully"
       navigate("/admin/products");
     } catch (err) {
       console.error("RTK Query error:", err);
       const errorMessage = err?.data?.message || "Something went wrong while adding the product.";
-      toast.error(errorMessage); // Uses exact backend messages
+      toast.error(errorMessage); 
     }
   };
 

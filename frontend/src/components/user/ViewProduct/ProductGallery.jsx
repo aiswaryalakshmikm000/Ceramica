@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
-import Badge from '.././ui/Badge';
+import Badge from '../.././ui/Badge';
 
 const ProductGallery = ({ images, isNew, discount }) => {
   const [activeIndex, setActiveIndex] = useState(0);

@@ -52,7 +52,7 @@ const ImageCropper = ({ onCropComplete, initialImage }) => {
     if (imageRef && completedCrop?.width && completedCrop?.height) {
       const croppedImage = await getCroppedImg(imageRef, completedCrop);
       onCropComplete(croppedImage);
-      setUpImg(null); // Reset after cropping
+      setUpImg(null); 
     }
   };
 
@@ -71,7 +71,7 @@ const ImageCropper = ({ onCropComplete, initialImage }) => {
             crop={crop}
             onChange={(_, percentCrop) => setCrop(percentCrop)}
             onComplete={(c) => setCompletedCrop(c)}
-            aspect={1} // Optional: enforce a square aspect ratio, adjust as needed
+            aspect={1} 
           >
             <img src={upImg} onLoad={(e) => onLoadImage(e.target)} alt="Crop preview" />
           </ReactCrop>
