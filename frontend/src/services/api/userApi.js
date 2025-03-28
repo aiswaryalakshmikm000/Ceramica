@@ -23,16 +23,18 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     );
 
     if (refreshResult.data && refreshResult.data.success) {
-      console.log("Access token refreshed successfully");
+      console.log("User Access token refreshed successfully");
       console.log("Refresh result:", refreshResult.data);
 
       api.dispatch(setUserCredentials({ user: refreshResult.data.user }));
       // Retry the original request after refresh
       result = await baseQuery(args, api, extraOptions);
     } else {
-      console.log("Refresh token failed, logging out user");
+      const isUserAuthenticated = api.getState().userAuth.isAuthenticated;
+      if (isUserAuthenticated) {
+        toast.error('User Session expired. Please log in again.');
+      }
       api.dispatch(logoutUser());
-      toast.error("Session expired. Please log in again.");
     }
   }
 

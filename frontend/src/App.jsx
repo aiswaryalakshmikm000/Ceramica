@@ -3,6 +3,8 @@ import { Suspense, lazy } from "react"; // Correct import for Suspense and lazy
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
+import AuthInitializer from "./services/AuthInitializer.jsx";
+
 
 // Lazy-loaded components
 const UserRegister = lazy(() => import("./pages/user/UserRegister.jsx"));
@@ -49,6 +51,7 @@ function App() {
         pauseOnHover
         theme="dark"
       />
+      <AuthInitializer>
       <ScrollToTop />
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
@@ -82,6 +85,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
+    </AuthInitializer>
     </Router>
   );
 }

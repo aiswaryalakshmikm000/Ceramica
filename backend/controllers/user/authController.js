@@ -146,7 +146,7 @@ const login = async (req, res) => {
       token: refreshToken,
       user: userExist._id,
       role: userExist.role,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
     await newRefreshToken.save();
 
@@ -265,7 +265,7 @@ const refreshUserToken = async (req, res) => {
     const newAccessToken = generateAccessToken(user);
 
     // Set new access token in a cookie
-    setCookie("userAccessToken", newAccessToken, 15 * 60 * 1000, res); // 15 minutes
+    setCookie("userAccessToken", newAccessToken, 15 * 60 * 1000, res); 
 
     console.log("New access token generated and set in cookie");
 
@@ -468,6 +468,40 @@ if(currentPassword===newPassword){
 }
 
 
+const checkAuth = async (req, res) => {
+  console.log("#$%^&*%$#@!$&^*%$#@%&^* user checkauth")
+  try {
+    const userId = req.user.id; // From authenticateToken middleware
+    const user = await User.findById(userId).select('name email role phone isBlocked');
+
+    if (!user) {
+      console.log("user not found in db");
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (user.isBlocked) {
+      console.log("User is blocked");
+      return res.status(403).json({ success: false, message: 'Account is blocked. Contact support' });
+    }
+
+    console.log("user found from check auth",user)
+
+    return res.status(200).json({
+      success: true,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        isBlocked: user.isBlocked
+      },
+    });
+  } catch (error) {
+    console.error('Error in checkAuth:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
 
 module.exports = {
   register,
@@ -481,4 +515,5 @@ module.exports = {
   resetPassword,
   verifyPassword,
   changePassword,
+  checkAuth,
 };

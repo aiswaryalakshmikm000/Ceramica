@@ -1,4 +1,3 @@
-// src/app/store.js
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import userAuthReducer from "../features/auth/userAuthSlice";
@@ -9,13 +8,11 @@ import { userProductApiSlice } from "../features/products/userProductApislice";
 import { adminProductApiSlice } from "../features/products/adminProductApiSlice";
 import { AdminCategoryApiSlice } from "../features/categories/AdminCategoryApiSlice";
 import { adminCustomerApiSlice } from "../features/customers/AdminCustomerApiSlice";
-import customerReducer from "../features/customers/AdminCustomerSlice"
 
 const store = configureStore({
   reducer: {
     userAuth: userAuthReducer,
     adminAuth: adminAuthReducer,
-    customers: customerReducer,
     [userApi.reducerPath]: userApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
     [userProductApiSlice.reducerPath]: userProductApiSlice.reducer,

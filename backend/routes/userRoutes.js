@@ -2,12 +2,14 @@ const express = require('express')
 
 const authenticateToken =require('../middlewares/user/authMiddleware')
 
-const { sendOTP,register, verifyOTP,logout, login, forgetPassword, refreshUserToken, verifyResetOtp, resetPassword, verifyPassword, changePassword} = require('../controllers/user/authController')
+const { sendOTP, checkAuth, register, verifyOTP,logout, login, forgetPassword, refreshUserToken, verifyResetOtp, resetPassword, verifyPassword, changePassword} = require('../controllers/user/authController')
 const { googleAuth } = require("../controllers/user/googleController")
 const {showCategories} =require("../controllers/user/categoryController")
 const { fetchBestProducts, fetchFeaturedProducts, viewProduct,fetchProducts} =require('../controllers/user/productController')
 
 const userRoute = express()
+
+userRoute.get('/check-auth', authenticateToken, checkAuth);
 
 //authentication
 userRoute.post('/register',register)

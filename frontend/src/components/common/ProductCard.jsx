@@ -13,9 +13,7 @@ const formatter = new Intl.NumberFormat("en-IN", {
 const ProductCard = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
-  console.log("Product ID:", product.id);
-
+  
   const handleAddToCart = () => {
     console.log(`Added ${product.name} to cart`);
     setShowSuccess(true);

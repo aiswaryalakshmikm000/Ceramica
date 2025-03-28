@@ -247,5 +247,31 @@ const refreshAccessToken = async (req, res) => {
 };
 
 
+const checkAuth = async (req, res) => {
+  console.log("#$%^&*%$#@!$&^*%$#@%&^* Admin checkauth")
+  try {
+    const adminId = req.user.id; // From authenticateAdminToken middleware
+    const admin = await Admin.findById(adminId).select('name email role');
 
-module.exports = { login, logout, register, refreshAccessToken };
+    if (!admin) {
+      console.logg("admin not fount checkAut")
+      return res.status(404).json({ success: false, message: 'Admin not found' });
+    }
+
+    console.log("Admin from check auth", admin)
+    return res.status(200).json({
+      success: true,
+      admin: {
+        id: admin._id,
+        name: admin.name,
+        email: admin.email,
+        role: admin.role,
+      },
+    });
+  } catch (error) {
+    console.error('Error in admin checkAuth:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+module.exports = { login, logout, register, refreshAccessToken, checkAuth };

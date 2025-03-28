@@ -4,6 +4,11 @@ import { setAdminCredentials, logoutAdmin } from "../../features/auth/adminAuthS
 export const adminApiSlice = adminApi.injectEndpoints({
   endpoints: (builder) => ({
 
+    checkAuth: builder.query({
+      query: () => '/check-auth',
+      transformResponse: (response) => response.admin,
+    }),
+
     register: builder.mutation({
       query: (credentials) => ({
         url: "/register",
@@ -30,4 +35,4 @@ export const adminApiSlice = adminApi.injectEndpoints({
   }),
 });
 
-export const { useRegisterMutation, useLoginMutation, useLogoutMutation } = adminApiSlice;
+export const { useRegisterMutation, useLoginMutation, useLogoutMutation, useCheckAuthQuery } = adminApiSlice;

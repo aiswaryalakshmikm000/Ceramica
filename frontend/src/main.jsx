@@ -1,5 +1,3 @@
-
-
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux"; //provider connect the react and redux making all component to use the store

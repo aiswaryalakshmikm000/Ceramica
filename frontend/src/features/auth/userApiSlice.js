@@ -2,6 +2,12 @@ import { userApi } from "../../services/api/userApi";
 
 export const userApiSlice = userApi.injectEndpoints({
   endpoints: (builder) => ({
+
+    checkAuth: builder.query({
+      query: () => '/check-auth',
+      transformResponse: (response) => response.user,
+    }),
+
     register: builder.mutation({
       query: (credentials) => ({
         url: "/register",
@@ -92,4 +98,5 @@ export const {
   useResendOTPMutation,      
   useResetPasswordMutation,
   useGoogleAuthMutation,  
+  useCheckAuthQuery,
 } = userApiSlice;

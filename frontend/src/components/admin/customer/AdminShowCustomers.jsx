@@ -1,27 +1,25 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
 import {
   useGetCustomerDetailsQuery,
   useEditCustomerStatusMutation,
 } from "../../../features/customers/AdminCustomerApiSlice";
-import {
-  setCurrentPage,
-  setLimit,
-  setSearchTerm,
-} from "../../../features/customers/AdminCustomerSlice";
 import Breadcrumbs from "../../common/BreadCrumbs";
 import Pagination from "../../common/Pagination";
 import { Eye } from "lucide-react";
 import Sidebar from "../SideBar";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify"; 
-import "react-toastify/dist/ReactToastify.css"; 
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AdminShowCustomers = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { currentPage, limit, searchTerm } = useSelector((state) => state.customers);
 
+  // Local state replacing Redux slice
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // RTK Query hook for fetching customer data
   const {
     data: customerData,
     isLoading,
@@ -31,16 +29,17 @@ const AdminShowCustomers = () => {
   const [editCustomerStatus] = useEditCustomerStatusMutation();
 
   const handleSearch = (e) => {
-    dispatch(setSearchTerm(e.target.value));
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page on new search
   };
 
   const handlePageChange = (newPage) => {
-    dispatch(setCurrentPage(newPage));
+    setCurrentPage(newPage);
   };
 
   const handleLimitChange = (e) => {
-    dispatch(setLimit(Number(e.target.value)));
-    dispatch(setCurrentPage(1));
+    setLimit(Number(e.target.value));
+    setCurrentPage(1); // Reset to first page when limit changes
   };
 
   const handleToggleStatus = async (userId) => {
@@ -48,9 +47,7 @@ const AdminShowCustomers = () => {
       const response = await editCustomerStatus(userId).unwrap();
       toast.success(response.message || "Customer status updated successfully");
     } catch (err) {
-      toast.error(
-        err?.data?.message || "Failed to update customer status"
-      );
+      toast.error(err?.data?.message || "Failed to update customer status");
     }
   };
 
@@ -69,8 +66,8 @@ const AdminShowCustomers = () => {
 
   if (isLoading) return <div className="text-center py-10">Loading...</div>;
 
-  const { users, totalPages } = customerData;
-  const totalItems = users.length ? totalPages * limit : 0;
+  const { users, totalPages } = customerData || {};
+  const totalItems = users?.length ? totalPages * limit : 0;
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -116,7 +113,7 @@ const AdminShowCustomers = () => {
               </tr>
             </thead>
             <tbody>
-              {users.map((user, index) => (
+              {users?.map((user, index) => (
                 <tr key={user._id} className="border-t hover:bg-gray-50">
                   <td className="p-3 text-sm">
                     {(currentPage - 1) * limit + index + 1}
@@ -153,19 +150,27 @@ const AdminShowCustomers = () => {
                     </button>
                   </td>
                 </tr>
-              ))}
+              )) || (
+                <tr>
+                  <td colSpan="6" className="p-3 text-center">
+                    No customers found
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
 
         {/* Pagination */}
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalItems={totalItems}
-          itemsPerPage={limit}
-          onPageChange={handlePageChange}
-        />
+        {totalPages > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={limit}
+            onPageChange={handlePageChange}
+          />
+        )}
       </main>
     </div>
   );

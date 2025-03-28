@@ -3,12 +3,14 @@ const upload =require('../config/multerConfig')
 
 const authenticateAdminToken = require('../middlewares/admin/adminAuthMiddleware')
 
-const {  login, logout, register, refreshAccessToken} = require('../controllers/admin/adminController')
+const {  login, logout, register, refreshAccessToken, checkAuth} = require('../controllers/admin/adminController')
 const {getCustomerDetails,editCustomerStatus,} = require('../controllers/admin/userController')
 const{addCategory,showCategories,editCategory,listCategory,showCategory} = require('../controllers/admin/categoryController')
 const {addProduct,showProducts,updateProductStatus, showProduct, editProduct} = require('../controllers/admin/productController')
 
 const adminRoute = express()
+
+adminRoute.get('/check-auth', authenticateAdminToken, checkAuth);
 
 //admin
 adminRoute.post('/register',register)

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useAddProductMutation } from "../../../features/products/adminProductApiSlice";
 import { useGetCategoriesQuery } from "../../../features/categories/AdminCategoryApiSlice";

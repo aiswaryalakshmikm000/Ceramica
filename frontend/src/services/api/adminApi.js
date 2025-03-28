@@ -30,9 +30,11 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       // Retry the original request after refresh
       result = await baseQuery(args, api, extraOptions); 
     } else {
-      console.log("Refresh token invalid. Logging out admin.");
+      const isAdminAuthenticated = api.getState().adminAuth.isAdminAuthenticated;
+      if (isAdminAuthenticated) {
+        toast.error('Admin Session expired. Please log in again.');
+      }
       api.dispatch(logoutAdmin());
-      toast.error("Session expired. Please log in again.");
     }
   }
 
