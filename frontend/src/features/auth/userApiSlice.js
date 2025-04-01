@@ -83,6 +83,21 @@ export const userApiSlice = userApi.injectEndpoints({
       }),
       invalidatesTags: ["User", "Wishlist", "Cart"],
     }),
+    
+    showProfile: builder.query({
+      query: (id) => `/profile/${id}`,
+      transformResponse: (response) => response.user,
+      providesTags: ["User"],
+    }),
+    updateProfile: builder.mutation({
+      query: ({ id, formData }) => ({
+        url: `/profile/${id}`,
+        method: "PUT",
+        body: formData,
+      }),
+      invalidatesTags: ["User"], 
+    }),
+
   }),
 });
 
@@ -99,4 +114,6 @@ export const {
   useResetPasswordMutation,
   useGoogleAuthMutation,  
   useCheckAuthQuery,
+  useShowProfileQuery,
+  useUpdateProfileMutation,
 } = userApiSlice;
