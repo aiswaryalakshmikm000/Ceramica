@@ -1,4 +1,5 @@
 const express = require('express')
+const upload =require('../config/multerConfig')
 
 const authenticateToken =require('../middlewares/user/authMiddleware')
 
@@ -6,13 +7,16 @@ const { sendOTP, checkAuth, register, verifyOTP,logout, login, forgetPassword, r
 const { googleAuth } = require("../controllers/user/googleController")
 const {showCategories} =require("../controllers/user/categoryController")
 const { fetchBestProducts, fetchFeaturedProducts, viewProduct,fetchProducts} =require('../controllers/user/productController')
+const {showProfile, editProfile} =require('../controllers/user/userController')
+const {addAddress, showAddresses, editAddress, deleteAddress, setDefaultAddress} = require('../controllers/user/addressController')
+const {addToCart, showCart, updateCart, removeItemFromCart} = require('../controllers/user/cartController')
 
 const userRoute = express()
 
 userRoute.get('/check-auth', authenticateToken, checkAuth);
 
 //authentication
-userRoute.post('/register',register)
+userRoute.post('/register', upload.single('image'), register)
 userRoute.post('/login',login)
 userRoute.post('/logout',logout)
 userRoute.post('/refreshToken',refreshUserToken)
@@ -38,6 +42,23 @@ userRoute.post('/reset-password',resetPassword)
 //change password
 userRoute.post('/verify-password/:userId',authenticateToken,verifyPassword)
 userRoute.post('/change-password/:userId',authenticateToken,changePassword)
+
+//profile
+userRoute.get('/profile/:id', authenticateToken, showProfile);
+userRoute.put('/profile/:id', authenticateToken, upload.single('image'), editProfile);
+
+//address
+userRoute.post('/addresses/:userId', authenticateToken, addAddress);
+userRoute.get('/addresses/:userId', authenticateToken, showAddresses);
+userRoute.put('/address/:userId/:addressId', authenticateToken, editAddress)
+userRoute.delete('/address/:userId/:addressId', authenticateToken, deleteAddress)
+userRoute.put('/address/:addressId/set-default', authenticateToken, setDefaultAddress)
+
+//cart
+userRoute.post('/cart/:userId/add', authenticateToken, addToCart);
+userRoute.get('/cart/:userId', authenticateToken, showCart);
+userRoute.put('/cart/:userId/update', authenticateToken, updateCart)
+userRoute.delete('/cart/:userId/remove', authenticateToken, removeItemFromCart)
 
 
 module.exports = userRoute

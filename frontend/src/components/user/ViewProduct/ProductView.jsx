@@ -37,7 +37,7 @@ useEffect(() => {
         setSelectedColor(data.product.colors[0].name);
       }
     }
-  }, [data]); // Add selectedColor to dependency array to prevent re-setting
+  }, [data, selectedColor]); 
 
 
   if (isLoading) {

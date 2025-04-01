@@ -7,7 +7,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { useRegisterMutation, useSendOTPMutation } from "../../features/auth/userApiSlice";
 import OTPEnterModal from "./OTPEnterModal";
 import banner2 from "../../assets/Banners/banner2.jpg";
-import PasswordInput from "./PasswordInputView"; 
+import PasswordInput from "./PasswordInputView";
+import { FaCamera } from "react-icons/fa";
 
 const registerValidationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
@@ -25,6 +26,7 @@ const registerValidationSchema = Yup.object({
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password"), null], "Passwords must match")
     .required("Confirm password is required"),
+  image: Yup.mixed().required("Profile Pic is required"),
 });
 
 const UserRegisterPage = () => {
@@ -33,6 +35,7 @@ const UserRegisterPage = () => {
   const [sendOTP] = useSendOTPMutation();
   const [showOTPModal, setShowOTPModal] = useState(false);
   const [formValues, setFormValues] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
 
   const initialValues = {
     name: "",
@@ -40,19 +43,23 @@ const UserRegisterPage = () => {
     password: "",
     phone: "",
     confirmPassword: "",
+    image: null,
   };
 
   const handleSubmit = async (values, { setSubmitting }) => {
-    console.log("handle submit from the user register page");
     try {
-      await register({
-        name: values.name,
-        email: values.email,
-        phone: values.phone,
-        password: values.password,
-      }).unwrap();
+      const formData = new FormData();
+      formData.append("name", values.name);
+      formData.append("email", values.email);
+      formData.append("phone", values.phone);
+      formData.append("password", values.password);
+      if (values.image) {
+        formData.append("image", values.image);
+      }
 
+      await register(formData).unwrap();
       await sendOTP({ email: values.email }).unwrap();
+      
       setFormValues(values);
       setShowOTPModal(true);
       toast.success("OTP sent to your email!");
@@ -65,11 +72,22 @@ const UserRegisterPage = () => {
   };
 
   const handleOTPVerifySuccess = async (response) => {
-    console.log("handle otp verify success from the user register page");
     if (response.success) {
       toast.success(response.message || "Registration successful!");
       setShowOTPModal(false);
       navigate("/login");
+    }
+  };
+
+  const handleImageChange = (event, setFieldValue) => {
+    const file = event.target.files[0];
+    if (file) {
+      setFieldValue("image", file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -86,16 +104,52 @@ const UserRegisterPage = () => {
         </div>
 
         <Formik
-
           initialValues={initialValues}
           validationSchema={registerValidationSchema}
           onSubmit={handleSubmit}
           validateOnChange={true}
           validateOnBlur={true}
         >
-          {({ isSubmitting }) => (
-            <Form className="mt-8 space-y-6">
+          {({ isSubmitting, setFieldValue }) => (
+            <Form className="mt-8 space-y-6" encType="multipart/form-data">
               <div className="space-y-5">
+                {/* Profile Picture Upload */}
+                <div className="flex justify-center">
+                  <div className="relative">
+                    <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                      {previewImage ? (
+                        <img
+                          src={previewImage}
+                          alt="Profile preview"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-gray-400">Add Profile Pic</span>
+                      )}
+                    </div>
+                    <label
+                      htmlFor="image"
+                      className="absolute bottom-0 right-0 bg-indigo-600 p-2 rounded-full cursor-pointer hover:bg-indigo-700 transition-colors"
+                    >
+                      <FaCamera className="text-white" />
+                      <input
+                        id="image"
+                        name="image"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(event) => handleImageChange(event, setFieldValue)}
+                      />
+                    </label>
+                  </div>
+                </div>
+                <ErrorMessage
+                  name="image"
+                  render={(msg) => (
+                    <p className="text-red-500 text-xs mt-1 font-medium text-center">{msg}</p>
+                  )}
+                />
+
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-800 mb-1">
                     Name
@@ -114,6 +168,7 @@ const UserRegisterPage = () => {
                     )}
                   />
                 </div>
+                {/* Rest of the form fields remain the same */}
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-800 mb-1">
                     Email Address

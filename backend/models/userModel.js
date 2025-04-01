@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
     },
+    images: {
+      type: String,
+      required: true
+    },
     isBlocked: {
       type: Boolean,
       default: false,

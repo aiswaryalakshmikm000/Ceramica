@@ -1,18 +1,17 @@
-
-import UserLoginPage from "../../components/user/UserLoginPage"
+import Profile from "../../components/user/ProfileDetails/Profile";
 import Navbar from "../../components/layouts/Navbar"
 import Footer from "../../components/layouts/Footer"
 
 
-const UserLogin = () => {
+const UserProfile = () => {
   
     return (
       <div className="min-h-screen">
         <Navbar />
-        <UserLoginPage />
+        <Profile />
         <Footer />
       </div>
     );
   };
   
-  export default UserLogin;
+  export default UserProfile;

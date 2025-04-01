@@ -55,22 +55,35 @@ export const userProductApiSlice = userApi.injectEndpoints({
     }),
 
 
-    fetchCart: builder.query({
-      query: () => "/cart",
-      providesTags: ["Cart"],
-    }),
     addToCart: builder.mutation({
-      query: ({ productId, quantity, color }) => ({
-        url: "/cart",
+      query: ({ userId, productId, quantity, color }) => ({
+        url: `/cart/${userId}/add`,
         method: "POST",
         body: { productId, quantity, color },
       }),
       invalidatesTags: ["Cart"],
     }),
+
+    getCart: builder.query({
+      query: (userId) => `/cart/${userId}`,
+      providesTags: ["Cart"],
+      transformResponse: (response) => response.cart,
+    }),
+
+    updateCartItem: builder.mutation({
+      query: ({ userId, productId, quantity, color }) => ({
+        url: `/cart/${userId}/update`,
+        method: "PUT",
+        body: { productId, quantity, color },
+      }),
+      invalidatesTags: ["Cart"],
+    }),
+
     removeFromCart: builder.mutation({
-      query: (itemId) => ({
-        url: `/cart/${itemId}`,
+      query: ({ userId, productId, color }) => ({
+        url: `/cart/${userId}/remove`,
         method: "DELETE",
+        body: { productId, color },
       }),
       invalidatesTags: ["Cart"],
     }),
@@ -85,8 +98,9 @@ export const {
   useFetchWishlistQuery,
   useAddToWishlistMutation,
   useRemoveFromWishlistMutation,
-  useFetchCartMutation,
   useAddToCartMutation,
+  useGetCartQuery,
+  useUpdateCartItemMutation,
   useRemoveFromCartMutation,
 
 } = userProductApiSlice;

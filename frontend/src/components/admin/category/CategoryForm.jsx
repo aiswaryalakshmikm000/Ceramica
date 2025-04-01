@@ -12,7 +12,7 @@ const categorySchema = Yup.object().shape({
     .trim()
     .required("Category description is required")
     .min(10, "Description must be at least 10 characters"),
-    image: Yup.mixed().required("Category image is required"),
+  image: Yup.mixed().required("Category image is required"),
 });
 
 const CategoryForm = ({

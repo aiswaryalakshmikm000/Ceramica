@@ -6,7 +6,7 @@ import LoginPromptModal from '../../components/ui/LoginPromptModal';
 import { useSelector } from 'react-redux';
 import { selectIsUserAuthenticated } from '../../features/auth/userAuthSlice';
 
-const Shop = () => {
+const UserShop = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isAuthenticated = useSelector(selectIsUserAuthenticated);
 
@@ -49,4 +49,4 @@ const Shop = () => {
   );
 };
 
-export default Shop;
+export default UserShop;

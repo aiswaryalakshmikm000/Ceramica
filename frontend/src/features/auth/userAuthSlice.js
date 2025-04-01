@@ -17,10 +17,14 @@ const userAuthSlice = createSlice({
       state.user = null;
       state.isAuthenticated = false;
     },
+    updateUser: (state, action) => {
+      state.user = { ...state.user, ...action.payload, lastUpdated: Date.now()};
+      console.log("Redux state updated with:", state.user);
+    }
   },
 });
 
-export const { setUserCredentials, logoutUser } = userAuthSlice.actions;
+export const { setUserCredentials, logoutUser, updateUser } = userAuthSlice.actions;
 export default userAuthSlice.reducer;
 
 export const selectUser = (state) => state.userAuth.user;

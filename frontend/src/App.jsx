@@ -3,25 +3,33 @@ import { Suspense, lazy } from "react"; // Correct import for Suspense and lazy
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
-import AuthInitializer from "./services/AuthInitializer.jsx";
+import AuthInitializer from "./services/AuthInitializer";
 
 
 // Lazy-loaded components
-const UserRegister = lazy(() => import("./pages/user/UserRegister.jsx"));
-const UserLogin = lazy(() => import("./pages/user/UserLogin.jsx"));
+const UserRegister = lazy(() => import("./pages/user/UserRegister"));
+const UserLogin = lazy(() => import("./pages/user/UserLogin"));
 const UserHome = lazy(() => import("./pages/user/UserHome"));
 const UserShop = lazy(() => import("./pages/user/UserShop"));
 const UserViewProduct = lazy(() => import("./pages/user/UserViewProduct"));
-const UserForgetPassword = lazy(() => import("./pages/user/UserForgetPasswrod.jsx"));
+const UserForgetPassword = lazy(() => import("./pages/user/UserForgetPasswrod"));
+const UserProfile = lazy(() => import ('./pages/user/UserProfile'))
+const UserEditProfile = lazy(() => import ('./pages/user/UserEditProfile'))
+const UserAddress = lazy(() => import ('./pages/user/UserAddress'))
+const UserOrder = lazy(() => import ('./components/user/order/Order'))
+const UserWishlist = lazy(() => import ('./components/user/wishlist/Wishlist'))
+const UserWallet = lazy(() => import ('./components/user/wallet/Wallet'))
+const UserCoupons = lazy(() => import ('./components/user/coupons/Coupons'))
+const UserCart = lazy(() => import ('./pages/user/UserCart'))
 
 const AdminLogin = lazy(() => import("./components/admin/AdminLogin"));
 const AdminRegister = lazy(() => import("./components/admin/AdminRegister"));
 const AdminAddProductPage = lazy(() => import("./components/admin/product/AdminAddProduct"));
 const AdminEditProductPage = lazy(() => import("./components/admin/product/AdminEditProduct"));
-const AdminShowProductsPage = lazy(() => import("./components/admin/product/AdminShowProducts.jsx"));
-const AdminCategoryManagement = lazy(() => import("./components/admin/category/AdminCategoryManagement.jsx"));
-const AdminShowCustomers = lazy(() => import("./components/admin/customer/AdminShowCustomers.jsx"));
-const AdminDashboard = lazy(() => import("./components/admin/dashboard/AdminDashboard.jsx"));
+const AdminShowProductsPage = lazy(() => import("./components/admin/product/AdminShowProducts"));
+const AdminCategoryManagement = lazy(() => import("./components/admin/category/AdminCategoryManagement"));
+const AdminShowCustomers = lazy(() => import("./components/admin/customer/AdminShowCustomers"));
+const AdminDashboard = lazy(() => import("./components/admin/dashboard/AdminDashboard"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -64,10 +72,14 @@ function App() {
           <Route path="/shop/:id" element={<UserViewProduct />} /> {/* Made public */}
 
           {/* Protected User Routes (Commented as in your code) */}
-          {/* <Route path="/cart" element={<IsUserLogin><UserViewProduct /></IsUserLogin>} /> */}
-          {/* <Route path="/checkout" element={<IsUserLogin><UserViewProduct /></IsUserLogin>} /> */}
-          {/* <Route path="/wishlist" element={<IsUserLogin><UserViewProduct /></IsUserLogin>} /> */}
-          {/* <Route path="/order" element={<IsUserLogin><UserViewProduct /></IsUserLogin>} /> */}
+          <Route path="/profile/:id" element={<IsUserLogin><UserProfile /></IsUserLogin>} />
+          <Route path="/profile/edit/:id" element={<IsUserLogin><UserEditProfile /></IsUserLogin>} />
+          <Route path="/address/:userId" element={<IsUserLogin><UserAddress /></IsUserLogin>} />
+          <Route path="/orders" element={<IsUserLogin><UserOrder /></IsUserLogin>} />
+          <Route path="/wishlist" element={<IsUserLogin><UserWishlist /></IsUserLogin>} />
+          <Route path="/wallet" element={<IsUserLogin><UserWallet /></IsUserLogin>} />
+          <Route path="/coupons" element={<IsUserLogin><UserCoupons /></IsUserLogin>} />
+          <Route path="/cart/:userId" element={<IsUserLogin><UserCart /></IsUserLogin>} />
 
           {/* Public Admin Routes */}
           <Route path="/admin/register" element={<IsAdminLogout><AdminRegister /></IsAdminLogout>} />

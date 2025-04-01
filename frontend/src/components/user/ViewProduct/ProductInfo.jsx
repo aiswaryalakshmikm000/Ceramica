@@ -1,36 +1,38 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, ShoppingCart, Check, Plus, Minus, ArrowRight } from 'lucide-react';
+import { Heart, ShoppingCart, Check, ArrowRight } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import {
   useFetchWishlistQuery,
   useAddToWishlistMutation,
   useRemoveFromWishlistMutation,
-  // useFetchCartMutation,
   useAddToCartMutation,
-  useRemoveFromCartMutation,
 } from "../../../features/products/userProductApislice";
-import { selectIsUserAuthenticated } from '../../../features/auth/userAuthSlice';
-import { toast } from 'sonner';
+import { selectUser } from '../../../features/auth/userAuthSlice';
 import LoginPromptModal from '../../ui/LoginPromptModal';
+import QuantityControl from '../../user/cart/QuantityControl';
+import { toast } from "react-toastify";
+
 
 const ProductInfo = ({ product, onColorSelect, selectedColor }) => {
   const [quantity, setQuantity] = useState(1);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // State for modal
-  // const dispatch = useDispatch();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const navigate = useNavigate();
-  // const wishlist = useSelector((state) => state.userProduct.wishlist);
-  const isAuthenticated = useSelector(selectIsUserAuthenticated);
+  const user = useSelector(selectUser); 
+  const isAuthenticated = !!user;
+
+  const userId = user?._id;
 
   const { data: wishlistData, isLoading: wishlistLoading } = useFetchWishlistQuery(undefined, {
-    skip: !isAuthenticated, // Skip if not authenticated
+    skip: !isAuthenticated,
   });
   const [addToWishlist] = useAddToWishlistMutation();
   const [removeFromWishlist] = useRemoveFromWishlistMutation();
   const [addToCart] = useAddToCartMutation();
 
-  const wishlist = wishlistData?.wishlist || []; 
+  const wishlist = wishlistData?.wishlist || [];
   const isInWishlist = wishlist.includes(product._id);
 
   const currentColorItem = product.colors.find((c) => c.name === selectedColor) || {};
@@ -60,22 +62,6 @@ const ProductInfo = ({ product, onColorSelect, selectedColor }) => {
     }
   };
 
-  const handleQuantityChange = (e) => {
-    const value = parseInt(e.target.value);
-    if (!isNaN(value)) {
-      if (value > currentStock) {
-        setQuantity(currentStock);
-        toast('Maximum available stock reached', {
-          description: `Only ${currentStock} units available in this color.`,
-        });
-      } else if (value < 1) {
-        setQuantity(1);
-      } else {
-        setQuantity(value);
-      }
-    }
-  };
-
   const toggleWishlist = async () => {
     if (!isAuthenticated) {
       setIsLoginModalOpen(true);
@@ -84,37 +70,52 @@ const ProductInfo = ({ product, onColorSelect, selectedColor }) => {
 
     try {
       if (isInWishlist) {
-        await removeFromWishlist(product._id).unwrap();
-        toast("Removed from wishlist", {
+        const response = await removeFromWishlist(product._id).unwrap();
+        toast.success(response.message || "Item removed from wishlist", {
           description: `${product.name} has been removed from your wishlist.`,
         });
       } else {
-        await addToWishlist(product._id).unwrap();
-        toast("Added to wishlist", {
+        const response = await addToWishlist(product._id).unwrap();
+        toast.success(response.message || "Item added to wishlist", {
           description: `${product.name} has been added to your wishlist.`,
         });
       }
     } catch (err) {
-      toast.error("Failed to update wishlist");
+      toast.error(err?.data?.message || "Failed to update wishlist");
     }
   };
 
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
-      setIsLoginModalOpen(true); 
+      setIsLoginModalOpen(true);
       return;
     }
+
+    if (!userId) {
+      toast.error("User ID not found. Please log in again.");
+      return;
+    }
+
     try {
-      await addToCart({ productId: product._id, quantity, color: selectedColor }).unwrap();
-      toast("Added to cart", {
+      const response = await addToCart({
+        userId,
+        productId: product._id,
+        quantity,
+        color: selectedColor,
+      }).unwrap();
+      toast.success(response.message || "Item successfully added to cart", {
         description: `${quantity} × ${product.name} (${selectedColor}) added to your cart.`,
       });
       setIsAddedToCart(true);
     } catch (err) {
-      toast.error("Failed to add to cart");
+      toast.error(err?.data?.message || "Failed to add item to cart");
     }
   };
 
+  const handleGoToCart = () => {
+    navigate(`/cart/${userId}`);
+  };
+  
   if (wishlistLoading) return <div>Loading wishlist...</div>;
 
   return (
@@ -182,41 +183,21 @@ const ProductInfo = ({ product, onColorSelect, selectedColor }) => {
         </div>
       )}
 
-      {/* Quantity Selector */}
+      {/* Quantity Selector using QuantityControl */}
       <div className="mb-6">
         <h3 className="text-sm font-medium text-gray-800 mb-3">Quantity</h3>
-        <div className="flex items-center space-x-2 w-32">
-          <button
-            className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors disabled:opacity-50"
-            onClick={decrementQuantity}
-            disabled={quantity <= 1}
-            aria-label="Decrease quantity"
-          >
-            <Minus size={16} className="text-gray-600" />
-          </button>
-          <input
-            type="text"
-            value={quantity}
-            onChange={handleQuantityChange}
-            className="w-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Quantity"
-          />
-          <button
-            className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors disabled:opacity-50"
-            onClick={incrementQuantity}
-            disabled={quantity >= currentStock}
-            aria-label="Increase quantity"
-          >
-            <Plus size={16} className="text-gray-600" />
-          </button>
-        </div>
+        <QuantityControl
+          quantity={quantity}
+          onIncrease={incrementQuantity}
+          onDecrease={decrementQuantity}
+        />
       </div>
 
       {/* Add to Cart / Go to Cart Button */}
       {isAddedToCart && isAuthenticated ? (
         <button
           className="w-full flex items-center justify-center py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-          onClick={() => navigate('/cart')}
+          onClick={handleGoToCart}
         >
           <ArrowRight className="mr-2" size={20} />
           Go to Cart

@@ -1,18 +1,16 @@
-
-import UserLoginPage from "../../components/user/UserLoginPage"
 import Navbar from "../../components/layouts/Navbar"
 import Footer from "../../components/layouts/Footer"
+import Address from "../../components/user/address/Address";
 
-
-const UserLogin = () => {
+const UserAddress = () => {
   
     return (
       <div className="min-h-screen">
         <Navbar />
-        <UserLoginPage />
+        <Address />
         <Footer />
       </div>
     );
   };
   
-  export default UserLogin;
+  export default UserAddress;

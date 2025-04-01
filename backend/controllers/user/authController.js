@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 const jwt = require('jsonwebtoken');
+const { cloudinaryImageUploadMethod } = require("../../utils/cloudinary/cloudinaryUpload");
+const {cloudinaryDeleteImages} = require("../../utils/cloudinary/deleteImages");
 
 //models
 const User = require("../../models/userModel");
@@ -19,8 +21,10 @@ const sendResetPasswordMail = require("../../utils/nodemailer/forgetPassword");
 //signup function
 const register = async (req, res) => {
   const { name, email, phone, password } = req.body;
+  const file = req.file;
 
   console.log(req.body)
+  console.log(req.file)
 
   if (!name || !email || !phone || !password) {
     return res.status(400).json({
@@ -39,6 +43,12 @@ const register = async (req, res) => {
         message: "Email or phone number already exists",
       });
     }
+
+    let imageUrl = "";
+    if (file) {
+      imageUrl = await cloudinaryImageUploadMethod(file.buffer);
+    }
+
     const securePassword = await hashPassword(password);
 
     const newUser = await User.create({
@@ -46,6 +56,7 @@ const register = async (req, res) => {
       email,
       phone,
       password: securePassword,
+      images: imageUrl || "",
       isVerified: false,
     });
 
@@ -60,6 +71,7 @@ const register = async (req, res) => {
         email: newUser.email,
         phone: newUser.phone,
         role: newUser.role,
+        images: newUser.images,
       },
     });
   } catch (error) {
@@ -165,6 +177,7 @@ const login = async (req, res) => {
         email: userExist.email,
         phone: userExist.phone,
         role: userExist.role,
+        images: userExist.images,
       },
     });
   } catch (error) {
@@ -284,8 +297,6 @@ const sendOTP = async (req, res) => {
   if (!validator.isEmail(email)) {
     return res.status(400).json({ message: "Invalid email address" });
   }
-
-
   try {
     const otp = generateOTP();
     console.log("Generated OTP:", otp);
@@ -323,7 +334,7 @@ const verifyOTP = async (req, res) => {
       {new: true},
     ).select("-password")
 
-    res.status(200).json({ success: true, message: "OTP verified successfully. redirecting to the login page.", user });
+    res.status(200).json({ success: true, message: "OTP verified successfully.", user });
     console.log("otp verified");
   } catch (error) {
     console.log("error in otp verification", error.message);
@@ -443,6 +454,7 @@ res.status(200).json({success:true, message:"Password verified."})
 }
 }
 
+
 const changePassword=async(req,res)=>{
   console.log("changing");
   const {userId}=req.params
@@ -472,7 +484,7 @@ const checkAuth = async (req, res) => {
   console.log("#$%^&*%$#@!$&^*%$#@%&^* user checkauth")
   try {
     const userId = req.user.id; // From authenticateToken middleware
-    const user = await User.findById(userId).select('name email role phone isBlocked');
+    const user = await User.findById(userId).select('name email role phone images isBlocked');
 
     if (!user) {
       console.log("user not found in db");
@@ -494,6 +506,7 @@ const checkAuth = async (req, res) => {
         email: user.email,
         phone: user.phone,
         role: user.role,
+        images: user.images,
         isBlocked: user.isBlocked
       },
     });

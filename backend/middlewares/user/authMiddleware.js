@@ -5,6 +5,7 @@ dotenv.config();
 const tokenKey = process.env.TOKEN_KEY;
 
 const authenticateToken = (req, res, next) => {
+    console.log('Authenticating request:', req.method, req.path);
     console.log('User Middleware - Received Cookies:', req.cookies);
 
     let token = req.cookies?.userAccessToken; 
