@@ -8,6 +8,8 @@ import { userProductApiSlice } from "../features/products/userProductApislice";
 import { adminProductApiSlice } from "../features/products/adminProductApiSlice";
 import { AdminCategoryApiSlice } from "../features/categories/AdminCategoryApiSlice";
 import { adminCustomerApiSlice } from "../features/customers/AdminCustomerApiSlice";
+import { userWishlistApiSlice } from "../features/wishlist/userWishlistApiSlice"
+import { userCartApiSlice } from "../features/cart/userCartApiSlice"
 
 const store = configureStore({
   reducer: {
@@ -16,6 +18,9 @@ const store = configureStore({
     [userApi.reducerPath]: userApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
     [userProductApiSlice.reducerPath]: userProductApiSlice.reducer,
+    [userWishlistApiSlice.reducerPath]: userProductApiSlice.reducer,
+    [userCartApiSlice.reducerPath]: userProductApiSlice.reducer,
+
     [adminProductApiSlice.reducerPath]: adminProductApiSlice.reducer,
     [AdminCategoryApiSlice.reducerPath]: AdminCategoryApiSlice.reducer,
     [adminCustomerApiSlice.reducerPath]: adminCustomerApiSlice.reducer,

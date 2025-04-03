@@ -16,10 +16,10 @@ const UserForgetPassword = lazy(() => import("./pages/user/UserForgetPasswrod"))
 const UserProfile = lazy(() => import ('./pages/user/UserProfile'))
 const UserEditProfile = lazy(() => import ('./pages/user/UserEditProfile'))
 const UserAddress = lazy(() => import ('./pages/user/UserAddress'))
-const UserOrder = lazy(() => import ('./components/user/order/Order'))
+const UserOrder = lazy(() => import ('./pages/user/UserOrder'))
 const UserWishlist = lazy(() => import ('./pages/user/UserWishlist'))
-const UserWallet = lazy(() => import ('./components/user/wallet/Wallet'))
-const UserCoupons = lazy(() => import ('./components/user/coupons/Coupons'))
+const UserWallet = lazy(() => import ('./pages/user/UserWallet'))
+const UserCoupons = lazy(() => import ('./pages/user/UserCoupons'))
 const UserCart = lazy(() => import ('./pages/user/UserCart'))
 const UserCheckout = lazy(() => import ('./pages/user/UserCheckout'))
 const UserOderConfrimation = lazy(() => import ('./pages/user/UserOrderConfirmation'))
@@ -79,7 +79,7 @@ function App() {
           <Route path="/address/:userId" element={<IsUserLogin><UserAddress /></IsUserLogin>} />
           <Route path="/orders" element={<IsUserLogin><UserOrder /></IsUserLogin>} />
           <Route path="/wishlist/:userId" element={<IsUserLogin><UserWishlist /></IsUserLogin>} />
-          <Route path="/wallet" element={<IsUserLogin><UserWallet /></IsUserLogin>} />
+          <Route path="/wallet/:userId" element={<IsUserLogin><UserWallet /></IsUserLogin>} />
           <Route path="/coupons" element={<IsUserLogin><UserCoupons /></IsUserLogin>} />
           <Route path="/cart/:userId" element={<IsUserLogin><UserCart /></IsUserLogin>} />
           <Route path="/checkout" element={<IsUserLogin><UserCheckout /></IsUserLogin>} />

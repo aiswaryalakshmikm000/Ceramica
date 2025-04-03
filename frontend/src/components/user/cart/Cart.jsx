@@ -122,6 +122,7 @@ const Cart = () => {
                     quantity={item.quantity}
                     image={item.image}
                     color={item.color}
+                    inStock={item.inStock}
                     onRemove={() => handleRemoveItem(item.productId, item.color)}
                     onUpdateQuantity={(newQuantity) =>
                       handleUpdateQuantity(item.productId, item.color, newQuantity)

@@ -64,7 +64,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                   Error loading cart: {error?.data?.message || error.message}
                 </p>
               </div>
-            ) : !cart || cart.items.length === 0 ? (
+            ) : !cart || !cart.items || cart.items.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full py-8">
                 <ShoppingCart size={90} className="mx-auto text-gray-400" />
                 <p className="mt-4 text-ceramic-charcoal">Your cart is empty</p>

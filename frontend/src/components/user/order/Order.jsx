@@ -1,207 +1,802 @@
-import React, { useState } from "react";
-import { ChevronDown, ChevronUp, ExternalLink, Eye } from "lucide-react";
+// import React, { useState } from "react";
+// import { Link, useNavigate } from "react-router-dom";
+// import { 
+//   Search, ChevronDown, ChevronUp, Download, 
+//   ExternalLink, Eye, ArrowLeft, ShoppingBag 
+// } from "lucide-react";
+// import { 
+//   Card, CardContent, CardHeader 
+// } from "../../ui/Card"; 
+// import { Button } from "../../ui/button";
+// import { Input } from "../../ui/input";
+// import { Badge } from "../../ui/OrderBadge"; 
+// import { toast } from "react-toastify";
+// import OrderDetailDialog from "./OrderDetailDialog";
+// import CancelOrderDialog from "./CancelOrder";
+// import ReturnOrderDialog from "./ReturnOrderDialog";
 
-const Orders = () => {
+// const Order = () => {
+//   const navigate = useNavigate();
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [expandedOrderId, setExpandedOrderId] = useState(null);
+//   const [selectedOrder, setSelectedOrder] = useState(null);
+//   const [showDetailDialog, setShowDetailDialog] = useState(false);
+//   const [showCancelDialog, setShowCancelDialog] = useState(false);
+//   const [showReturnDialog, setShowReturnDialog] = useState(false);
+
+//   // Mock order data - this would come from API
+//   const orders = [
+//     {
+//       orderId: "CER-10045-2023",
+//       date: "April 15, 2023",
+//       status: "Delivered",
+//       total: "₹2,899",
+//       paymentMethod: "Credit Card",
+//       trackingNumber: "TRK764532198",
+//       shippingAddress: {
+//         fullName: "Rahul Sharma",
+//         addressLine: "123 Main Street, Apartment 4B",
+//         city: "Bengaluru",
+//         state: "Karnataka",
+//         pincode: "560001",
+//         phone: "+91 98765 43210"
+//       },
+//       items: [
+//         {
+//           id: 1,
+//           name: "Handcrafted Ceramic Vase",
+//           price: "₹1,499",
+//           quantity: 1,
+//           image: "https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
+//           status: "Delivered"
+//         },
+//         {
+//           id: 2,
+//           name: "Ceramic Serving Plate",
+//           price: "₹1,399",
+//           quantity: 1,
+//           image: "https://images.unsplash.com/photo-1516223725307-6f76b9ec8742?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
+//           status: "Delivered"
+//         }
+//       ]
+//     },
+//     {
+//       orderId: "CER-10039-2023",
+//       date: "April 10, 2023",
+//       status: "Shipped",
+//       total: "₹3,699",
+//       paymentMethod: "UPI",
+//       trackingNumber: "TRK837645123",
+//       shippingAddress: {
+//         fullName: "Priya Patel",
+//         addressLine: "456 Park Avenue, Building C",
+//         city: "Mumbai",
+//         state: "Maharashtra",
+//         pincode: "400001",
+//         phone: "+91 98765 12345"
+//       },
+//       items: [
+//         {
+//           id: 3,
+//           name: "Ceramic Bowl Set (4 pieces)",
+//           price: "₹2,499",
+//           quantity: 1,
+//           image: "https://images.unsplash.com/photo-1578873375969-d60aad647bb9?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
+//           status: "Shipped"
+//         },
+//         {
+//           id: 4,
+//           name: "Ceramic Tea Cups (Set of 2)",
+//           price: "₹1,199",
+//           quantity: 1,
+//           image: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
+//           status: "Shipped"
+//         }
+//       ]
+//     },
+//     {
+//       orderId: "CER-10028-2023",
+//       date: "March 25, 2023",
+//       status: "Processing",
+//       total: "₹4,499",
+//       paymentMethod: "Cash on Delivery",
+//       trackingNumber: "Pending",
+//       shippingAddress: {
+//         fullName: "Vikram Singh",
+//         addressLine: "789 Lake View, Floor 2",
+//         city: "Delhi",
+//         state: "Delhi",
+//         pincode: "110001",
+//         phone: "+91 87654 32109"
+//       },
+//       items: [
+//         {
+//           id: 5,
+//           name: "Large Decorative Ceramic Planter",
+//           price: "₹3,299",
+//           quantity: 1,
+//           image: "https://images.unsplash.com/photo-1485955900006-10f4d324d411?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
+//           status: "Processing"
+//         },
+//         {
+//           id: 6,
+//           name: "Ceramic Chopstick Holders (Set of 4)",
+//           price: "₹1,199",
+//           quantity: 1,
+//           image: "https://images.unsplash.com/photo-1525974160448-038dacadcc71?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
+//           status: "Processing"
+//         }
+//       ]
+//     }
+//   ];
+
+//   // Filter orders based on search query
+//   const filteredOrders = orders.filter(order => 
+//     order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//     order.status.toLowerCase().includes(searchQuery.toLowerCase())
+//   );
+
+//   const toggleOrderExpand = (orderId) => {
+//     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
+//   };
+
+//   const handleViewDetails = (order) => {
+//     setSelectedOrder(order);
+//     setShowDetailDialog(true);
+//   };
+
+//   const handleCancelOrder = (order) => {
+//     setSelectedOrder(order);
+//     setShowCancelDialog(true);
+//   };
+
+//   const handleReturnOrder = (order) => {
+//     setSelectedOrder(order);
+//     setShowReturnDialog(true);
+//   };
+
+//   const handleDownloadInvoice = (orderId) => {
+//     toast.success(`Invoice for order ${orderId} has been downloaded`, {
+//       position: "top-right",
+//       autoClose: 3000,
+//     });
+//   };
+
+//   const getStatusColor = (status) => {
+//     switch (status.toLowerCase()) {
+//       case "delivered":
+//         return "bg-green-100 text-green-800 border-green-300";
+//       case "processing":
+//         return "bg-blue-100 text-blue-800 border-blue-300";
+//       case "shipped":
+//         return "bg-purple-100 text-purple-800 border-purple-300";
+//       case "cancelled":
+//         return "bg-red-100 text-red-800 border-red-300";
+//       case "returned":
+//         return "bg-amber-100 text-amber-800 border-amber-300";
+//       default:
+//         return "bg-gray-100 text-gray-800 border-gray-300";
+//     }
+//   };
+
+//   return (
+//     <div className="container mx-auto px-4 py-8 md:py-12">
+//       <div className="max-w-5xl mx-auto">
+//         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
+//           <div>
+//             <h1 className="text-3xl font-serif font-bold text-gray-900">My Orders</h1>
+//             <p className="text-gray-500 mt-1">View and manage your order history</p>
+//           </div>
+//           <Link 
+//             to="/"
+//             className="mt-4 md:mt-0 inline-flex items-center text-gray-600 hover:text-gray-900"
+//           >
+//             <ArrowLeft size={16} className="mr-2" />
+//             Back to Home
+//           </ Link>
+//         </div>
+
+//         <Card className="mb-8">
+//           <CardHeader className="pb-4">
+//             <div className="relative">
+//               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+//               <Input
+//                 type="text"
+//                 placeholder="Search by order ID or status..."
+//                 className="pl-10 w-full"
+//                 value={searchQuery}
+//                 onChange={(e) => setSearchQuery(e.target.value)}
+//               />
+//             </div>
+//           </CardHeader>
+
+//           <CardContent className="p-0">
+//             {filteredOrders.length > 0 ? (
+//               <div className="divide-y divide-gray-100">
+//                 {filteredOrders.map((order) => (
+//                   <div key={order.orderId} className="transition-colors">
+//                     <div 
+//                       className="p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between cursor-pointer hover:bg-gray-50/50"
+//                       onClick={() => toggleOrderExpand(order.orderId)}
+//                     >
+//                       <div className="flex flex-col mb-3 md:mb-0">
+//                         <div className="flex items-center gap-2 md:gap-4">
+//                           <span className="text-lg font-medium text-gray-900">{order.orderId}</span>
+//                           <Badge className={`${getStatusColor(order.status)}`}>
+//                             {order.status}
+//                           </Badge>
+//                         </div>
+//                         <div className="text-sm text-gray-500 mt-1 flex flex-col md:flex-row md:items-center md:gap-3">
+//                           <span>Ordered on {order.date}</span>
+//                           <span className="hidden md:inline">•</span>
+//                           <span>{order.total}</span>
+//                         </div>
+//                       </div>
+                      
+//                       <div className="flex items-center gap-3">
+//                         <Button
+//                           variant="outline"
+//                           size="sm"
+//                           className="text-xs"
+//                           onClick={(e) => {
+//                             e.stopPropagation();
+//                             handleViewDetails(order);
+//                           }}
+//                         >
+//                           <Eye size={14} className="mr-1.5" />
+//                           Details
+//                         </Button>
+//                         {expandedOrderId === order.orderId ? (
+//                           <ChevronUp size={20} className="text-gray-500" />
+//                         ) : (
+//                           <ChevronDown size={20} className="text-gray-500" />
+//                         )}
+//                       </div>
+//                     </div>
+                    
+//                     {expandedOrderId === order.orderId && (
+//                       <div className="p-4 md:p-6 bg-gray-50 border-t border-gray-100">
+//                         <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+//                           <div>
+//                             <h4 className="text-xs uppercase text-gray-500 font-medium mb-1">Payment Method</h4>
+//                             <p className="text-sm text-gray-900">{order.paymentMethod}</p>
+//                           </div>
+//                           <div>
+//                             <h4 className="text-xs uppercase text-gray-500 font-medium mb-1">Tracking Number</h4>
+//                             <p className="text-sm text-gray-900">{order.trackingNumber}</p>
+//                           </div>
+//                           <div className="flex justify-start md:justify-end items-center gap-3 flex-wrap">
+//                             <Button
+//                               variant="outline"
+//                               size="sm"
+//                               className="text-xs"
+//                               onClick={(e) => {
+//                                 e.stopPropagation();
+//                                 handleDownloadInvoice(order.orderId);
+//                               }}
+//                             >
+//                               <Download size={14} className="mr-1.5" />
+//                               Invoice
+//                             </Button>
+                            
+//                             {order.status === "Shipped" && (
+//                               <Button
+//                                 variant="outline"
+//                                 size="sm"
+//                                 className="text-xs"
+//                               >
+//                                 <ExternalLink size={14} className="mr-1.5" />
+//                                 Track
+//                               </Button>
+//                             )}
+//                           </div>
+//                         </div>
+                        
+//                         <h4 className="font-medium text-gray-900 mb-3">Order Items</h4>
+//                         <div className="space-y-3 mb-4">
+//                           {order.items.map((item) => (
+//                             <div key={item.id} className="flex items-start p-3 bg-white rounded-lg border border-gray-100">
+//                               <div className="h-16 w-16 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
+//                                 <img 
+//                                   src={item.image} 
+//                                   alt={item.name} 
+//                                   className="h-full w-full object-cover"
+//                                   onError={(e) => {
+//                                     e.target.src = "https://via.placeholder.com/150";
+//                                   }}
+//                                 />
+//                               </div>
+//                               <div className="ml-4 flex-grow">
+//                                 <h5 className="text-sm font-medium text-gray-900">{item.name}</h5>
+//                                 <div className="flex justify-between items-center mt-1">
+//                                   <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+//                                   <p className="text-sm font-medium text-gray-900">{item.price}</p>
+//                                 </div>
+//                               </div>
+//                             </div>
+//                           ))}
+//                         </div>
+                        
+//                         <div className="flex flex-wrap gap-3 justify-start md:justify-end mt-4">
+//                           {order.status === "Processing" && (
+//                             <Button
+//                               variant="outline"
+//                               className="border-red-200 text-red-600 hover:text-red-700 hover:bg-red-50"
+//                               onClick={(e) => {
+//                                 e.stopPropagation();
+//                                 handleCancelOrder(order);
+//                               }}
+//                             >
+//                               Cancel Order
+//                             </Button>
+//                           )}
+                          
+//                           {order.status === "Delivered" && (
+//                             <Button
+//                               variant="outline"
+//                               className="border-amber-200 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+//                               onClick={(e) => {
+//                                 e.stopPropagation();
+//                                 handleReturnOrder(order);
+//                               }}
+//                             >
+//                               Return Order
+//                             </Button>
+//                           )}
+//                         </div>
+//                       </div>
+//                     )}
+//                   </div>
+//                 ))}
+//               </div>
+//             ) : (
+//               <div className="py-12 px-6 text-center">
+//                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+//                   <ShoppingBag size={24} className="text-gray-400" />
+//                 </div>
+//                 <h3 className="text-lg font-medium text-gray-900 mb-2">No Orders Found</h3>
+//                 {searchQuery ? (
+//                   <p className="text-gray-500 mb-4">No orders match your search criteria.</p>
+//                 ) : (
+//                   <p className="text-gray-500 mb-4">You haven't placed any orders yet.</p>
+//                 )}
+//                 <Button onClick={() => navigate("/")}>
+//                   Start Shopping
+//                 </Button>
+//               </div>
+//             )}
+//           </CardContent>
+//         </Card>
+//       </div>
+      
+//       {selectedOrder && (
+//         <OrderDetailDialog 
+//           open={showDetailDialog} 
+//           onOpenChange={setShowDetailDialog} 
+//           order={selectedOrder}
+//           onDownloadInvoice={() => handleDownloadInvoice(selectedOrder.orderId)}
+//         />
+//       )}
+      
+//       {selectedOrder && (
+//         <CancelOrderDialog 
+//           open={showCancelDialog} 
+//           onOpenChange={setShowCancelDialog} 
+//           order={selectedOrder}
+//         />
+//       )}
+      
+//       {selectedOrder && (
+//         <ReturnOrderDialog 
+//           open={showReturnDialog} 
+//           onOpenChange={setShowReturnDialog} 
+//           order={selectedOrder}
+//         />
+//       )}
+//     </div>
+//   );
+// };
+
+// export default Order;
+
+
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { 
+  Search, ChevronDown, ChevronUp, Download, 
+  ExternalLink, Eye, ArrowLeft, ShoppingBag 
+} from "lucide-react";
+import { Card, CardContent, CardHeader } from "../../ui/Card"; 
+import { Button } from "../../ui/button";
+import { Input } from "../../ui/input";
+import { Badge } from "../../ui/OrderBadge"; 
+import { toast } from "react-toastify";
+import OrderDetailDialog from "./OrderDetailDialog";
+import CancelOrderDialog from "./CancelOrder";
+import ReturnOrderDialog from "./ReturnOrderDialog";
+
+const Order = () => {
+  const navigate = useNavigate();
+  // State management
+  const [searchQuery, setSearchQuery] = useState("");
   const [expandedOrderId, setExpandedOrderId] = useState(null);
-  
-  // Mock order data
+  const [modalState, setModalState] = useState({
+    type: null, // 'detail', 'cancel', 'return'
+    isOpen: false,
+    order: null,
+  });
+
+  // Mock order data - this would come from API
   const orders = [
     {
-      id: "ORD-3892-4902",
-      date: "June 12, 2023",
+      orderId: "CER-10045-2023",
+      date: "April 15, 2023",
       status: "Delivered",
-      total: "$189.99",
+      total: "₹2,899",
       paymentMethod: "Credit Card",
-      trackingNumber: "TRK928374651",
+      trackingNumber: "TRK764532198",
+      shippingAddress: {
+        fullName: "Rahul Sharma",
+        addressLine: "123 Main Street, Apartment 4B",
+        city: "Bengaluru",
+        state: "Karnataka",
+        pincode: "560001",
+        phone: "+91 98765 43210"
+      },
       items: [
         {
           id: 1,
-          name: "Handcrafted Ceramic Mug",
-          price: "$29.99",
-          quantity: 2,
-          image: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80"
+          name: "Handcrafted Ceramic Vase",
+          price: "₹1,499",
+          quantity: 1,
+          image: "https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
+          status: "Delivered"
         },
         {
           id: 2,
-          name: "Ceramic Flower Pot",
-          price: "$49.99",
+          name: "Ceramic Serving Plate",
+          price: "₹1,399",
           quantity: 1,
-          image: "https://images.unsplash.com/photo-1485955900006-10f4d324d411?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80"
-        },
+          image: "https://images.unsplash.com/photo-1516223725307-6f76b9ec8742?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
+          status: "Delivered"
+        }
+      ]
+    },
+    {
+      orderId: "CER-10039-2023",
+      date: "April 10, 2023",
+      status: "Shipped",
+      total: "₹3,699",
+      paymentMethod: "UPI",
+      trackingNumber: "TRK837645123",
+      shippingAddress: {
+        fullName: "Priya Patel",
+        addressLine: "456 Park Avenue, Building C",
+        city: "Mumbai",
+        state: "Maharashtra",
+        pincode: "400001",
+        phone: "+91 98765 12345"
+      },
+      items: [
         {
           id: 3,
-          name: "Ceramic Serving Plate",
-          price: "$79.99",
-          quantity: 1,
-          image: "https://images.unsplash.com/photo-1516223725307-6f76b9ec8742?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80"
-        }
-      ]
-    },
-    {
-      id: "ORD-2573-9183",
-      date: "May 28, 2023",
-      status: "Processing",
-      total: "$95.99",
-      paymentMethod: "PayPal",
-      trackingNumber: "TRK837465123",
-      items: [
-        {
-          id: 4,
           name: "Ceramic Bowl Set (4 pieces)",
-          price: "$79.99",
+          price: "₹2,499",
           quantity: 1,
-          image: "https://images.unsplash.com/photo-1578873375969-d60aad647bb9?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80"
+          image: "https://images.unsplash.com/photo-1578873375969-d60aad647bb9?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
+          status: "Shipped"
         },
         {
-          id: 5,
-          name: "Ceramic Chopstick Holder",
-          price: "$15.99",
+          id: 4,
+          name: "Ceramic Tea Cups (Set of 2)",
+          price: "₹1,199",
           quantity: 1,
-          image: "https://images.unsplash.com/photo-1525974160448-038dacadcc71?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80"
+          image: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
+          status: "Shipped"
         }
       ]
     },
     {
-      id: "ORD-9284-3572",
-      date: "April 15, 2023",
-      status: "Delivered",
-      total: "$129.99",
-      paymentMethod: "Credit Card",
-      trackingNumber: "TRK764532198",
+      orderId: "CER-10028-2023",
+      date: "March 25, 2023",
+      status: "Processing",
+      total: "₹4,499",
+      paymentMethod: "Cash on Delivery",
+      trackingNumber: "Pending",
+      shippingAddress: {
+        fullName: "Vikram Singh",
+        addressLine: "789 Lake View, Floor 2",
+        city: "Delhi",
+        state: "Delhi",
+        pincode: "110001",
+        phone: "+91 87654 32109"
+      },
       items: [
         {
-          id: 6,
-          name: "Ceramic Vase",
-          price: "$129.99",
+          id: 5,
+          name: "Large Decorative Ceramic Planter",
+          price: "₹3,299",
           quantity: 1,
-          image: "https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80"
+          image: "https://images.unsplash.com/photo-1485955900006-10f4d324d411?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
+          status: "Processing"
+        },
+        {
+          id: 6,
+          name: "Ceramic Chopstick Holders (Set of 4)",
+          price: "₹1,199",
+          quantity: 1,
+          image: "https://images.unsplash.com/photo-1525974160448-038dacadcc71?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
+          status: "Processing"
         }
       ]
     }
   ];
 
-  const toggleOrderExpand = (orderId) => {
-    if (expandedOrderId === orderId) {
-      setExpandedOrderId(null);
-    } else {
-      setExpandedOrderId(orderId);
-    }
+  // Filter orders based on search query
+  const filteredOrders = orders.filter(order => 
+    order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    order.status.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Modal handlers - simplified to a single pattern
+  const openModal = (type, order) => {
+    setModalState({
+      type,
+      isOpen: true,
+      order
+    });
   };
 
+  const closeModal = () => {
+    setModalState({
+      type: null,
+      isOpen: false,
+      order: null
+    });
+  };
+
+  // Toggle order expansion
+  const toggleOrderExpand = (orderId) => {
+    setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
+  };
+
+  // Download invoice handler
+  const handleDownloadInvoice = (orderId) => {
+    toast.success(`Invoice for order ${orderId} has been downloaded`, {
+      position: "top-right",
+      autoClose: 3000,
+    });
+  };
+
+  // Helper for status color
   const getStatusColor = (status) => {
-    switch (status) {
-      case "Delivered":
-        return "bg-green-100 text-green-800";
-      case "Processing":
-        return "bg-blue-100 text-blue-800";
-      case "Shipped":
-        return "bg-purple-100 text-purple-800";
-      case "Cancelled":
-        return "bg-red-100 text-red-800";
+    switch (status.toLowerCase()) {
+      case "delivered":
+        return "bg-green-100 text-green-800 border-green-300";
+      case "processing":
+        return "bg-blue-100 text-blue-800 border-blue-300";
+      case "shipped":
+        return "bg-purple-100 text-purple-800 border-purple-300";
+      case "cancelled":
+        return "bg-red-100 text-red-800 border-red-300";
+      case "returned":
+        return "bg-amber-100 text-amber-800 border-amber-300";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-800 border-gray-300";
     }
   };
 
   return (
-    <div className="container mx-auto px-4 py-20">
-      <h1 className="text-3xl font-serif font-bold mb-8 text-center">My Orders</h1>
-      
-      <div className="max-w-4xl mx-auto">
-        {orders.length > 0 ? (
-          <div className="bg-white shadow rounded-lg overflow-hidden">
-            {orders.map((order) => (
-              <div key={order.id} className="border-b border-gray-200 last:border-b-0">
-                <div 
-                  className="p-4 flex flex-wrap items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
-                  onClick={() => toggleOrderExpand(order.id)}
-                >
-                  <div className="w-full md:w-auto mb-2 md:mb-0">
-                    <h3 className="text-lg font-medium text-gray-900">{order.id}</h3>
-                    <p className="text-sm text-gray-500">{order.date}</p>
-                  </div>
-                  
-                  <div className="flex items-center space-x-4">
-                    <div className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
-                      {order.status}
-                    </div>
-                    <div className="text-sm font-medium">{order.total}</div>
-                    <button className="text-gray-500">
-                      {expandedOrderId === order.id ? (
-                        <ChevronUp size={20} />
-                      ) : (
-                        <ChevronDown size={20} />
-                      )}
-                    </button>
-                  </div>
-                </div>
-                
-                {expandedOrderId === order.id && (
-                  <div className="p-4 bg-gray-50 border-t border-gray-200">
-                    <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <h4 className="text-xs uppercase text-gray-500 font-medium mb-1">Payment Method</h4>
-                        <p className="text-sm text-gray-900">{order.paymentMethod}</p>
+    <div className="container mx-auto px-4 py-8 my-10 md:py-12 ">
+      <div className="max-w-5xl mx-auto">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-serif font-bold text-gray-900">My Orders</h1>
+            <p className="text-gray-500 mt-1">View and manage your order history</p>
+          </div>
+        </div>
+
+        <Card className="mb-8">
+          <CardHeader className="pb-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Input
+                type="text"
+                placeholder="Search by order ID or status..."
+                className="pl-10 w-full"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </CardHeader>
+
+          <CardContent className="p-0">
+            {filteredOrders.length > 0 ? (
+              <div className="divide-y divide-gray-100">
+                {filteredOrders.map((order) => (
+                  <div key={order.orderId} className="transition-colors">
+                    <div 
+                      className="p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between cursor-pointer hover:bg-gray-50/50"
+                      onClick={() => toggleOrderExpand(order.orderId)}
+                    >
+                      <div className="flex flex-col mb-3 md:mb-0">
+                        <div className="flex items-center gap-2 md:gap-4">
+                          <span className="text-lg font-medium text-gray-900">{order.orderId}</span>
+                          <Badge className={`${getStatusColor(order.status)}`}>
+                            {order.status}
+                          </Badge>
+                        </div>
+                        <div className="text-sm text-gray-500 mt-1 flex flex-col md:flex-row md:items-center md:gap-3">
+                          <span>Ordered on {order.date}</span>
+                          <span className="hidden md:inline">•</span>
+                          <span>{order.total}</span>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="text-xs uppercase text-gray-500 font-medium mb-1">Tracking Number</h4>
-                        <p className="text-sm text-gray-900">{order.trackingNumber}</p>
-                      </div>
-                      <div className="flex justify-start md:justify-end items-center">
-                        <button className="text-sm text-gray-600 hover:text-gray-900 flex items-center">
-                          <Eye size={16} className="mr-1" />
-                          View Invoice
-                        </button>
-                        {order.status === "Shipped" || order.status === "Delivered" ? (
-                          <button className="text-sm text-gray-600 hover:text-gray-900 flex items-center ml-4">
-                            <ExternalLink size={16} className="mr-1" />
-                            Track Package
-                          </button>
-                        ) : null}
+                      
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-xs"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openModal('detail', order);
+                          }}
+                        >
+                          <Eye size={14} className="mr-1.5" />
+                          Details
+                        </Button>
+                        {expandedOrderId === order.orderId ? (
+                          <ChevronUp size={20} className="text-gray-500" />
+                        ) : (
+                          <ChevronDown size={20} className="text-gray-500" />
+                        )}
                       </div>
                     </div>
                     
-                    <h4 className="font-medium text-gray-900 mb-3">Order Items</h4>
-                    <div className="space-y-3">
-                      {order.items.map((item) => (
-                        <div key={item.id} className="flex items-start p-3 bg-white rounded-lg shadow-sm">
-                          <div className="h-16 w-16 flex-shrink-0">
-                            <img 
-                              src={item.image} 
-                              alt={item.name} 
-                              className="h-full w-full object-contain"
-                              onError={(e) => {
-                                e.target.src = "https://via.placeholder.com/150";
-                              }}
-                            />
+                    {expandedOrderId === order.orderId && (
+                      <div className="p-4 md:p-6 bg-gray-50 border-t border-gray-100">
+                        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <h4 className="text-xs uppercase text-gray-500 font-medium mb-1">Payment Method</h4>
+                            <p className="text-sm text-gray-900">{order.paymentMethod}</p>
                           </div>
-                          <div className="ml-4 flex-grow">
-                            <h5 className="text-sm font-medium text-gray-900">{item.name}</h5>
-                            <div className="flex justify-between items-center mt-1">
-                              <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                              <p className="text-sm font-medium text-gray-900">{item.price}</p>
-                            </div>
+                          <div>
+                            <h4 className="text-xs uppercase text-gray-500 font-medium mb-1">Tracking Number</h4>
+                            <p className="text-sm text-gray-900">{order.trackingNumber}</p>
+                          </div>
+                          <div className="flex justify-start md:justify-end items-center gap-3 flex-wrap">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDownloadInvoice(order.orderId);
+                              }}
+                            >
+                              <Download size={14} className="mr-1.5" />
+                              Invoice
+                            </Button>
+                            
+                            {order.status === "Shipped" && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-xs"
+                              >
+                                <ExternalLink size={14} className="mr-1.5" />
+                                Track
+                              </Button>
+                            )}
                           </div>
                         </div>
-                      ))}
-                    </div>
+                        
+                        <h4 className="font-medium text-gray-900 mb-3">Order Items</h4>
+                        <div className="space-y-3 mb-4">
+                          {order.items.map((item) => (
+                            <div key={item.id} className="flex items-start p-3 bg-white rounded-lg border border-gray-100">
+                              <div className="h-16 w-16 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
+                                <img 
+                                  src={item.image} 
+                                  alt={item.name} 
+                                  className="h-full w-full object-cover"
+                                  onError={(e) => {
+                                    e.target.src = "https://via.placeholder.com/150";
+                                  }}
+                                />
+                              </div>
+                              <div className="ml-4 flex-grow">
+                                <h5 className="text-sm font-medium text-gray-900">{item.name}</h5>
+                                <div className="flex justify-between items-center mt-1">
+                                  <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                                  <p className="text-sm font-medium text-gray-900">{item.price}</p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-3 justify-start md:justify-end mt-4">
+                          {order.status === "Processing" && (
+                            <Button
+                              variant="outline"
+                              className="border-red-200 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openModal('cancel', order);
+                              }}
+                            >
+                              Cancel Order
+                            </Button>
+                          )}
+                          
+                          {order.status === "Delivered" && (
+                            <Button
+                              variant="outline"
+                              className="border-amber-200 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openModal('return', order);
+                              }}
+                            >
+                              Return Order
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
+                ))}
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12 bg-white rounded-lg shadow">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Orders Yet</h3>
-            <p className="text-gray-500">You haven't placed any orders yet.</p>
-            <button className="mt-4 px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 inline-flex items-center">
-              Start Shopping
-            </button>
-          </div>
-        )}
+            ) : (
+              <div className="py-12 px-6 text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+                  <ShoppingBag size={24} className="text-gray-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No Orders Found</h3>
+                {searchQuery ? (
+                  <p className="text-gray-500 mb-4">No orders match your search criteria.</p>
+                ) : (
+                  <p className="text-gray-500 mb-4">You haven't placed any orders yet.</p>
+                )}
+                <Button onClick={() => navigate("/")}>
+                  Start Shopping
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
+      
+      {/* Modals */}
+      {modalState.order && (
+        <>
+          {/* Order Detail Modal */}
+          <OrderDetailDialog 
+            open={modalState.type === 'detail' && modalState.isOpen} 
+            onOpenChange={(isOpen) => isOpen ? null : closeModal()} 
+            order={modalState.order}
+            onDownloadInvoice={() => handleDownloadInvoice(modalState.order.orderId)}
+          />
+          
+          {/* Cancel Order Modal */}
+          <CancelOrderDialog 
+            open={modalState.type === 'cancel' && modalState.isOpen} 
+            onOpenChange={(isOpen) => isOpen ? null : closeModal()} 
+            order={modalState.order}
+          />
+          
+          {/* Return Order Modal */}
+          <ReturnOrderDialog 
+            open={modalState.type === 'return' && modalState.isOpen} 
+            onOpenChange={(isOpen) => isOpen ? null : closeModal()} 
+            order={modalState.order}
+          />
+        </>
+      )}
     </div>
   );
 };
 
-export default Orders;
+export default Order;

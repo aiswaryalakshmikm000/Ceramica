@@ -1,0 +1,17 @@
+import Coupons from "../../components/user/coupons/Coupons";
+import Navbar from "../../components/layouts/Navbar"
+import Footer from "../../components/layouts/Footer"
+
+
+const UserCoupons = () => {
+  
+    return (
+      <div className="min-h-screen">
+        <Navbar />
+        <Coupons />
+        <Footer />
+      </div>
+    );
+  };
+  
+  export default UserCoupons;

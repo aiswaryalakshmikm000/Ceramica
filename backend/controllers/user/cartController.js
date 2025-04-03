@@ -105,6 +105,8 @@ const showCart = async (req, res) => {
     }
 
     const originalItemCount = cart.items.length;
+    let outOfStockItems = [];
+    
     cart.items = cart.items.filter(item => {
       const product = item.productId;
       return product && product.isListed === true;
