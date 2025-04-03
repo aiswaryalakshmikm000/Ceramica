@@ -45,8 +45,6 @@ const register = async (req, res) => {
       role: "admin",
     });
 
-    console.log("Admin registered successfully");
-
     // Send response with admin details (without tokens)
     res.status(201).json({
       success: true,
@@ -72,7 +70,6 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  console.log("Received login request:", req.body);
 
   if (!email || !password) {
     return res.status(400).json({
@@ -82,7 +79,6 @@ const login = async (req, res) => {
   }
 
   try {
-    console.log("Checking if admin exists...");
 
     const admin = await Admin.findOne({ email, role: "admin" });
 
@@ -93,8 +89,6 @@ const login = async (req, res) => {
       });
     }
 
-    console.log("Admin found, verifying password...");
-
     const checkPassword = await bcrypt.compare(password, admin.password);
     if (!checkPassword) {
       return res.status(401).json({
@@ -103,7 +97,6 @@ const login = async (req, res) => {
       });
     }
 
-    console.log("Password verified, generating tokens...");
 
     const adminData = { id: admin._id, email: admin.email, role: admin.role };
     const adminAccessToken = generateAccessToken(adminData);
@@ -123,7 +116,6 @@ const login = async (req, res) => {
     setCookie("adminAccessToken", adminAccessToken, 30 * 60 * 1000, res);
     setCookie("adminRefreshToken", adminRefreshToken, 15 * 24 * 60 * 60 * 1000, res); 
 
-    console.log("Admin logged in successfully.");
 
     res.status(200).json({
       success: true,
@@ -149,7 +141,6 @@ const login = async (req, res) => {
 const logout = async (req, res) => {
   try {
     const adminRefreshToken = req.cookies["adminRefreshToken"];
-    console.log("Admin REF:", adminRefreshToken);
 
     if (!adminRefreshToken) {
       return res.status(400).json({ message: "No refresh token found" });
@@ -170,7 +161,6 @@ const logout = async (req, res) => {
       sameSite: "strict",
     });
 
-    console.log("Admin logout successful.");
     
     res.status(200).json({ message: "Admin logout successful" });
 
@@ -182,11 +172,9 @@ const logout = async (req, res) => {
 
 
 const refreshAccessToken = async (req, res) => {
-  console.log("REFRESHING ADMIN ACCESS TOKEN");
 
   const refreshToken = req.cookies.adminRefreshToken;
   if (!refreshToken) {
-    console.log("No token provided");
     return res
       .status(401)
       .json({ error: "No refresh token provided.", success: false });
@@ -195,9 +183,7 @@ const refreshAccessToken = async (req, res) => {
   try {
     // Verify the refresh token
     const decoded = jwt.verify(refreshToken, process.env.ADMIN_REFRESH_TOKEN_KEY);
-    console.log('DECODED', decoded)
     const admin_id = decoded.user.id;
-    console.log("decoded role",decoded.user.role)
 
     // Check if the refresh token exists in the database and is valid
     const storedToken = await RefreshToken.findOne({
@@ -208,7 +194,6 @@ const refreshAccessToken = async (req, res) => {
     });
 
     if (!storedToken) {
-      console.log("Invalid refresh token in database");
       return res
         .status(403)
         .json({ success: false, error: "Invalid refresh token" });
@@ -234,12 +219,9 @@ const refreshAccessToken = async (req, res) => {
     // Use setCookie function to store the new access token
     setCookie("adminAccessToken", newAccessToken, 30 * 60 * 1000, res);
 
-    console.log("New admin access token generated and set in cookie.");
-
     res.status(200).json({ success: true, message: "Access token refreshed", admin });
 
   } catch (error) {
-    console.log("Error in refreshing token", error.message);
     res
       .status(403)
       .json({ success: false, message: "Token verification failed", error });
@@ -248,17 +230,14 @@ const refreshAccessToken = async (req, res) => {
 
 
 const checkAuth = async (req, res) => {
-  console.log("#$%^&*%$#@!$&^*%$#@%&^* Admin checkauth")
   try {
     const adminId = req.user.id; // From authenticateAdminToken middleware
     const admin = await Admin.findById(adminId).select('name email role');
 
     if (!admin) {
-      console.logg("admin not fount checkAut")
       return res.status(404).json({ success: false, message: 'Admin not found' });
     }
 
-    console.log("Admin from check auth", admin)
     return res.status(200).json({
       success: true,
       admin: {

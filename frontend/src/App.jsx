@@ -17,10 +17,12 @@ const UserProfile = lazy(() => import ('./pages/user/UserProfile'))
 const UserEditProfile = lazy(() => import ('./pages/user/UserEditProfile'))
 const UserAddress = lazy(() => import ('./pages/user/UserAddress'))
 const UserOrder = lazy(() => import ('./components/user/order/Order'))
-const UserWishlist = lazy(() => import ('./components/user/wishlist/Wishlist'))
+const UserWishlist = lazy(() => import ('./pages/user/UserWishlist'))
 const UserWallet = lazy(() => import ('./components/user/wallet/Wallet'))
 const UserCoupons = lazy(() => import ('./components/user/coupons/Coupons'))
 const UserCart = lazy(() => import ('./pages/user/UserCart'))
+const UserCheckout = lazy(() => import ('./pages/user/UserCheckout'))
+const UserOderConfrimation = lazy(() => import ('./pages/user/UserOrderConfirmation'))
 
 const AdminLogin = lazy(() => import("./components/admin/AdminLogin"));
 const AdminRegister = lazy(() => import("./components/admin/AdminRegister"));
@@ -76,10 +78,12 @@ function App() {
           <Route path="/profile/edit/:id" element={<IsUserLogin><UserEditProfile /></IsUserLogin>} />
           <Route path="/address/:userId" element={<IsUserLogin><UserAddress /></IsUserLogin>} />
           <Route path="/orders" element={<IsUserLogin><UserOrder /></IsUserLogin>} />
-          <Route path="/wishlist" element={<IsUserLogin><UserWishlist /></IsUserLogin>} />
+          <Route path="/wishlist/:userId" element={<IsUserLogin><UserWishlist /></IsUserLogin>} />
           <Route path="/wallet" element={<IsUserLogin><UserWallet /></IsUserLogin>} />
           <Route path="/coupons" element={<IsUserLogin><UserCoupons /></IsUserLogin>} />
           <Route path="/cart/:userId" element={<IsUserLogin><UserCart /></IsUserLogin>} />
+          <Route path="/checkout" element={<IsUserLogin><UserCheckout /></IsUserLogin>} />
+          <Route path="/order-confirmation" element={<IsUserLogin><UserOderConfrimation /></IsUserLogin>} />
 
           {/* Public Admin Routes */}
           <Route path="/admin/register" element={<IsAdminLogout><AdminRegister /></IsAdminLogout>} />

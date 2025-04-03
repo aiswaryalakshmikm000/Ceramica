@@ -175,17 +175,10 @@ const Address = () => {
                 </div>
                 
                 <div className="mt-4 flex justify-between items-center">
-                  {address.isDefault ? (
+                  {address.isDefault && (
                     <span className="text-sm bg-gray-100 text-gray-700 py-1 px-3 rounded-full">
                       Default Address
                     </span>
-                  ) : (
-                    <button 
-                      onClick={() => handleSetDefault(address._id)}
-                      className="text-sm text-gray-600 hover:text-gray-900 underline"
-                    >
-                      Set as Default
-                    </button>
                   )}
                 </div>
               </div>

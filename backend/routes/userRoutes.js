@@ -10,6 +10,7 @@ const { fetchBestProducts, fetchFeaturedProducts, viewProduct,fetchProducts} =re
 const {showProfile, editProfile} =require('../controllers/user/userController')
 const {addAddress, showAddresses, editAddress, deleteAddress, setDefaultAddress} = require('../controllers/user/addressController')
 const {addToCart, showCart, updateCart, removeItemFromCart} = require('../controllers/user/cartController')
+const {updateWishlistItem, removeWishlistItem, getWishlist, toggleWishlistItem} = require("../controllers/user/wishlistController");
 
 const userRoute = express()
 
@@ -60,5 +61,10 @@ userRoute.get('/cart/:userId', authenticateToken, showCart);
 userRoute.put('/cart/:userId/update', authenticateToken, updateCart)
 userRoute.delete('/cart/:userId/remove', authenticateToken, removeItemFromCart)
 
+//wishlist
+userRoute.post('/wishlist/:userId/toggle', authenticateToken, toggleWishlistItem);
+userRoute.delete('/wishlist/:userId/remove', authenticateToken, removeWishlistItem);
+userRoute.put('/wishlist/:userId/update', authenticateToken, updateWishlistItem);
+userRoute.get('/wishlist/:userId', authenticateToken, getWishlist);
 
 module.exports = userRoute

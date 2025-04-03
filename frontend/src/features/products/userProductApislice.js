@@ -32,24 +32,36 @@ export const userProductApiSlice = userApi.injectEndpoints({
       providesTags: (result, error, id) => [{ type: "Product", id }]
     }),
 
+
     fetchWishlist: builder.query({
-      query: () => "/wishlist",
+      query: (userId) => `/wishlist/${userId}`,
       providesTags: ["Wishlist"],
+      transformResponse: (response) => response || [],
     }),
     
-    addToWishlist: builder.mutation({
-      query: (productId) => ({
-        url: "/wishlist",
+    toggleWishlistItem: builder.mutation({
+      query: ({ userId, productId, color }) => ({
+        url: `/wishlist/${userId}/toggle`,
         method: "POST",
-        body: { productId },
+        body: { productId, color },
       }),
       invalidatesTags: ["Wishlist"],
     }),
 
     removeFromWishlist: builder.mutation({
-      query: (productId) => ({
-        url: `/wishlist/${productId}`,
+      query: ({ userId, productId, color }) => ({
+        url: `/wishlist/${userId}/remove`,
         method: "DELETE",
+        body: { productId, color },
+      }),
+      invalidatesTags: ["Wishlist"],
+    }),
+
+    updateWishlistItem: builder.mutation({
+      query: ({ userId, productId, oldColor, newColor }) => ({
+        url: `/wishlist/${userId}/update`,
+        method: "PUT",
+        body: { productId, oldColor, newColor },
       }),
       invalidatesTags: ["Wishlist"],
     }),
@@ -61,7 +73,7 @@ export const userProductApiSlice = userApi.injectEndpoints({
         method: "POST",
         body: { productId, quantity, color },
       }),
-      invalidatesTags: ["Cart"],
+      invalidatesTags: ["Cart", "Wishlist"],
     }),
 
     getCart: builder.query({
@@ -96,8 +108,9 @@ export const {
   useFetchFeaturedProductsQuery,
   useViewProductQuery,
   useFetchWishlistQuery,
-  useAddToWishlistMutation,
+  useToggleWishlistItemMutation,
   useRemoveFromWishlistMutation,
+  useUpdateWishlistItemMutation,
   useAddToCartMutation,
   useGetCartQuery,
   useUpdateCartItemMutation,

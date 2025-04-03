@@ -60,7 +60,6 @@ const addCategory = async (req, res) => {
       category: newCategory,
     });
   } catch (error) {
-    console.log("error in adding category", error.message);
     res.status(500).json({
       success: false,
       message: error.message || "Something went wrong",
@@ -93,7 +92,6 @@ const listCategory = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Category status changed.", category });
   } catch (error) {
-    console.log("error in listing categories".error.message);
     res
       .status(error?.status || 500)
       .json({ message: error.message || "Something went wrong" });
@@ -106,8 +104,6 @@ const editCategory = async (req, res) => {
     const { catId } = req.params;
     const { name, description } = req.body;
     const file = req.file;
-
-    console.log("id:", req.params.catId)
 
     const category = await Category.findById(catId);
     if (!category) {
@@ -140,7 +136,6 @@ const editCategory = async (req, res) => {
       category: updatedCategory,
     });
   } catch (error) {
-    console.log("error in editing category", error.message);
     res.status(500).json({
       success: false,
       message: error.message || "Something went wrong",

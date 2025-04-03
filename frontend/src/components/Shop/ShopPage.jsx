@@ -10,6 +10,7 @@ import SortFilter from './filter/SortFilter';
 import ProductsGrid from './ProductGrid';
 import ShopHeader from './ShopHeader';
 import Pagination from '../common/Pagination';
+import { useAddToCartMutation } from '../../features/products/userProductApislice';
 
 const Shop = () => {
   const location = useLocation();

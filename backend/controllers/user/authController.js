@@ -23,9 +23,6 @@ const register = async (req, res) => {
   const { name, email, phone, password } = req.body;
   const file = req.file;
 
-  console.log(req.body)
-  console.log(req.file)
-
   if (!name || !email || !phone || !password) {
     return res.status(400).json({
       success: false,
@@ -60,8 +57,6 @@ const register = async (req, res) => {
       isVerified: false,
     });
 
-    console.log("User registered successfully");
-
     res.json({
       success: true,
       message: "User created. Please verify your email with OTP.",
@@ -75,7 +70,6 @@ const register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error in user registration:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
@@ -94,7 +88,6 @@ const login = async (req, res) => {
   }
 
   try {
-    console.log("Checking if user exists...");
 
     const userExist = await User.findOne({ email });
 
@@ -106,7 +99,6 @@ const login = async (req, res) => {
     }
 
     if (userExist.isBlocked) {
-      console.log("User is blocked");
       return res.status(403).json({
         success: false,
         message: "Account is blocked. Please contact support.",
@@ -121,13 +113,11 @@ const login = async (req, res) => {
     }
 
     if(!userExist.isVerified){
-      console.log("user is not verified")
       return res.status(403).json({
         success: false,
         message: "Please verify your email with OTP before logging in."
       })
     }
-    console.log("Verifying password...");
 
     const isPasswordCorrect = await bcrypt.compare(
       password,
@@ -139,7 +129,6 @@ const login = async (req, res) => {
         message: "Incorrect password",
       });
     }
-    console.log("Generating tokens...");
 
     // Generate tokens
     const userData = {
@@ -165,8 +154,6 @@ const login = async (req, res) => {
     // Use setCookie function to store tokens
     setCookie("userAccessToken", accessToken, 15 * 60 * 1000, res); 
     setCookie("userRefreshToken", refreshToken, 7 * 24 * 60 * 60 * 1000, res); 
-
-    console.log("User logged in successfully!");
 
     return res.status(200).json({
       success: true,
@@ -199,8 +186,6 @@ const logout = async (req, res) => {
       return res.status(400).json({ message: "No refresh token found" });
     }
 
-    console.log("Logging out user with refreshToken:", refreshToken);
-
     const deletedToken = await RefreshToken.findOneAndDelete({
       token: refreshToken,
     });
@@ -220,8 +205,6 @@ const logout = async (req, res) => {
       sameSite: "strict",
     });
 
-    console.log("User logout successful.");
-
     res.status(200).json({ message: "User logged out successfully" });
 
   } catch (error) {
@@ -232,21 +215,15 @@ const logout = async (req, res) => {
 
 
 const refreshUserToken = async (req, res) => {
-  console.log("Refreshing user access token");
 
   const refreshToken = req.cookies.userRefreshToken;
   if (!refreshToken) {
-    console.log("No refresh token provided");
     return res.status(401).json({ error: "No refresh token provided.", success: false });
   }
 
   try {
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_KEY);
-    console.log("decoded User", decoded)
     const userId = decoded.user.id;
-    console.log("Role decoded", userId, decoded.user.role)
-
-    console.log("Decoded data:", decoded, "User ID:", userId, "Refresh Token:", refreshToken);
 
     const storedToken = await RefreshToken.findOne({
       token: refreshToken,
@@ -254,10 +231,8 @@ const refreshUserToken = async (req, res) => {
       role: "user",
       expiresAt: { $gt: new Date() },
     });
-    console.log("Stored token from DB:", storedToken);
 
     if (!storedToken) {
-      console.log("Invalid refresh token in database");
       return res.status(403).json({ success: false, error: "Invalid refresh token" });
     }
 
@@ -280,12 +255,9 @@ const refreshUserToken = async (req, res) => {
     // Set new access token in a cookie
     setCookie("userAccessToken", newAccessToken, 15 * 60 * 1000, res); 
 
-    console.log("New access token generated and set in cookie");
-
     res.status(200).json({ success: true, message: "Access token refreshed", user: user });
 
   } catch (error) {
-    console.log("Error in refreshing token:", error.message);
     res.status(403).json({ success: false, message: "Token verification failed", error });
   }
 };
@@ -299,19 +271,15 @@ const sendOTP = async (req, res) => {
   }
   try {
     const otp = generateOTP();
-    console.log("Generated OTP:", otp);
 
     const otpEntry = await OTP.create({
       email,
       otp,
     });
-    console.log("otp saved in db", otpEntry);
 
     await sendVerificationEmail(email, otp);
-    console.log("otp sent successfully")
     res.json({ success: true, message: "OTP sent to email successfully" });
   } catch (error) {
-    console.log("Error in sendOTP:", error.message);
     res.status(error.status||500).json({success:false,message:"Internal server error."})
   }
 };
@@ -321,7 +289,6 @@ const verifyOTP = async (req, res) => {
   const { otp, email } = req.body;
   try {
     const otpData = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1);
-    console.log("otp query", otpData);
     //verifying otp
     if (!otpData.length || otp !== otpData[0].otp) {
       const errorMessage = otpData.length ? "OTP is not valid" : "OTP expired";
@@ -335,7 +302,6 @@ const verifyOTP = async (req, res) => {
     ).select("-password")
 
     res.status(200).json({ success: true, message: "OTP verified successfully.", user });
-    console.log("otp verified");
   } catch (error) {
     console.log("error in otp verification", error.message);
   }
@@ -372,7 +338,6 @@ const forgetPassword=async(req,res)=>{
    })
     //send mail with to email
     sendResetPasswordMail(email,otp)
-    console.log("forget password otp sent successfully")
     res.status(201).json({ success: true, message: "OTP sent to email successfully" });
   } catch (error) {
     res.status(error.status||500).json({message:"Internal server error."})
@@ -381,11 +346,9 @@ const forgetPassword=async(req,res)=>{
 
 const verifyResetOtp=async(req,res)=>{
   const {email,otp}=req.body;
-  console.log("verifying otp",otp);
   try {
     //check otp with email and otp and newest otp
    const otpData= await OTP.findOne({  email}).sort({createdAt:-1}).limit(1)
-   console.log("otpdata",otpData);
    
    if(otp!=otpData.otp || !otpData?.otp.length){
     const errorMessage=!otpData?.otp.length?"OTP Expired.":"OTP is not valid."
@@ -421,7 +384,6 @@ const resetPassword=async(req,res)=>{
    await user.save()
    res.status(200).json({success:true,message:'Password updated successfully'})
   } catch (error) {
-    console.log("error resdetting password",error);
     res.status(error.status||500).json({success:false,message:"Password resetting failed."})
   }
 }
@@ -430,7 +392,6 @@ const resetPassword=async(req,res)=>{
 
 
 const verifyPassword=async(req,res)=>{
-  console.log("verifiying password");
   const{userId}=req.params
   const{currentPassword}=req.body;
 try {
@@ -445,18 +406,15 @@ try {
  if(!isPasswordCorrect){
   return res.status(400).json({success:false, message:"Incorrect Password"})
  }
- console.log("verified successfully");
  
 res.status(200).json({success:true, message:"Password verified."})
 } catch (error) {
-  console.log("error verifying password",error);
   res.status(error.status||500).json({success:false, message:'Password verification failed.'})
 }
 }
 
 
 const changePassword=async(req,res)=>{
-  console.log("changing");
   const {userId}=req.params
   const {currentPassword,newPassword}=req.body;
   if(!newPassword.trim()||newPassword.length<6||!userId){
@@ -474,29 +432,23 @@ if(currentPassword===newPassword){
     await User.findOneAndUpdate({_id:userId},{$set:{password:securePassword}})
     res.status(200).json({success:true,message:"Password updated"})
   } catch (error) {
-    console.log("Error CHANGING PASSWORD",error);
     res.status(error.status||500).json({success:true, message:"Failed to update password"})
   }
 }
 
 
 const checkAuth = async (req, res) => {
-  console.log("#$%^&*%$#@!$&^*%$#@%&^* user checkauth")
   try {
     const userId = req.user.id; // From authenticateToken middleware
     const user = await User.findById(userId).select('name email role phone images isBlocked');
 
     if (!user) {
-      console.log("user not found in db");
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
     if (user.isBlocked) {
-      console.log("User is blocked");
       return res.status(403).json({ success: false, message: 'Account is blocked. Contact support' });
     }
-
-    console.log("user found from check auth",user)
 
     return res.status(200).json({
       success: true,
@@ -515,6 +467,7 @@ const checkAuth = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
 
 module.exports = {
   register,

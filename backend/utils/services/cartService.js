@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 const Cart = require('../../models/cartModel');
 const Product = require('../../models/productModel');
+const Wishlist = require('../../models/wishlistModel');
 
 // Round to two decimal places
 const roundToTwo = (num) => Number((Math.round(num * 100) / 100).toFixed(2));
@@ -45,8 +46,6 @@ const fetchLatestPrice = async (productId) => {
 // Recalculate cart totals
 const recalculateCartTotals = (cart) => {
     try {
-        console.log("$$$$$$$$$$$$$$$$44recalculatecartToatals")
-        console.log("Cart items:", JSON.stringify(cart.items, null, 2));
 
         const totals = cart.items
             .filter((item) => item.inStock === true)
@@ -82,8 +81,6 @@ const recalculateCartTotals = (cart) => {
             return totalAmount >= (process.env.THRESHOLD_AMOUNT || 500) ? 0 : 60;
         };
 
-        console.log("totals", totals)
-
         const deliveryCharge = calculateDeliveryCharge();
 
         console.log("deliveryCharge", deliveryCharge)
@@ -107,9 +104,32 @@ const recalculateCartTotals = (cart) => {
     }
 };
 
+
+// Helper function
+const checkAndRemoveFromCart = async (userId, productId, color) => {
+        let removedFromWishlist = false;
+      const wishlist = await Wishlist.findOne({ userId });
+      if (wishlist) {
+        const itemIndex = wishlist.items.findIndex(
+          (item) =>
+            item.productId.toString() === productId &&
+            item.color === color.toLowerCase()
+        );
+        if (itemIndex > -1) {
+          wishlist.items.splice(itemIndex, 1);
+          await wishlist.save();
+          removedFromWishlist = true;
+        }
+      }
+      {
+    }
+  };
+
+  
 module.exports = {
     calculateDiscountPrice,
     checkStock,
     fetchLatestPrice,
     recalculateCartTotals,
+    checkAndRemoveFromCart,
 };

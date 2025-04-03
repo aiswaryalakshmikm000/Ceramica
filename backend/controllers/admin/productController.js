@@ -9,26 +9,20 @@ const cloudinaryDeleteImages = require('../../utils/cloudinary/deleteImages')
 // Add product function
 const addProduct = async (req, res) => {
 
-  console.log("req.body", req.body)
-  console.log("req.files", req.files)
-
   const { name, description, price, discount, offerId, categoryId, tags, colors, isFeatured } = req.body;
 
   
   try {
     const productExist = await Product.findOne({ name: { $regex: new RegExp(`^${name}$`, "i") } });
-    console.log("existing product:",  productExist)
     if (productExist) {
       return res.status(400).json({ message: "Product already exists" });
     }
 
     // Parse colors (JSON string from FormData)
     const parsedColors = JSON.parse(colors);
-    console.log("parsedColors:",parsedColors)
 
     // Validate images (at least 3 total across all variants)
     if (!req.files || Object.keys(req.files).length === 0) {
-      console.log("images are required for color varient")
       return res.status(400).json({ message: "Images are required for color variants." });
     }
 
@@ -158,13 +152,11 @@ const updateProductStatus = async (req, res) => {
   try {
     const product = await Product.findById(id);
     if (!product) {
-      console.log("Product not found in the database.");
 
       return res
         .status(400)
         .json({ success: false, message: "Product not found" });
     }
-    console.log("Product found:", product);
 
     product.isListed = !product.isListed;
 
@@ -173,11 +165,8 @@ const updateProductStatus = async (req, res) => {
     // Fetch the updated product to send fresh data
     const updatedProduct = await Product.findById(id);
 
-    console.log("product list status updated");
-
     res.status(200).json({ success: true, message: "Poduct status changed", product: updatedProduct });
   } catch (error) {
-    console.log("error in updating status", error);
     res
       .status(error?.status || 500)
       .json({ message: error || "Something went wrong" });
@@ -193,16 +182,11 @@ const showProduct = async (req, res) => {
   }
 
   try {
-    console.log(`Searching for product with _id: ${_id}`);
-
     const product = await Product.findById(_id).populate("categoryId", "name");
 
     if (!product) {
-      console.log(`No product found with _id: ${_id}`);
       return res.status(404).json({ success: false, message: "Product not found" });
     }
-
-    console.log("Product found:", product);
 
     res.status(200).json({ success: true, message: "Product details fetched", product });
   } catch (error) {
@@ -218,8 +202,6 @@ const showProduct = async (req, res) => {
 
 const editProduct = async (req, res) => {
   const { _id } = req.params;
-  console.log("Request body:", req.body);
-  console.log("Request files:", req.files || "No files received");
 
   let { name, description, price, discount, categoryId, tags, colors, updatedUrls, deletedImages, isFeatured } = req.body;
   const files = req.files || {};
@@ -290,11 +272,8 @@ const editProduct = async (req, res) => {
 
     Object.assign(productExist, updatedProduct);
     const editedProduct = await productExist.save();
-
-    console.log("Updated product successfully:", editedProduct);
     res.status(200).json({ message: "Product edited successfully", product: editedProduct });
   } catch (error) {
-    console.error("Error editing product:", error.message);
     res.status(500).json({
       message: "Something went wrong while editing the product.",
       error: process.env.NODE_ENV === "development" ? error.message : undefined,

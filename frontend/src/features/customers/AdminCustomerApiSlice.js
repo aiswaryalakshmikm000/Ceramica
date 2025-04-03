@@ -1,4 +1,4 @@
-import { adminApi } from "../../services/api/adminApi"; // Import the existing adminApi
+import { adminApi } from "../../services/api/adminApi"; 
 
 export const adminCustomerApiSlice = adminApi.injectEndpoints({
   endpoints: (builder) => ({
