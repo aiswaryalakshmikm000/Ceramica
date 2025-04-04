@@ -9,6 +9,8 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const googleAuth = async (req, res) => {
   const { credential } = req.body;
 
+  console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$4",credential)
+
   if (!credential) {
     return res.status(400).json({
       success: false,
@@ -22,8 +24,11 @@ const googleAuth = async (req, res) => {
       idToken: credential,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
+    console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$", ticket)
     const payload = ticket.getPayload();
-    const { sub: googleId, email, name } = payload;
+
+    console.log("&&&&&&&&&&&*&^%$###################################33", payload)
+    const { sub: googleId, email, name, picture } = payload;
 
     const existingUser = await User.findOne({ email });
 
@@ -46,6 +51,7 @@ const googleAuth = async (req, res) => {
       if (existingUser) {
         user = existingUser;
         user.googleId = googleId;
+        user.images = picture;
         await user.save();
       } else {
         user = new User({
@@ -53,6 +59,7 @@ const googleAuth = async (req, res) => {
           email,
           name,
           role: "user",
+          images: picture,
           isVerified: true,
         });
         await user.save();
@@ -109,6 +116,7 @@ const googleAuth = async (req, res) => {
         email: user.email,
         name: user.name,
         role: user.role,
+        images: user.images
       },
     });
   } catch (error) {

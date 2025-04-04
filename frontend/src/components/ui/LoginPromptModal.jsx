@@ -46,13 +46,13 @@ const LoginPromptModal = ({ isOpen, onClose }) => {
           <div className="flex justify-center space-x-4 mb-4">
             <div className="flex items-center">
               <span className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mr-2">
-                <Heart size={20} className="text-orange-600" />
+                <Heart size={20} className="text-orange-800" />
               </span>
               <span className="text-sm text-gray-700">Wishlist</span>
             </div>
             <div className="flex items-center">
               <span className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mr-2">
-                <ShoppingCart size={20} className="text-orange-600" />
+                <ShoppingCart size={20} className="text-orange-800" />
               </span>
               <span className="text-sm text-gray-700">Add to Cart</span>
             </div>
@@ -61,7 +61,7 @@ const LoginPromptModal = ({ isOpen, onClose }) => {
 
         {/* Login Button */}
         <button
-          className="w-full flex items-center justify-center py-3 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors font-semibold"
+          className="w-full flex items-center justify-center py-3 bg-orange-800/90 text-white rounded-md hover:bg-orange-800 transition-colors font-semibold"
           onClick={() => navigate('/login')}
         >
           Login Now

@@ -19,15 +19,6 @@ const AddressStep = ({ addresses, selectedAddress, setSelectedAddress, onNext })
     setSelectedAddress(address);
   };
 
-  const handleSetDefault = async (addressId) => {
-    try {
-      await setDefaultAddress({ addressId }).unwrap();
-      toast.success("Default address updated");
-    } catch (error) {
-      toast.error(error?.data?.message || "Failed to update default address");
-    }
-  };
-
   const handleEditAddress = (address) => {
     setEditingAddress(address);
     setIsAddingAddress(true);
@@ -43,7 +34,6 @@ const AddressStep = ({ addresses, selectedAddress, setSelectedAddress, onNext })
     setEditingAddress(null);
   };
 
-  // Dummy formData state (you might not need this if AddressForm handles it internally)
   const [formData, setFormData] = useState({});
 
   return (

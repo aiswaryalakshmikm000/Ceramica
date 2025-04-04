@@ -162,7 +162,7 @@ const Checkout = () => {
               activeStep={activeStep}
               onNext={handleNextStep}
               onBack={handlePreviousStep}
-              onPlaceOrder={placeOrder}
+              // onPlaceOrder={placeOrder}
             />
           </div>
         </div>

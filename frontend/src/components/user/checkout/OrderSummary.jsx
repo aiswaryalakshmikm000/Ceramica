@@ -10,7 +10,7 @@ const OrderSummary = ({
   activeStep,
   onNext,
   onBack,
-  onPlaceOrder
+  // onPlaceOrder
 }) => {
   const [couponCode, setCouponCode] = useState("");
   const [couponError, setCouponError] = useState("");

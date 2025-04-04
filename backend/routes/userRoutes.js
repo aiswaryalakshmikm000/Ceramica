@@ -32,7 +32,7 @@ userRoute.get('/categories',showCategories)
 userRoute.get('/products/bestsellers',fetchBestProducts)
 userRoute.get('/products/featured',fetchFeaturedProducts)
 userRoute.get('/products',fetchProducts)
-userRoute.get('/products/:id',authenticateToken,viewProduct)
+userRoute.get('/products/:id',viewProduct)
 
 //forget passwords
 userRoute.post('/forget-password',forgetPassword)

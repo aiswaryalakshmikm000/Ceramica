@@ -13,7 +13,7 @@ const cartItemSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Color selection is required']
     },
-    originalPrice: {  // Added originalPrice
+    originalPrice: { 
         type: Number,
         required: [true, 'Original price is required'],
         min: [0, 'Price cannot be negative']
@@ -28,7 +28,7 @@ const cartItemSchema = new mongoose.Schema({
         required: [true, 'Price is required'],
         min: [0, 'Price cannot be negative']
     },
-    image: {  // Added image field
+    image: {  
         type: String,
     },
     discount: {
