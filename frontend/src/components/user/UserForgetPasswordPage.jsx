@@ -11,7 +11,7 @@ import ResetPasswordModal from "./ResetPasswordModal";
 import {
   useForgetPasswordMutation,
   useResetPasswordMutation,
-} from "../../features/auth/userApiSlice";
+} from "../../features/userAuth/userApiSlice";
 
 const forgotPasswordSchema = Yup.object({
   email: Yup.string()

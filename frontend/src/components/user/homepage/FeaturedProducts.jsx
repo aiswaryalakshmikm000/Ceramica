@@ -2,7 +2,7 @@ import React from 'react';
 import ProductCard from '../../common/ProductCard';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useFetchFeaturedProductsQuery } from '../../../features/products/userProductApislice';
+import { useFetchFeaturedProductsQuery } from '../../../features/userAuth/userProductApislice';
 import { Loader2 } from 'lucide-react';
 
 const FeaturedProducts = () => {

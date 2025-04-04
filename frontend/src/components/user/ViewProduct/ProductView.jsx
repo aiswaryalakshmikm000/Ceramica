@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useViewProductQuery } from '../../../features/products/userProductApislice';
+import { useViewProductQuery } from '../../../features/userAuth/userProductApislice';
 import Breadcrumbs from '../../common/BreadCrumbs';
 import ProductGallery from './ProductGallery';
 import ProductInfo from './ProductInfo';

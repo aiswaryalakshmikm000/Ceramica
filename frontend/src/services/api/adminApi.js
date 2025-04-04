@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { logoutAdmin, setAdminCredentials } from "../../features/auth/adminAuthSlice";
+import { logoutAdmin, setAdminCredentials } from "../../features/adminAuth/adminAuthSlice";
 import { toast } from "react-toastify";
 
 const baseQuery = fetchBaseQuery({

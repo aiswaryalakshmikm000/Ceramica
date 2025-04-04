@@ -1,6 +1,6 @@
-import { useRegisterMutation } from "../../features/auth/adminApiSlice";
+import { useRegisterMutation } from "../../features/adminAuth/adminApiSlice";
 import { useDispatch } from "react-redux";
-import { setAdminCredentials } from "../../features/auth/adminAuthSlice";
+import { setAdminCredentials } from "../../features/adminAuth/adminAuthSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

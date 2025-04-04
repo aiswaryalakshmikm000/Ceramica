@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEditProductMutation, useShowProductQuery } from "../../../features/products/adminProductApiSlice";
-import { useGetCategoriesQuery } from "../../../features/categories/AdminCategoryApiSlice";
+import { useEditProductMutation, useShowProductQuery } from "../../../features/adminAuth/adminProductApiSlice";
+import { useGetCategoriesQuery } from "../../../features/adminAuth/AdminCategoryApiSlice";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ProductForm from "./ProductForm";

@@ -14,8 +14,8 @@ import {
   LogOut
 } from "lucide-react";
 import { useDispatch } from 'react-redux';
-import { logoutAdmin } from '../../features/auth/adminAuthSlice';
-import { useLogoutMutation } from '../../features/auth/adminApiSlice';
+import { logoutAdmin } from '../../features/adminAuth/adminAuthSlice';
+import { useLogoutMutation } from '../../features/adminAuth/adminApiSlice';
 import Modal from '../common/Modal';
 
 const SideBar = () => {

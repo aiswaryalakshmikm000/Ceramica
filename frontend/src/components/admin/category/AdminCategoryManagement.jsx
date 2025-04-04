@@ -1,15 +1,9 @@
 import React, { useEffect, useState } from "react";
-// import { useDispatch, useSelector } from "react-redux";
 import {
   useGetCategoriesQuery,
   useUpdateCategoryMutation,
   useListCategoryMutation,
-} from "../../../features/categories/AdminCategoryApiSlice";
-// import {
-//   setCategories,
-//   setLoading,
-//   setError,
-// } from "../../../features/categories/AdminCategorySlice";
+} from "../../../features/adminAuth/AdminCategoryApiSlice";
 import { toast } from "react-toastify";
 import Breadcrumbs from "../../common/BreadCrumbs";
 import Pagination from "../../common/Pagination";
@@ -19,8 +13,6 @@ import AddCategory from "./AdminAddCategory";
 import EditCategory from "./AdminEditCategory";
 
 const AdminCategoryManagement = () => {
-  // const dispatch = useDispatch();
-  // const { categories } = useSelector((state) => state.categories);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [editCategory, setEditCategory] = useState(null);
@@ -36,17 +28,6 @@ const AdminCategoryManagement = () => {
 
   const [updateCategory, { isLoading: isUpdating }] = useUpdateCategoryMutation();
   const [listCategory] = useListCategoryMutation();
-
-  // useEffect(() => {
-  //   if (isLoading) {
-  //     dispatch(setLoading());
-  //   } else if (isError) {
-  //     dispatch(setError(error?.data?.message || "Failed to fetch categories"));
-  //     toast.error(error?.data?.message || "Failed to fetch categories");
-  //   } else if (categoriesData) {
-  //     dispatch(setCategories(categoriesData.categories));
-  //   }
-  // }, [categoriesData, isLoading, isError, error, dispatch]);
 
   const categories = categoriesData?.categories || [];
 

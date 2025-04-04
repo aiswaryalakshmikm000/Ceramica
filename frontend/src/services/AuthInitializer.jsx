@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { useCheckAuthQuery as useUserCheckAuthQuery } from '../features/auth/userApiSlice';
-import { useCheckAuthQuery as useAdminCheckAuthQuery } from '../features/auth/adminApiSlice';
-import { setUserCredentials, logoutUser } from '../features/auth/userAuthSlice';
-import { setAdminCredentials, logoutAdmin } from '../features/auth/adminAuthSlice';
+import { useCheckAuthQuery as useUserCheckAuthQuery } from '../features/userAuth/userApiSlice';
+import { useCheckAuthQuery as useAdminCheckAuthQuery } from '../features/adminAuth/adminApiSlice';
+import { setUserCredentials, logoutUser } from '../features/userAuth/userAuthSlice';
+import { setAdminCredentials, logoutAdmin } from '../features/adminAuth/adminAuthSlice';
 import { toast } from 'react-toastify';
 
 const AuthInitializer = ({ children }) => {

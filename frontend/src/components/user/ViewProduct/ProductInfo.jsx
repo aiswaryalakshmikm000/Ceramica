@@ -6,10 +6,12 @@ import { useSelector } from "react-redux";
 import {
   useFetchWishlistQuery,
   useToggleWishlistItemMutation,
+} from "../../../features/userAuth/userWishlistApiSlice";
+import {
   useAddToCartMutation,
   useGetCartQuery,
-} from "../../../features/products/userProductApislice";
-import { selectUser } from "../../../features/auth/userAuthSlice";
+} from "../../../features/userAuth/userCartApislice";
+import { selectUser } from "../../../features/userAuth/userAuthSlice";
 import LoginPromptModal from "../../ui/LoginPromptModal";
 import QuantityControl from "../../user/cart/QuantityControl";
 import { toast } from "react-toastify";

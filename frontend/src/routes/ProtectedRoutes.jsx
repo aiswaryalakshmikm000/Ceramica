@@ -1,34 +1,9 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import { selectIsUserAuthenticated, selectUserRole } from '../features/auth/userAuthSlice';
-import { selectIsAdminAuthenticated, selectAdminRole } from '../features/auth/adminAuthSlice';
-import { useCheckAuthQuery } from "../features/auth/userApiSlice";
-
-// export const IsUserLogin = ({ children }) => {
-//   const dispatch = useDispatch();
-
-//   const isAuthenticated = useSelector(selectIsUserAuthenticated);
-//   const userRole = useSelector(selectUserRole);
-//   const isAdminAuthenticated = useSelector(selectIsAdminAuthenticated);
-
-//   console.log('--- IsUserLogin ---');
-//   console.log('isAuthenticated:', isAuthenticated);
-//   console.log('userRole:', userRole);
-//   console.log('isAdminAuthenticated:', isAdminAuthenticated);
-
-//   if (!isAuthenticated || userRole !== 'user') {
-//     console.log('User not authenticated or wrong role, redirecting to /login');
-//     return <Navigate to="/login" />;
-//   }
-//   if (isAdminAuthenticated) {
-//     console.log('Admin authenticated, clearing admin state');
-//     dispatch(logoutAdmin());
-//   }
-//   console.log('User access granted');
-//   return children;
-// };
-
+import { selectIsUserAuthenticated, selectUserRole } from '../features/userAuth/userAuthSlice';
+import { selectIsAdminAuthenticated, selectAdminRole } from '../features/adminAuth/adminAuthSlice';
+import { useCheckAuthQuery } from "../features/userAuth/userApiSlice";
 
 export const IsUserLogin = ({ children }) => {
   const isAuthenticated = useSelector(selectIsUserAuthenticated);

@@ -1,8 +1,8 @@
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useLoginMutation } from "../../features/auth/userApiSlice";
-import { setUserCredentials } from "../../features/auth/userAuthSlice";
+import { useLoginMutation } from "../../features/userAuth/userApiSlice";
+import { setUserCredentials } from "../../features/userAuth/userAuthSlice";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";

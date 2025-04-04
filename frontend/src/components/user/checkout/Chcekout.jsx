@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
-import { selectUser } from "../../../features/auth/userAuthSlice";
-import { useGetAddressesQuery } from "../../../features/auth/userApiSlice";
-import { useGetCartQuery } from "../../../features/products/userProductApislice";
+import { selectUser } from "../../../features/userAuth/userAuthSlice";
+import { useGetAddressesQuery } from "../../../features/userAuth/userAddressApiSlice";
+import { useGetCartQuery } from "../../../features/userAuth/userCartApislice";
 import { toast } from "react-toastify";
 import AddressStep from "./AddressStep";
 import PaymentStep from "./PaymentStep";

@@ -1,5 +1,4 @@
 import { adminApi } from "../../services/api/adminApi";
-import { setAdminCredentials, logoutAdmin } from "../../features/auth/adminAuthSlice";
 
 export const adminApiSlice = adminApi.injectEndpoints({
   endpoints: (builder) => ({

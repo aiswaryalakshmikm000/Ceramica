@@ -4,7 +4,7 @@ import * as Yup from "yup";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useRegisterMutation, useSendOTPMutation } from "../../features/auth/userApiSlice";
+import { useRegisterMutation, useSendOTPMutation } from "../../features/userAuth/userApiSlice";
 import OTPEnterModal from "./OTPEnterModal";
 import banner2 from "../../assets/Banners/banner2.jpg";
 import PasswordInput from "./PasswordInputView";

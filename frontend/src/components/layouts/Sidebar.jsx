@@ -1,10 +1,7 @@
-
-
-// Sidebar.jsx
 import React from "react";
 import { Link, useLocation } from "react-router-dom"; 
 import { useSelector } from 'react-redux';
-import { selectUser } from '../../features/auth/userAuthSlice';
+import { selectUser } from '../../features/userAuth/userAuthSlice';
 import { 
   User, 
   MapPin, 

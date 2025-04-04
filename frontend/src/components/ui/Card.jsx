@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "@/lib/utils"; // Assuming you have a utility for className merging
+import { cn } from "@/lib/utils"; 
 
 // Card component
 const Card = React.forwardRef(({ className, ...props }, ref) => (

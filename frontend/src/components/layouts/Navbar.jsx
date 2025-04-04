@@ -5,8 +5,8 @@ import Modal from "../common/Modal";
 import Sidebar from "./Sidebar";
 import CartSidebar from "./CartSidebar"; 
 import { useSelector, useDispatch } from "react-redux";
-import { selectUser, selectIsUserAuthenticated, logoutUser } from "../../features/auth/userAuthSlice";
-import { useLogoutMutation } from "../../features/auth/userApiSlice";
+import { selectUser, selectIsUserAuthenticated, logoutUser } from "../../features/userAuth/userAuthSlice";
+import { useLogoutMutation } from "../../features/userAuth/userApiSlice";
 import { googleLogout } from "@react-oauth/google";
 import { toast } from "react-toastify";
 

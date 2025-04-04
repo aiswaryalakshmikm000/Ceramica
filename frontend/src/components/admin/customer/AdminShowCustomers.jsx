@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   useGetCustomerDetailsQuery,
   useEditCustomerStatusMutation,
-} from "../../../features/customers/AdminCustomerApiSlice";
+} from "../../../features/adminAuth/AdminCustomerApiSlice";
 import Breadcrumbs from "../../common/BreadCrumbs";
 import Pagination from "../../common/Pagination";
 import { Eye } from "lucide-react";

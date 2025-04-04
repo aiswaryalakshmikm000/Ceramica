@@ -1,5 +1,5 @@
 import React from "react";
-import { useAddCategoryMutation } from "../../../features/categories/AdminCategoryApiSlice";
+import { useAddCategoryMutation } from "../../../features/adminAuth/AdminCategoryApiSlice";
 import { toast } from "react-toastify";
 import CategoryForm from "./CategoryForm";
 

@@ -57,7 +57,7 @@ userRoute.put('/address/:addressId/set-default', authenticateToken, setDefaultAd
 
 //cart
 userRoute.post('/cart/:userId/add', authenticateToken, addToCart);
-userRoute.get('/cart/:userId', authenticateToken, showCart);
+userRoute.get('/cart/:userId',authenticateToken, showCart);
 userRoute.put('/cart/:userId/update', authenticateToken, updateCart)
 userRoute.delete('/cart/:userId/remove', authenticateToken, removeItemFromCart)
 

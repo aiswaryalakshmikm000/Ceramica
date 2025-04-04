@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { User, Mail, Phone, Calendar } from "lucide-react";
-import { useShowProfileQuery } from "../../../features/auth/userApiSlice";
+import { useShowProfileQuery } from "../../../features/userAuth/userProfileApiSlice";
 import { toast } from "react-toastify";
-import ChangePasswordRequestModal from "./ChangePasswordRequestModal"; // New modal
+import ChangePasswordRequestModal from "./ChangePasswordRequestModal"; 
 import OTPEnterModal from "../OTPEnterModal";
 import ResetPasswordModal from "../ResetPasswordModal";
-import { useForgetPasswordMutation, useResetPasswordMutation } from "../../../features/auth/userApiSlice";
+import { useForgetPasswordMutation, useResetPasswordMutation } from "../../../features/userAuth/userApiSlice";
 
 const Profile = () => {
   const { id } = useParams();
@@ -89,7 +89,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="mx-20 px-4 my-20">
+    <div className="mx-20 px-14 my-20">
       <div className="w-full bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
         <div className="p-8">
           <div className="flex flex-col md:flex-row">

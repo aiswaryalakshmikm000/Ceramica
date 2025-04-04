@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { MapPin, Plus, Edit, Check } from "lucide-react";
 import { useSelector } from "react-redux";
-import { selectUser } from "../../../features/auth/userAuthSlice";
-import { useSetDefaultAddressMutation } from "../../../features/auth/userApiSlice";
+import { selectUser } from "../../../features/userAuth/userAuthSlice";
+import { useSetDefaultAddressMutation } from "../../../features/userAuth/userAddressApiSlice";
 import AddressForm from "../address/AddressForm"; 
 import { toast } from "react-toastify";
-import { useAddAddressMutation, useUpdateAddressMutation } from "../../../features/auth/userApiSlice";
+import { useAddAddressMutation, useUpdateAddressMutation } from "../../../features/userAuth/userAddressApiSlice";
 
 const AddressStep = ({ addresses, selectedAddress, setSelectedAddress, onNext }) => {
   const user = useSelector(selectUser);

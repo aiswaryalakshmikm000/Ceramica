@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useShowCategoriesQuery } from "../../features/categories/userCategoryApiSlice";
+import { useShowCategoriesQuery } from "../../features/userAuth/userCategoryApiSlice";
 import { Loader2 } from 'lucide-react';
 
 const Categories = () => {

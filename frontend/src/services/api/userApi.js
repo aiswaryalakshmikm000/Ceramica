@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { logoutUser, setUserCredentials } from "../../features/auth/userAuthSlice";
+import { logoutUser, setUserCredentials } from "../../features/userAuth/userAuthSlice";
 import { toast } from "react-toastify";
 
 

@@ -1,8 +1,8 @@
 import React from "react";
 import { GoogleLogin } from "@react-oauth/google";
-import { useGoogleAuthMutation } from "../../features/auth/userApiSlice";
+import { useGoogleAuthMutation } from "../../features/userAuth/userApiSlice";
 import { useDispatch } from "react-redux";
-import { setUserCredentials } from "../../features/auth/userAuthSlice";
+import { setUserCredentials } from "../../features/userAuth/userAuthSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import GoogleIcon from "../../assets/google-icon.png";

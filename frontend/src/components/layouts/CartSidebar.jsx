@@ -2,8 +2,8 @@ import React from "react";
 import { X, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { selectUser } from "../../features/auth/userAuthSlice";
-import { useGetCartQuery } from "../../features/products/userProductApislice";
+import { selectUser } from "../../features/userAuth/userAuthSlice";
+import { useGetCartQuery } from "../../features/userAuth/userCartApislice";
 
 const CartSidebar = ({ isOpen, onClose }) => {
   const user = useSelector(selectUser);

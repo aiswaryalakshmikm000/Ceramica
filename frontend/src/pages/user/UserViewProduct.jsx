@@ -4,7 +4,7 @@ import Navbar from '../../components/layouts/Navbar';
 import Footer from '../../components/layouts/Footer';
 import LoginPromptModal from '../../components/ui/LoginPromptModal';
 import { useSelector } from 'react-redux';
-import { selectIsUserAuthenticated } from '../../features/auth/userAuthSlice';
+import { selectIsUserAuthenticated } from '../../features/userAuth/userAuthSlice';
 
 const UserViewProduct = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

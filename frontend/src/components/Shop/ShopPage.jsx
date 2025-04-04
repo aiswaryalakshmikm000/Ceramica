@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useFetchProductsQuery } from '../../features/products/userProductApislice';
-import { useShowCategoriesQuery } from '../../features/categories/userCategoryApiSlice';
+import { useFetchProductsQuery } from '../../features/userAuth/userProductApiSlice';
+import { useShowCategoriesQuery } from '../../features/userAuth/userCategoryApiSlice';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from '../common/BreadCrumbs';
 import PriceRangeFilter from './filter/PriceRangeFilter';
@@ -10,7 +10,7 @@ import SortFilter from './filter/SortFilter';
 import ProductsGrid from './ProductGrid';
 import ShopHeader from './ShopHeader';
 import Pagination from '../common/Pagination';
-import { useAddToCartMutation } from '../../features/products/userProductApislice';
+import { useAddToCartMutation } from '../../features/userAuth/userCartApislice';
 
 const Shop = () => {
   const location = useLocation();

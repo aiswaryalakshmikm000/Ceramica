@@ -1,6 +1,6 @@
 import React from "react";
-import { useAddProductMutation } from "../../../features/products/adminProductApiSlice";
-import { useGetCategoriesQuery } from "../../../features/categories/AdminCategoryApiSlice";
+import { useAddProductMutation } from "../../../features/adminAuth/adminProductApiSlice";
+import { useGetCategoriesQuery } from "../../../features/adminAuth/AdminCategoryApiSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

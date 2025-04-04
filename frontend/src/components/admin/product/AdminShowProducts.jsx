@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useShowProductsQuery, useUpdateProductStatusMutation } from '../../../features/products/adminProductApiSlice';
-import { useGetCategoriesQuery } from '../../../features/categories/AdminCategoryApiSlice';
+import { useShowProductsQuery, useUpdateProductStatusMutation } from '../../../features/adminAuth/adminProductApiSlice';
+import { useGetCategoriesQuery } from '../../../features/adminAuth/AdminCategoryApiSlice';
 import { Link } from 'react-router-dom';
 import Breadcrumbs from '../../common/BreadCrumbs';
 import Pagination from '../../common/Pagination';
