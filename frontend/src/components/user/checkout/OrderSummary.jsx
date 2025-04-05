@@ -178,22 +178,6 @@ const OrderSummary = ({
           You have saved: ₹{(parseFloat(cart.totalDiscount) + parseFloat(couponDiscount)).toFixed(2)}
         </div>
       </div>
-{/* 
-      <button 
-        onClick={handleButtonClick}
-        className="w-full mt-6 bg-orange-800/90 hover:bg-orange-800 text-white py-3 rounded-lg transition-colors font-medium"
-      >
-        {getButtonText()}
-      </button>
-
-      {activeStep > 0 && (
-        <button
-          onClick={onBack}
-          className="w-full mt-3 text-orange-600 hover:text-orange-700 py-2 rounded-lg transition-colors font-medium"
-        >
-          Back to {activeStep === 1 ? "Address" : "Payment"}
-        </button>
-      )} */}
     </div>
   );
 };

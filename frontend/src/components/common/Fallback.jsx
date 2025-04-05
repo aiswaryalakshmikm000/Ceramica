@@ -213,9 +213,11 @@
 // export default Fallback;
 
 
+
+
 import React from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion"; // For animations
+import { motion } from "framer-motion";
 
 const Fallback = ({
   isLoading,
@@ -224,8 +226,8 @@ const Fallback = ({
   emptyMessage,
   emptyActionText = "Continue Shopping",
   emptyActionPath = "/shop",
+  onEmptyAction, // New prop for custom action
 }) => {
-  // Animation variants for smooth transitions
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
@@ -237,11 +239,11 @@ const Fallback = ({
         initial="hidden"
         animate="visible"
         variants={fadeIn}
-        className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+        className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
       >
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-orange-500 mb-4"></div>
-          <p className="text-gray-700 text-xl font-medium">Loading your cart...</p>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-orange-800 mb-4"></div>
+          <p className="text-gray-700 text-xl font-medium">Loading products...</p>
         </div>
       </motion.div>
     );
@@ -253,9 +255,9 @@ const Fallback = ({
         initial="hidden"
         animate="visible"
         variants={fadeIn}
-        className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+        className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
       >
-        <div className="bg-white rounded-3xl shadow-lg p-8 text-center max-w-md w-full border border-red-100">
+        <div className="bg-white rounded-3xl shadow-lg p-8 text-center max-w-md w-full border border-orange-100">
           <svg
             className="w-16 h-16 text-red-500 mx-auto mb-4"
             fill="none"
@@ -274,7 +276,7 @@ const Fallback = ({
           </p>
           <Link
             to={emptyActionPath}
-            className="inline-block bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium px-6 py-3 rounded-full shadow-md transition-all duration-300"
+            className="inline-block bg-orange-800/90 hover:bg-orange-800 text-white font-medium px-6 py-3 rounded-full shadow-md transition-all duration-300"
           >
             {emptyActionText}
           </Link>
@@ -289,11 +291,11 @@ const Fallback = ({
         initial="hidden"
         animate="visible"
         variants={fadeIn}
-        className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+        className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
       >
-        <div className="bg-white rounded-3xl shadow-lg p-8 text-center max-w-md w-full border border-gray-100">
+        <div className="bg-white rounded-3xl shadow-lg p-8 text-center max-w-md w-full border border-orange-100">
           <svg
-            className="w-16 h-16 text-orange-500 mx-auto mb-4"
+            className="w-16 h-16 text-orange-800 mx-auto mb-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -310,7 +312,7 @@ const Fallback = ({
           </p>
           <Link
             to="/login"
-            className="inline-block bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium px-6 py-3 rounded-full shadow-md transition-all duration-300"
+            className="inline-block bg-orange-800/90 hover:bg-orange-800 text-white font-medium px-6 py-3 rounded-full shadow-md transition-all duration-300"
           >
             Log In
           </Link>
@@ -342,12 +344,21 @@ const Fallback = ({
             />
           </svg>
           <p className="text-gray-600 text-xl font-semibold mb-4">{emptyMessage}</p>
-          <Link
-            to={emptyActionPath}
-            className="inline-block bg-gradient-to-r from-orange-800/90 to-orange-800 hover:from-orange-800 hover:to-orange-800 text-white font-medium px-6 py-3 rounded-lg shadow-md transition-all duration-300"
-          >
-            {emptyActionText}
-          </Link>
+          {onEmptyAction ? (
+            <button
+              onClick={onEmptyAction}
+              className="inline-block bg-orange-800/90 hover:bg-orange-800 text-white font-medium px-6 py-3 rounded-lg shadow-md transition-all duration-300"
+            >
+              {emptyActionText}
+            </button>
+          ) : (
+            <Link
+              to={emptyActionPath}
+              className="inline-block bg-orange-800/90 hover:bg-orange-800 text-white font-medium px-6 py-3 rounded-lg shadow-md transition-all duration-300"
+            >
+              {emptyActionText}
+            </Link>
+          )}
         </div>
       </motion.div>
     );

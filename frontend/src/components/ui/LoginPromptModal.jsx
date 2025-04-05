@@ -81,3 +81,191 @@ const LoginPromptModal = ({ isOpen, onClose }) => {
 };
 
 export default LoginPromptModal;
+
+
+// import React from 'react';
+// import { X, ArrowRight, Heart, ShoppingCart } from 'lucide-react';
+// import { useNavigate } from 'react-router-dom';
+// import { motion, AnimatePresence } from 'framer-motion'; 
+
+// const LoginPromptModal = ({ isOpen, onClose }) => {
+//   const navigate = useNavigate();
+
+//   // Animation variants
+//   const overlayVariants = {
+//     hidden: { opacity: 0 },
+//     visible: { 
+//       opacity: 1,
+//       transition: { duration: 0.3 }
+//     },
+//     exit: { 
+//       opacity: 0,
+//       transition: { duration: 0.2 }
+//     }
+//   };
+
+//   const modalVariants = {
+//     hidden: { opacity: 0, y: 50, scale: 0.9 },
+//     visible: { 
+//       opacity: 1, 
+//       y: 0, 
+//       scale: 1,
+//       transition: { 
+//         type: "spring", 
+//         damping: 25, 
+//         stiffness: 300 
+//       }
+//     },
+//     exit: { 
+//       opacity: 0,
+//       y: 20,
+//       scale: 0.95,
+//       transition: { duration: 0.2 }
+//     }
+//   };
+
+//   const featureVariants = {
+//     hidden: { opacity: 0, x: -20 },
+//     visible: (i) => ({ 
+//       opacity: 1, 
+//       x: 0,
+//       transition: { 
+//         delay: i * 0.15 + 0.3,
+//         duration: 0.5
+//       }
+//     })
+//   };
+
+//   return (
+//     <AnimatePresence>
+//       {isOpen && (
+//         <div className="fixed inset-0 flex items-center justify-center z-50">
+//           {/* Backdrop */}
+//           <motion.div 
+//             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+//             onClick={onClose}
+//             initial="hidden"
+//             animate="visible"
+//             exit="exit"
+//             variants={overlayVariants}
+//           />
+
+//           {/* Modal Content */}
+//           <motion.div 
+//             className="relative bg-white w-full max-w-md mx-4 rounded-xl shadow-xl overflow-hidden"
+//             initial="hidden"
+//             animate="visible"
+//             exit="exit"
+//             variants={modalVariants}
+//           >
+//             {/* Close Button */}
+//             <motion.button
+//               onClick={onClose}
+//               className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors duration-300 z-10"
+//               whileHover={{ rotate: 90, backgroundColor: "#fee2e2" }}
+//               transition={{ duration: 0.2 }}
+//             >
+//               <X size={18} />
+//             </motion.button>
+
+//             {/* Modal Header with Gradient */}
+//             <div className="bg-gradient-to-r from-orange-800/20 to-orange-700/20 pt-12 pb-6 px-8 text-white">
+//               <motion.h3 
+//                 className="text-2xl font-bold tracking-tight"
+//                 initial={{ opacity: 0, y: -20 }}
+//                 animate={{ opacity: 1, y: 0 }}
+//                 transition={{ delay: 0.2, duration: 0.5 }}
+//               >
+//                 Unlock Exclusive Benefits!
+//               </motion.h3>
+//             </div>
+
+//             {/* Promotional Content */}
+//             <div className="px-8 py-6 bg-white">
+//               <motion.div 
+//                 className="mb-6"
+//                 initial={{ opacity: 0 }}
+//                 animate={{ opacity: 1 }}
+//                 transition={{ delay: 0.3 }}
+//               >
+//                 <p className="text-gray-700 leading-relaxed">
+//                   Login now to enjoy exclusive offers, save items to your wishlist, and add them to your cart effortlessly!
+//                 </p>
+//               </motion.div>
+
+//               <div className="space-y-4 mb-8">
+//                 <motion.div 
+//                   className="flex items-center space-x-3"
+//                   custom={0}
+//                   initial="hidden"
+//                   animate="visible"
+//                   variants={featureVariants}
+//                 >
+//                   <div className="p-2 rounded-full bg-orange-800/10 text-orange-800">
+//                     <Heart size={18} />
+//                   </div>
+//                   <span className="text-gray-800 font-medium">Save to Wishlist</span>
+//                 </motion.div>
+
+//                 <motion.div 
+//                   className="flex items-center space-x-3"
+//                   custom={1}
+//                   initial="hidden"
+//                   animate="visible"
+//                   variants={featureVariants}
+//                 >
+//                   <div className="p-2 rounded-full bg-orange-800/10 text-orange-800">
+//                     <ShoppingCart size={18} />
+//                   </div>
+//                   <span className="text-gray-800 font-medium">Easy Shopping Experience</span>
+//                 </motion.div>
+
+//                 <motion.div 
+//                   className="flex items-center space-x-3"
+//                   custom={2}
+//                   initial="hidden"
+//                   animate="visible"
+//                   variants={featureVariants}
+//                 >
+//                   <div className="p-2 rounded-full bg-orange-800/10 text-orange-800">
+//                     <ArrowRight size={18} />
+//                   </div>
+//                   <span className="text-gray-800 font-medium">Exclusive Offers</span>
+//                 </motion.div>
+//               </div>
+
+//               {/* Login Button */}
+//               <motion.button
+//                 onClick={() => navigate('/login')}
+//                 className="w-full py-3 bg-orange-800/90 text-white rounded-lg hover:bg-orange-800 transition-colors duration-300 font-medium flex items-center justify-center"
+//                 whileHover={{ scale: 1.03 }}
+//                 whileTap={{ scale: 0.98 }}
+//                 initial={{ opacity: 0, y: 20 }}
+//                 animate={{ opacity: 1, y: 0 }}
+//                 transition={{ delay: 0.6 }}
+//               >
+//                 Login Now
+//                 <ArrowRight size={16} className="ml-2" />
+//               </motion.button>
+
+//               {/* Continue as Guest */}
+//               <motion.button
+//                 onClick={onClose}
+//                 className="w-full mt-3 py-2 text-orange-800 hover:text-orange-900 font-medium text-sm transition-colors duration-300"
+//                 whileHover={{ scale: 1.03 }}
+//                 initial={{ opacity: 0 }}
+//                 animate={{ opacity: 1 }}
+//                 transition={{ delay: 0.7 }}
+//               >
+//                 Continue as Guest
+//               </motion.button>
+              
+//             </div>
+//           </motion.div>
+//         </div>
+//       )}
+//     </AnimatePresence>
+//   );
+// };
+
+// export default LoginPromptModal;

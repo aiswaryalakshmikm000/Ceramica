@@ -8,15 +8,15 @@ import {
 import { Card, CardContent, CardHeader } from "../../ui/Card.jsx"; 
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
-import { Badge } from "../../ui/OrderBadge"; 
+import StatusBadge from '../../common/StatusBadge'; 
 import { toast } from "react-toastify";
 import OrderDetailDialog from "./OrderDetailDialog";
 import CancelOrderDialog from "./CancelOrder";
 import ReturnOrderDialog from "./ReturnOrderDialog";
+import Breadcrumbs from "../../common/BreadCrumbs.jsx"; 
 
 const Order = () => {
   const navigate = useNavigate();
-  // State management
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [modalState, setModalState] = useState({
@@ -25,12 +25,12 @@ const Order = () => {
     order: null,
   });
 
-  // Mock order data - this would come from API
+  // Mock order data
   const orders = [
     {
       orderId: "CER-10045-2023",
       date: "April 15, 2023",
-      status: "Delivered",
+      status: "delivered",
       total: "₹2,899",
       paymentMethod: "Credit Card",
       trackingNumber: "TRK764532198",
@@ -49,7 +49,7 @@ const Order = () => {
           price: "₹1,499",
           quantity: 1,
           image: "https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
-          status: "Delivered"
+          status: "delivered"
         },
         {
           id: 2,
@@ -57,14 +57,14 @@ const Order = () => {
           price: "₹1,399",
           quantity: 1,
           image: "https://images.unsplash.com/photo-1516223725307-6f76b9ec8742?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
-          status: "Delivered"
+          status: "delivered"
         }
       ]
     },
     {
       orderId: "CER-10039-2023",
       date: "April 10, 2023",
-      status: "Shipped",
+      status: "shipped",
       total: "₹3,699",
       paymentMethod: "UPI",
       trackingNumber: "TRK837645123",
@@ -83,7 +83,7 @@ const Order = () => {
           price: "₹2,499",
           quantity: 1,
           image: "https://images.unsplash.com/photo-1578873375969-d60aad647bb9?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
-          status: "Shipped"
+          status: "shipped"
         },
         {
           id: 4,
@@ -91,14 +91,14 @@ const Order = () => {
           price: "₹1,199",
           quantity: 1,
           image: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
-          status: "Shipped"
+          status: "shipped"
         }
       ]
     },
     {
       orderId: "CER-10028-2023",
       date: "March 25, 2023",
-      status: "Processing",
+      status: "pending",
       total: "₹4,499",
       paymentMethod: "Cash on Delivery",
       trackingNumber: "Pending",
@@ -117,7 +117,7 @@ const Order = () => {
           price: "₹3,299",
           quantity: 1,
           image: "https://images.unsplash.com/photo-1485955900006-10f4d324d411?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
-          status: "Processing"
+          status: "pending"
         },
         {
           id: 6,
@@ -125,7 +125,7 @@ const Order = () => {
           price: "₹1,199",
           quantity: 1,
           image: "https://images.unsplash.com/photo-1525974160448-038dacadcc71?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
-          status: "Processing"
+          status: "pending"
         }
       ]
     }
@@ -137,7 +137,7 @@ const Order = () => {
     order.status.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Modal handlers - simplified to a single pattern
+  // Modal handlers
   const openModal = (type, order) => {
     setModalState({
       type,
@@ -167,211 +167,196 @@ const Order = () => {
     });
   };
 
-  // Helper for status color
-  const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
-      case "delivered":
-        return "bg-green-100 text-green-800 border-green-300";
-      case "processing":
-        return "bg-blue-100 text-blue-800 border-blue-300";
-      case "shipped":
-        return "bg-purple-100 text-purple-800 border-purple-300";
-      case "cancelled":
-        return "bg-red-100 text-red-800 border-red-300";
-      case "returned":
-        return "bg-amber-100 text-amber-800 border-amber-300";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-300";
-    }
-  };
+  // Define breadcrumb items
+  const breadcrumbItems = [
+    { label: "My Account", href: "" },
+    { label: "Orders", href: "/account/orders" },
+  ];
 
   return (
-    <div className="container mx-auto px-4 py-8 my-10 md:py-12 ">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-serif font-bold text-gray-900">My Orders</h1>
-            <p className="text-gray-500 mt-1">View and manage your order history</p>
+    <div className="min-h-screen bg-gray-50 py-20 my-2 px-4 sm:px-6 lg:px-8">
+      <div className="px-24 mx-auto">
+        <div className="bg-white rounded-2xl shadow-md p-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-gray-800">My Orders</h2>
           </div>
-        </div>
+          <Breadcrumbs items={breadcrumbItems} />
 
-        <Card className="mb-8">
-          <CardHeader className="pb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-              <Input
-                type="text"
-                placeholder="Search by order ID or status..."
-                className="pl-10 w-full"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </CardHeader>
+          <Card className="mb-8 border-none shadow-none">
+            <CardHeader className="pb-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <Input
+                  type="text"
+                  placeholder="Search by order ID or status..."
+                  className="pl-10 w-full"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </CardHeader>
 
-          <CardContent className="p-0">
-            {filteredOrders.length > 0 ? (
-              <div className="divide-y divide-gray-100">
-                {filteredOrders.map((order) => (
-                  <div key={order.orderId} className="transition-colors">
-                    <div 
-                      className="p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between cursor-pointer hover:bg-gray-50/50"
-                      onClick={() => toggleOrderExpand(order.orderId)}
-                    >
-                      <div className="flex flex-col mb-3 md:mb-0">
-                        <div className="flex items-center gap-2 md:gap-4">
-                          <span className="text-lg font-medium text-gray-900">{order.orderId}</span>
-                          <Badge className={`${getStatusColor(order.status)}`}>
-                            {order.status}
-                          </Badge>
+            <CardContent className="p-0">
+              {filteredOrders.length > 0 ? (
+                <div className="divide-y divide-gray-100">
+                  {filteredOrders.map((order) => (
+                    <div key={order.orderId} className="transition-colors">
+                      <div 
+                        className="p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between cursor-pointer hover:bg-gray-50/50"
+                        onClick={() => toggleOrderExpand(order.orderId)}
+                      >
+                        <div className="flex flex-col mb-3 md:mb-0">
+                          <div className="flex items-center gap-2 md:gap-4">
+                            <span className="text-lg font-medium text-gray-900">{order.orderId}</span>
+                            <StatusBadge status={order.status} /> 
+                          </div>
+                          <div className="text-sm text-gray-500 mt-1 flex flex-col md:flex-row md:items-center md:gap-3">
+                            <span>Ordered on {order.date}</span>
+                            <span className="hidden md:inline">•</span>
+                            <span>{order.total}</span>
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-500 mt-1 flex flex-col md:flex-row md:items-center md:gap-3">
-                          <span>Ordered on {order.date}</span>
-                          <span className="hidden md:inline">•</span>
-                          <span>{order.total}</span>
+                        
+                        <div className="flex items-center gap-3">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openModal('detail', order);
+                            }}
+                          >
+                            <Eye size={14} className="mr-1.5" />
+                            Details
+                          </Button>
+                          {expandedOrderId === order.orderId ? (
+                            <ChevronUp size={20} className="text-gray-500" />
+                          ) : (
+                            <ChevronDown size={20} className="text-gray-500" />
+                          )}
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-xs"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openModal('detail', order);
-                          }}
-                        >
-                          <Eye size={14} className="mr-1.5" />
-                          Details
-                        </Button>
-                        {expandedOrderId === order.orderId ? (
-                          <ChevronUp size={20} className="text-gray-500" />
-                        ) : (
-                          <ChevronDown size={20} className="text-gray-500" />
-                        )}
-                      </div>
-                    </div>
-                    
-                    {expandedOrderId === order.orderId && (
-                      <div className="p-4 md:p-6 bg-gray-50 border-t border-gray-100">
-                        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div>
-                            <h4 className="text-xs uppercase text-gray-500 font-medium mb-1">Payment Method</h4>
-                            <p className="text-sm text-gray-900">{order.paymentMethod}</p>
-                          </div>
-                          <div>
-                            <h4 className="text-xs uppercase text-gray-500 font-medium mb-1">Tracking Number</h4>
-                            <p className="text-sm text-gray-900">{order.trackingNumber}</p>
-                          </div>
-                          <div className="flex justify-start md:justify-end items-center gap-3 flex-wrap">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="text-xs"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDownloadInvoice(order.orderId);
-                              }}
-                            >
-                              <Download size={14} className="mr-1.5" />
-                              Invoice
-                            </Button>
-                            
-                            {order.status === "Shipped" && (
+                      {expandedOrderId === order.orderId && (
+                        <div className="p-4 md:p-6 bg-gray-50 border-t border-gray-100">
+                          <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                              <h4 className="text-xs uppercase text-gray-500 font-medium mb-1">Payment Method</h4>
+                              <p className="text-sm text-gray-900">{order.paymentMethod}</p>
+                            </div>
+                            <div>
+                              <h4 className="text-xs uppercase text-gray-500 font-medium mb-1">Tracking Number</h4>
+                              <p className="text-sm text-gray-900">{order.trackingNumber}</p>
+                            </div>
+                            <div className="flex justify-start md:justify-end items-center gap-3 flex-wrap">
                               <Button
                                 variant="outline"
                                 size="sm"
                                 className="text-xs"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDownloadInvoice(order.orderId);
+                                }}
                               >
-                                <ExternalLink size={14} className="mr-1.5" />
-                                Track
+                                <Download size={14} className="mr-1.5" />
+                                Invoice
+                              </Button>
+                              
+                              {order.status === "shipped" && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-xs"
+                                >
+                                  <ExternalLink size={14} className="mr-1.5" />
+                                  Track
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <h4 className="font-medium text-gray-900 mb-3">Order Items</h4>
+                          <div className="space-y-3 mb-4">
+                            {order.items.map((item) => (
+                              <div key={item.id} className="flex items-start p-3 bg-white rounded-lg border border-gray-100">
+                                <div className="h-16 w-16 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
+                                  <img 
+                                    src={item.image} 
+                                    alt={item.name} 
+                                    className="h-full w-full object-cover"
+                                    onError={(e) => {
+                                      e.target.src = "";
+                                    }}
+                                  />
+                                </div>
+                                <div className="ml-4 flex-grow">
+                                  <h5 className="text-sm font-medium text-gray-900">{item.name}</h5>
+                                  <div className="flex justify-between items-center mt-1">
+                                    <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                                    <p className="text-sm font-medium text-gray-900">{item.price}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          <div className="flex flex-wrap gap-3 justify-start md:justify-end mt-4">
+                            {order.status === "pending" && (
+                              <Button
+                                variant="outline"
+                                className="border-red-200 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openModal('cancel', order);
+                                }}
+                              >
+                                Cancel Order
+                              </Button>
+                            )}
+                            
+                            {order.status === "delivered" && (
+                              <Button
+                                variant="outline"
+                                className="border-amber-200 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openModal('return', order);
+                                }}
+                              >
+                                Return Order
                               </Button>
                             )}
                           </div>
                         </div>
-                        
-                        <h4 className="font-medium text-gray-900 mb-3">Order Items</h4>
-                        <div className="space-y-3 mb-4">
-                          {order.items.map((item) => (
-                            <div key={item.id} className="flex items-start p-3 bg-white rounded-lg border border-gray-100">
-                              <div className="h-16 w-16 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
-                                <img 
-                                  src={item.image} 
-                                  alt={item.name} 
-                                  className="h-full w-full object-cover"
-                                  onError={(e) => {
-                                    e.target.src = "https://via.placeholder.com/150";
-                                  }}
-                                />
-                              </div>
-                              <div className="ml-4 flex-grow">
-                                <h5 className="text-sm font-medium text-gray-900">{item.name}</h5>
-                                <div className="flex justify-between items-center mt-1">
-                                  <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                                  <p className="text-sm font-medium text-gray-900">{item.price}</p>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                        
-                        <div className="flex flex-wrap gap-3 justify-start md:justify-end mt-4">
-                          {order.status === "Processing" && (
-                            <Button
-                              variant="outline"
-                              className="border-red-200 text-red-600 hover:text-red-700 hover:bg-red-50"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openModal('cancel', order);
-                              }}
-                            >
-                              Cancel Order
-                            </Button>
-                          )}
-                          
-                          {order.status === "Delivered" && (
-                            <Button
-                              variant="outline"
-                              className="border-amber-200 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openModal('return', order);
-                              }}
-                            >
-                              Return Order
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="py-12 px-6 text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
-                  <ShoppingBag size={24} className="text-gray-400" />
+                      )}
+                    </div>
+                  ))}
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No Orders Found</h3>
-                {searchQuery ? (
-                  <p className="text-gray-500 mb-4">No orders match your search criteria.</p>
-                ) : (
-                  <p className="text-gray-500 mb-4">You haven't placed any orders yet.</p>
-                )}
-                <Button onClick={() => navigate("/")}>
-                  Start Shopping
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              ) : (
+                <div className="py-12 px-6 text-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+                    <ShoppingBag size={24} className="text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No Orders Found</h3>
+                  {searchQuery ? (
+                    <p className="text-gray-500 mb-4">No orders match your search criteria.</p>
+                  ) : (
+                    <p className="text-gray-500 mb-4">You haven't placed any orders yet.</p>
+                  )}
+                  <Button onClick={() => navigate("/")}>
+                    Start Shopping
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
       
       {/* Modals */}
       {modalState.order && (
         <>
-          {/* Order Detail Modal */}
           <OrderDetailDialog 
             open={modalState.type === 'detail' && modalState.isOpen} 
             onOpenChange={(isOpen) => isOpen ? null : closeModal()} 
@@ -379,14 +364,12 @@ const Order = () => {
             onDownloadInvoice={() => handleDownloadInvoice(modalState.order.orderId)}
           />
           
-          {/* Cancel Order Modal */}
           <CancelOrderDialog 
             open={modalState.type === 'cancel' && modalState.isOpen} 
             onOpenChange={(isOpen) => isOpen ? null : closeModal()} 
             order={modalState.order}
           />
           
-          {/* Return Order Modal */}
           <ReturnOrderDialog 
             open={modalState.type === 'return' && modalState.isOpen} 
             onOpenChange={(isOpen) => isOpen ? null : closeModal()} 

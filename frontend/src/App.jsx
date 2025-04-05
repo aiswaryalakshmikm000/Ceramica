@@ -32,6 +32,9 @@ const AdminShowProductsPage = lazy(() => import("./components/admin/product/Admi
 const AdminCategoryManagement = lazy(() => import("./components/admin/category/AdminCategoryManagement"));
 const AdminShowCustomers = lazy(() => import("./components/admin/customer/AdminShowCustomers"));
 const AdminDashboard = lazy(() => import("./components/admin/dashboard/AdminDashboard"));
+const AdminOrder = lazy(() => import("./components/admin/order/Order"));
+const AdminWallet = lazy(() => import("./components/admin/wallet/WalletListing"));
+
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -96,6 +99,8 @@ function App() {
           <Route path="/admin/categories" element={<IsAdminLogin><AdminCategoryManagement /></IsAdminLogin>} />
           <Route path="/admin/customers" element={<IsAdminLogin><AdminShowCustomers /></IsAdminLogin>} />
           <Route path="/admin/dashboard" element={<IsAdminLogin><AdminDashboard /></IsAdminLogin>} />
+          <Route path="/admin/orders" element={<IsAdminLogin><AdminOrder /></IsAdminLogin>} />
+          <Route path="/admin/wallet" element={<IsAdminLogin><AdminWallet /></IsAdminLogin>} />
 
           {/* 404 Route */}
           <Route path="*" element={<NotFound />} />

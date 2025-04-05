@@ -97,17 +97,6 @@ const AddressStep = ({ addresses, selectedAddress, setSelectedAddress, onNext })
                       >
                         <Edit size={18} />
                       </button>
-                      {/* {!address.isDefault && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSetDefault(address._id);
-                          }}
-                          className="text-xs text-gray-500 hover:text-orange-800 underline"
-                        >
-                          Set as default
-                        </button>
-                      )} */}
                     </div>
                   </div>
 

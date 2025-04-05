@@ -333,14 +333,14 @@ const AddressForm = ({
                   <button
                     type="button"
                     onClick={handleCloseForm}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                    className="px-4 py-2 border border-grey-700 rounded-md text-orange-800  hover:border-orange-800"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 disabled:bg-gray-500"
+                    className="px-4 py-2 bg-orange-800/90 text-white rounded-md hover:bg-orange-800 disabled:bg-gray-500"
                   >
                     {editingAddress ? "Update" : "Save"} Address
                   </button>

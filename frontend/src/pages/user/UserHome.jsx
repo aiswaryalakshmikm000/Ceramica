@@ -5,7 +5,7 @@ import Categories from '../../components/common/Categories';
 import FeaturedProducts from '../../components/user/homepage/FeaturedProducts';
 import VideoSection from '../../components/user/homepage/VideoSection';
 import Footer from '../../components/layouts/Footer';
-import LoginPromptModal from '../../components/ui/LoginPromptModal'; // Import the modal
+import LoginPromptModal from '../../components/ui/LoginPromptModal'; 
 import { useSelector } from 'react-redux';
 import { selectIsUserAuthenticated } from '../../features/userAuth/userAuthSlice';
 

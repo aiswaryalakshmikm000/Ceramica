@@ -1,5 +1,6 @@
+
 import React, { useState } from "react";
-import { Eye, ShoppingCart } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import Badge from "../ui/Badge";
 
@@ -28,8 +29,14 @@ const ProductCard = ({ product }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Product Image */}
-      <div className="relative overflow-hidden rounded-lg aspect-square bg-ceramic-light">
+      {/* Product Image - Now clickable */}
+      <Link 
+        to={`/shop/${product.id}`}
+        className="relative block overflow-hidden rounded-lg aspect-square bg-ceramic-light"
+        onClick={(e) => {
+          console.log("Navigating to:", `/shop/${product.id}`);
+        }}
+      >
         <img
           src={product.image}
           alt={product.name}
@@ -44,41 +51,27 @@ const ProductCard = ({ product }) => {
           </Badge>
         )}
         
-        {showSuccess && (
+        {/* {showSuccess && (
           <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 z-10 bg-orange-500/50 text-white px-1 py-1 rounded-md shadow-md transition-opacity duration-300 text-sm">
             Added to Cart!
           </div>
-        )}
+        )} */}
 
         <div
           className={`absolute inset-0 bg-ceramic-dark/30 backdrop-blur-sm flex items-center justify-center gap-4 transition-opacity duration-300 ${
             isHovered ? "opacity-100" : "opacity-0"
           }`}
         >
-          <Link
-            to={`/shop/${product.id}`}
-            className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-ceramic-dark hover:bg-ceramic-accent hover:text-white transition-colors"
-            onClick={(e) => {
-              console.log("Navigating to:", `/shop/${product.id}`);
-            }}
-          >
-            <Eye size={18} />
-          </Link>
-
-          <button
-            className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-ceramic-dark hover:bg-ceramic-accent hover:text-white transition-colors"
-            onClick={handleAddToCart}
-          >
-            <ShoppingCart size={18} />
-          </button>
         </div>
-      </div>
+      </Link>
 
       {/* Product Info */}
       <div className="pt-4 pb-2">
-        <h3 className="text-base font-medium text-ceramic-dark transition-colors group-hover:text-ceramic-accent">
-          {product.name}
-        </h3>
+        <Link to={`/shop/${product.id}`}>
+          <h3 className="text-base font-medium text-ceramic-dark transition-colors group-hover:text-ceramic-accent">
+            {product.name}
+          </h3>
+        </Link>
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-center gap-2">
             <span className="text-ceramic-dark font-bold text-lg">
