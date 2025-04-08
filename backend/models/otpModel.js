@@ -19,12 +19,6 @@ const otpSchema = new mongoose.Schema({
 
 otpSchema.pre("save",async function (next) {
     console.log("New OTP document saved to database");
-    // //only send email when a anew document is created
-    
-    // if(this.isNew){
-    //     await sendVerificationEmail(this.email,this.otp)
-    // }
-    // next();
     
 })
 module.exports = mongoose.model('OTP',otpSchema)

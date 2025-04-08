@@ -5,7 +5,6 @@ dotenv.config();
 const tokenKey = process.env.TOKEN_KEY;
 
 const authenticateToken = (req, res, next) => {
-    console.log('Authenticating request:', req.method, req.path);
     console.log('User Middleware - Received Cookies:', req.cookies);
 
     let token = req.cookies?.userAccessToken; 
@@ -23,10 +22,6 @@ const authenticateToken = (req, res, next) => {
             console.log('User Middleware - Invalid or expired access token:', error);
             return res.status(401).json({ message: 'Invalid or expired access token' });
         }
-        // if (decoded.role !== 'user') {
-        //     console.log('User Middleware - Not authorized as user')
-        //     return res.status(403).json({ message: 'Not authorized as user' });
-        // }
         console.log('User Middleware - Token decoded:', decoded);
         req.user = decoded.user; 
         console.log(req.user);

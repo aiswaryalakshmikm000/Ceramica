@@ -166,7 +166,7 @@ const Navbar = () => {
                   <div className="relative group">
                     <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-black-500/50">
                       <img
-                        src={userImage || ""}
+                        src={userImage}
                         alt={userName}
                         className="w-full h-full object-cover"
                         onError={(e) => {
@@ -262,7 +262,7 @@ const Navbar = () => {
                     <div className="flex items-center space-x-2">
                       <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-orange-500">
                         <img
-                          src={userImage || "/placeholder.svg"}
+                          src={userImage}
                           alt={userName}
                           className="w-full h-full object-cover"
                           onError={(e) => {

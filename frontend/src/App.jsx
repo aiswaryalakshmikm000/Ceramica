@@ -17,6 +17,7 @@ const UserProfile = lazy(() => import ('./pages/user/UserProfile'))
 const UserEditProfile = lazy(() => import ('./pages/user/UserEditProfile'))
 const UserAddress = lazy(() => import ('./pages/user/UserAddress'))
 const UserOrder = lazy(() => import ('./pages/user/UserOrder'))
+const UserViewOrder = lazy(() => import ('./pages/user/UserViewOrder'))
 const UserWishlist = lazy(() => import ('./pages/user/UserWishlist'))
 const UserWallet = lazy(() => import ('./pages/user/UserWallet'))
 const UserCoupons = lazy(() => import ('./pages/user/UserCoupons'))
@@ -81,6 +82,7 @@ function App() {
           <Route path="/profile/edit/:id" element={<IsUserLogin><UserEditProfile /></IsUserLogin>} />
           <Route path="/address/:userId" element={<IsUserLogin><UserAddress /></IsUserLogin>} />
           <Route path="/orders" element={<IsUserLogin><UserOrder /></IsUserLogin>} />
+          <Route path="/orders/:orderId" element={<IsUserLogin><UserViewOrder /></IsUserLogin>} />
           <Route path="/wishlist/:userId" element={<IsUserLogin><UserWishlist /></IsUserLogin>} />
           <Route path="/wallet/:userId" element={<IsUserLogin><UserWallet /></IsUserLogin>} />
           <Route path="/coupons" element={<IsUserLogin><UserCoupons /></IsUserLogin>} />

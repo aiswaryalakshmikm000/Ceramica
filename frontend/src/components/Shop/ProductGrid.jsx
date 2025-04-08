@@ -31,6 +31,7 @@ const ProductsGrid = ({ products, isLoading }) => {
               id: product._id || product.id,
               name: product.name,
               price: product.price,
+              colors: product.colors,
               discount: product.discount,
               discountedPrice: product.discountedPrice,
               image: product.colors?.[0]?.images?.[0] || product.images?.[0],

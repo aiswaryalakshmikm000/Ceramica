@@ -1,19 +1,27 @@
 import React, { useState } from "react";
-import { MapPin, Plus, Edit, Check } from "lucide-react";
+import { MapPin, Plus, Edit, Check, Trash2 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { selectUser } from "../../../features/userAuth/userAuthSlice";
-import { useSetDefaultAddressMutation } from "../../../features/userAuth/userAddressApiSlice";
-import AddressForm from "../address/AddressForm"; 
+import { 
+  useSetDefaultAddressMutation,
+  useAddAddressMutation,
+  useUpdateAddressMutation,
+  useDeleteAddressMutation
+} from "../../../features/userAuth/userAddressApiSlice";
+import AddressForm from "../address/AddressForm";
 import { toast } from "react-toastify";
-import { useAddAddressMutation, useUpdateAddressMutation } from "../../../features/userAuth/userAddressApiSlice";
+import Modal from "../../common/Modal"; // Import the Modal component
 
 const AddressStep = ({ addresses, selectedAddress, setSelectedAddress, onNext }) => {
   const user = useSelector(selectUser);
   const [isAddingAddress, setIsAddingAddress] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false); // State for modal visibility
+  const [addressToDelete, setAddressToDelete] = useState(null); // State for address to delete
   const [setDefaultAddress] = useSetDefaultAddressMutation();
-  const [addAddress] = useAddAddressMutation(); 
-  const [updateAddress] = useUpdateAddressMutation(); 
+  const [addAddress] = useAddAddressMutation();
+  const [updateAddress] = useUpdateAddressMutation();
+  const [deleteAddress] = useDeleteAddressMutation();
 
   const handleSelectAddress = (address) => {
     setSelectedAddress(address);
@@ -34,24 +42,46 @@ const AddressStep = ({ addresses, selectedAddress, setSelectedAddress, onNext })
     setEditingAddress(null);
   };
 
+  const handleDeleteClick = (addressId) => {
+    setAddressToDelete(addressId);
+    setShowDeleteModal(true); // Show the modal
+  };
+
+  const handleDeleteAddress = async () => {
+    try {
+      const result = await deleteAddress({ userId: user._id, addressId: addressToDelete }).unwrap();
+      toast.success(result.message || "Address deleted successfully");
+      setShowDeleteModal(false); // Close the modal
+      setAddressToDelete(null); // Clear the address to delete
+      // If the deleted address was selected, clear the selection
+      if (selectedAddress && selectedAddress._id === addressToDelete) {
+        setSelectedAddress(null);
+      }
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to delete address");
+      setShowDeleteModal(false); // Close the modal even on error
+      setAddressToDelete(null);
+    }
+  };
+
   const [formData, setFormData] = useState({});
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-6">
       <div className="flex items-center mb-6">
         <MapPin className="mr-2 text-orange-800" />
-        <h2 className="text-2xl font-semibold text-gray-800">Shipping Address</h2>
+        <h2 className="text-xl font-semibold text-gray-800">Shipping Address</h2>
       </div>
 
       {isAddingAddress ? (
         <AddressForm
-          formData={editingAddress || {}} 
-          setFormData={setFormData} 
+          formData={editingAddress || {}}
+          setFormData={setFormData}
           handleCloseForm={handleCloseForm}
           editingAddress={editingAddress}
-          userId={user._id} 
-          addAddress={addAddress} 
-          updateAddress={updateAddress} 
+          userId={user._id}
+          addAddress={addAddress}
+          updateAddress={updateAddress}
         />
       ) : (
         <>
@@ -60,10 +90,10 @@ const AddressStep = ({ addresses, selectedAddress, setSelectedAddress, onNext })
               addresses.map((address) => (
                 <div
                   key={address._id}
-                  className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                  className={`bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow border p-4 cursor-pointer ${
                     selectedAddress && selectedAddress._id === address._id
                       ? "bg-orange-50"
-                      : "border-gray-200 hover:border-orange-800"
+                      : "border-gray-200"
                   }`}
                   onClick={() => handleSelectAddress(address)}
                 >
@@ -97,12 +127,23 @@ const AddressStep = ({ addresses, selectedAddress, setSelectedAddress, onNext })
                       >
                         <Edit size={18} />
                       </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteClick(address._id); // Trigger modal instead of direct delete
+                        }}
+                        className="text-red-500 hover:text-red-600"
+                      >
+                        <Trash2 size={18} />
+                      </button>
                     </div>
                   </div>
 
                   <div className="text-gray-600 text-sm">
                     <p>{address.addressLine}</p>
-                    <p>{address?.city}, {address?.state} - {address?.pincode}</p>
+                    <p>
+                      {address?.city}, {address?.state} - {address?.pincode}
+                    </p>
                     <p className="mt-1">Phone: {address?.phone}</p>
                     <p>Landmark: {address?.landmark ? `${address.landmark}` : ""}</p>
                   </div>
@@ -138,6 +179,18 @@ const AddressStep = ({ addresses, selectedAddress, setSelectedAddress, onNext })
           </div>
         </>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setAddressToDelete(null);
+        }}
+        onConfirm={handleDeleteAddress}
+        title="Confirm Delete Address"
+        message="Are you sure you want to delete this address? This action cannot be undone."
+      />
     </div>
   );
 };

@@ -7,6 +7,7 @@ const {  login, logout, register, refreshAccessToken, checkAuth} = require('../c
 const {getCustomerDetails,editCustomerStatus,} = require('../controllers/admin/userController')
 const{addCategory,showCategories,editCategory,listCategory,showCategory} = require('../controllers/admin/categoryController')
 const {addProduct,showProducts,updateProductStatus, showProduct, editProduct} = require('../controllers/admin/productController')
+const {getAllOrders, updateOrderStatus, verifyReturnRequest, getOrderDetails} = require('../controllers/admin/oderController');
 
 const adminRoute = express()
 
@@ -35,6 +36,12 @@ adminRoute.get('/products',authenticateAdminToken,showProducts)
 adminRoute.patch('/products/:id', authenticateAdminToken,updateProductStatus)
 adminRoute.get('/products/:_id',authenticateAdminToken,showProduct)
 adminRoute.put('/products/:_id', authenticateAdminToken, upload.fields(Array.from({ length: 10 }, (_, i) => ({ name: `color${i}Images`, maxCount: 4 }))), editProduct );
+
+//order
+adminRoute.get('/orders', authenticateAdminToken, getAllOrders)
+adminRoute.put('/orders/:orderId/status', authenticateAdminToken, updateOrderStatus)
+adminRoute.put('/orders/:orderId/return', authenticateAdminToken, verifyReturnRequest)
+adminRoute.get('/orders/:orderId', authenticateAdminToken, getOrderDetails)
 
 module.exports = adminRoute
 

@@ -12,7 +12,6 @@ const viewProduct = async (req, res) => {
 
   try {
     if (!id) {
-      console.log("Invalid product Id");
       return res
         .status(400)
         .json({ success: false, message: "Invalid product id." });
@@ -46,7 +45,6 @@ const viewProduct = async (req, res) => {
       relatedProducts: relatedProducts,
     });
   } catch (error) {
-    console.log("Error in viewProduct:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -109,9 +107,6 @@ const fetchProducts = async (req, res) => {
     limit = parseInt(limit);
     const skip = (page - 1) * limit;
 
-    console.log("Filter:", filter);
-    console.log("Sort:", sortOptions);
-
     // Aggregation pipeline to count and fetch products
     const aggregatePipeline = [
       { $match: filter }, 
@@ -154,7 +149,6 @@ const fetchProducts = async (req, res) => {
       },
     ]);
 
-    console.log("Found products:", products);
 
     res.status(200).json({
       success: true,

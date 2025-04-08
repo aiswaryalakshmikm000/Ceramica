@@ -1,6 +1,6 @@
 
-import React from "react";
-import { Lock, RotateCcw, Shield, Trash2 } from "lucide-react";
+import React, { useState } from "react";
+import { Lock, RotateCcw, Shield, Trash2, } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectUser } from "../../../features/userAuth/userAuthSlice";
@@ -29,6 +29,11 @@ const Cart = () => {
   const [updateCartItem] = useUpdateCartItemMutation();
   const [removeFromCart] = useRemoveFromCartMutation();
 
+  const [problematicItems, setProblematicItems] = useState({
+    outOfStockItems: [],
+    unlistedItems: [],
+  });
+
   if (isLoading || error || !user) {
     return (
       <Fallback
@@ -46,6 +51,10 @@ const Cart = () => {
     try {
       const response = await removeFromCart({ userId, productId: productId._id, color }).unwrap();
       toast.success(response.message || "Item removed from cart");
+      setProblematicItems(prev => ({
+        outOfStockItems: prev.outOfStockItems.filter(item => item.productId !== productId._id || item.color !== color),
+        unlistedItems: prev.unlistedItems.filter(item => item.productId !== productId._id || item.color !== color),
+      }));
     } catch (err) {
       toast.error(err?.data?.message || "Failed to remove item");
     }
@@ -71,6 +80,7 @@ const Cart = () => {
         await removeFromCart({ userId, productId: item.productId._id, color: item.color }).unwrap();
       }
       toast.success("Cart cleared successfully");
+      setProblematicItems({ outOfStockItems: [], unlistedItems: [] });
     } catch (err) {
       toast.error(err?.data?.message || "Failed to clear cart");
     }
@@ -90,6 +100,23 @@ const Cart = () => {
     { label: "My Account", href: "" },
     { label: "Cart", href: "/cart" },
   ];
+
+  const isProblematic = (productId, color) => {
+    return (
+      problematicItems.outOfStockItems.some(item => item.productId === productId._id && item.color === color) ||
+      problematicItems.unlistedItems.some(item => item.productId === productId._id && item.color === color)
+    );
+  };
+
+  const getProblematicReason = (productId, color) => {
+    if (problematicItems.outOfStockItems.some(item => item.productId === productId._id && item.color === color)) {
+      return "Out of Stock";
+    }
+    if (problematicItems.unlistedItems.some(item => item.productId === productId._id && item.color === color)) {
+      return "No Longer Available";
+    }
+    return "";
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-20 my-2 px-4 sm:px-6 lg:px-8">
@@ -124,22 +151,31 @@ const Cart = () => {
               ) : (
                 <div className="space-y-4">
                   {cart.items.map((item) => (
-                    <CartItem
+                    <div
                       key={`${item.productId._id}-${item.color}`}
-                      id={item.productId._id}
-                      name={item.name}
-                      originalPrice={item.originalPrice}
-                      latestPrice={item.latestPrice}
-                      discount={item.discount}
-                      quantity={item.quantity}
-                      image={item.image}
-                      color={item.color}
-                      inStock={item.inStock}
-                      onRemove={() => handleRemoveItem(item.productId, item.color)}
-                      onUpdateQuantity={(newQuantity) =>
-                        handleUpdateQuantity(item.productId, item.color, newQuantity)
-                      }
-                    />
+                      className={`relative ${isProblematic(item.productId, item.color) ? "border-2 border-red-500 rounded-lg p-2" : ""}`}
+                    >
+                      <CartItem
+                        id={item.productId._id}
+                        name={item.name}
+                        originalPrice={item.originalPrice}
+                        latestPrice={item.latestPrice}
+                        discount={item.discount}
+                        quantity={item.quantity}
+                        image={item.image}
+                        color={item.color}
+                        inStock={item.inStock}
+                        onRemove={() => handleRemoveItem(item.productId, item.color)}
+                        onUpdateQuantity={(newQuantity) =>
+                          handleUpdateQuantity(item.productId, item.color, newQuantity)
+                        }
+                      />
+                      {isProblematic(item.productId, item.color) && (
+                        <span className="absolute top-2 right-2 text-red-600 text-sm font-medium">
+                          {getProblematicReason(item.productId, item.color)}
+                        </span>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}
@@ -161,6 +197,7 @@ const Cart = () => {
             subtotal={subtotal}
             isCartEmpty={isCartEmpty}
             totalAmount={totalAmount}
+            setProblematicItems={setProblematicItems} 
           />
         </div>
       </div>
@@ -169,3 +206,5 @@ const Cart = () => {
 };
 
 export default Cart;
+
+

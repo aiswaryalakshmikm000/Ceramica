@@ -8,12 +8,10 @@ const PriceRangeFilter = ({ onChange, initialRange = { min: 0, max: 5000 }, rese
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    console.log('Reset triggered:', { resetTrigger, initialRange });
     setRange(DEFAULT_RANGE); 
   }, [resetTrigger]);
 
   useEffect(() => {
-    console.log('Initial range updated:', initialRange);
     setRange(initialRange);
   }, [initialRange]);
 

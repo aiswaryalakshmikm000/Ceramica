@@ -10,19 +10,16 @@ const addToCart = async (req, res) => {
 
     // Validate input
     if (!productId || !quantity || !color) {
-      console.log("Product ID, quantity, and color are required");
       return res.status(400).json({ success: false, message: 'Product ID, quantity, and color are required' });
     }
 
     if (quantity < 1) {
-      console.log("Quantity must be at least 1");
       return res.status(400).json({ success: false, message: 'Quantity must be at least 1' });
     }
 
     // Check stock
     const inStock = await cartService.checkStock(productId, color, quantity);
     if (!inStock) {
-      console.log("Product out of stock", inStock);
       return res.status(400).json({ success: false, message: 'Product is currently out of stock' });
     }
 
@@ -33,11 +30,9 @@ const addToCart = async (req, res) => {
 
     // Fetch latest price
     const latestPrice = await cartService.fetchLatestPrice(productId);
-    console.log("latestPrice", latestPrice);
 
     // Find or create cart
     let cart = await Cart.findOne({ userId });
-    console.log('cart from db%%%%%%%%%%%%%$%$%%%%%%$$$$$$$$$$$$$$$$$$$$\n%%$#$%^&*&^%$#$%^&',cart);
     
     if (!cart) {
       cart = new Cart({ userId, items: [] });
@@ -73,13 +68,10 @@ const addToCart = async (req, res) => {
       });
     }
 
-    console.log("cart", cart);
-
     // Recalculate totals
     const updatedCart = await cartService.recalculateCartTotals(cart);
     cart.set(updatedCart);
     await cart.save();
-    console.log("updated Item added to cart", updatedCart);
 
     // Remove from wishlist after successful cart addition
     await cartService.checkAndRemoveFromCart(userId, productId, color);
@@ -90,7 +82,6 @@ const addToCart = async (req, res) => {
       cart: updatedCart 
     });
   } catch (error) {
-    console.log("Error adding to cart:", error.stack);
     res.status(500).json({ success: false, message: 'Failed to add item to cart', error: error.message });
   }
 };
@@ -147,7 +138,6 @@ const updateCart = async (req, res) => {
 
     const cart = await Cart.findOne({ userId });
     if (!cart) {
-      console.log("no cart", cart);
       return res.status(404).json({ success: false, message: 'Cart not found for this user' });
     }
 
@@ -222,9 +212,84 @@ const removeItemFromCart = async (req, res) => {
   }
 };
 
+
+// checkoutValidation.js
+const checkoutValidation = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const cart = await Cart.findOne({ userId }).populate('items.productId');
+
+    if (!cart || cart.items.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Your cart is empty',
+        data: null,
+      });
+    }
+
+    const issues = {
+      outOfStockItems: [],
+      unlistedItems: [],
+    };
+
+    for (const item of cart.items) {
+      const product = item.productId;
+
+      if (!product || !product.isListed) {
+        issues.unlistedItems.push({
+          productId: item.productId.toString(),
+          name: item.name,
+          color: item.color,
+        });
+        continue;
+      }
+
+      const isInStock = await cartService.checkStock(item.productId, item.color, item.quantity);
+      if (!isInStock) {
+        issues.outOfStockItems.push({
+          productId: item.productId.toString(),
+          name: item.name,
+          color: item.color,
+        });
+      }
+    }
+
+    if (issues.outOfStockItems.length > 0 || issues.unlistedItems.length > 0) {
+      let message = '';
+      if (issues.outOfStockItems.length > 0) {
+        message += 'Some items are out of stock. ';
+      }
+      if (issues.unlistedItems.length > 0) {
+        message += 'Some items are no longer available. ';
+      }
+      message += 'Please remove them from your cart to proceed to checkout.';
+
+      return res.status(400).json({
+        success: false,
+        message,
+        data: issues,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Cart is ready for checkout',
+      data: null,
+    });
+  } catch (error) {
+    console.error('Error in checkout validation:', error.stack);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to validate cart for checkout',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
+  }
+};
+
 module.exports = {
   addToCart,
   showCart,
   updateCart,
   removeItemFromCart,
+  checkoutValidation
 };

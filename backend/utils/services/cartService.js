@@ -4,6 +4,9 @@ const Cart = require('../../models/cartModel');
 const Product = require('../../models/productModel');
 const Wishlist = require('../../models/wishlistModel');
 
+const dotenv = require('dotenv');
+dotenv.config();
+
 // Round to two decimal places
 const roundToTwo = (num) => Number((Math.round(num * 100) / 100).toFixed(2));
 
@@ -47,6 +50,17 @@ const fetchLatestPrice = async (productId) => {
 const recalculateCartTotals = (cart) => {
     try {
 
+        if (!cart.items || cart.items.length === 0) {
+            return {
+                ...cart.toObject(),
+                totalItems: 0,
+                totalMRP: 0,
+                totalDiscount: 0,
+                deliveryCharge: 0,
+                totalAmount: 0
+            };
+        }
+
         const totals = cart.items
             .filter((item) => item.inStock === true)
             .reduce(
@@ -78,7 +92,7 @@ const recalculateCartTotals = (cart) => {
 
         const calculateDeliveryCharge = () => {
             const totalAmount = totals.totalMRP - totals.totalDiscount + (cart.platformFee || 0);
-            return totalAmount >= (process.env.THRESHOLD_AMOUNT || 500) ? 0 : 60;
+            return totalAmount >= process.env.THRESHOLD_AMOUNT ? 0 : 60;
         };
 
         const deliveryCharge = calculateDeliveryCharge();

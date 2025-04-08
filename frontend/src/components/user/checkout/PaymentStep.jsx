@@ -15,7 +15,7 @@ const paymentMethods = [
     description: "Google Pay, PhonePe, Paytm & more"
   },
   {
-    id: "cod",
+    id: "Cash on Delivery",
     title: "Cash on Delivery",
     icon: <BanknoteIcon className="text-orange-800" />,
     description: "Pay when you receive your order"

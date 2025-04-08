@@ -10,6 +10,7 @@ const {
 
 // Toggle item in wishlist
 const toggleWishlistItem = async (req, res) => {
+
   try {
     const { userId } = req.params;
     const { productId, color } = req.body;

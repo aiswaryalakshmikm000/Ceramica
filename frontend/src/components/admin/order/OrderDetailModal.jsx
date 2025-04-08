@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Package, MapPin, FileText, CheckCircle, XCircle, Truck, ShoppingBag, Clock, AlertCircle, Wallet } from 'lucide-react';
+import StatusBadge from '../../common/StatusBadge';
 
 const OrderDetailModal = ({ isOpen, onClose, order, onStatusChange, onReturnApproval }) => {
   const [activeTab, setActiveTab] = useState('details');
@@ -19,40 +20,18 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusChange, onReturnAppr
     });
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'pending':
-        return <Clock className="h-5 w-5 text-yellow-500" />;
-      case 'shipped':
-        return <Truck className="h-5 w-5 text-blue-500" />;
-      case 'out-for-delivery':
-        return <Truck className="h-5 w-5 text-purple-500" />;
-      case 'delivered':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case 'cancelled':
-        return <XCircle className="h-5 w-5 text-red-500" />;
-      case 'return-requested':
-        return <AlertCircle className="h-5 w-5 text-orange-500" />;
-      case 'return-approved':
-        return <CheckCircle className="h-5 w-5 text-teal-500" />;
-      case 'return-rejected':
-        return <XCircle className="h-5 w-5 text-gray-500" />;
-      default:
-        return <ShoppingBag className="h-5 w-5 text-gray-500" />;
-    }
-  };
-
   const handleStatusChange = (e) => {
-    onStatusChange(order.id, e.target.value);
+    console.log("newstatus", e.target.value)
+    onStatusChange(order._id,  e.target.value);
   };
 
-  const handleApproveReturn = () => {
-    onReturnApproval(order.id, true, refundToWallet);
+  const handleReturnAction = (isApproved) => {
+    onReturnApproval(order._id, isApproved, refundToWallet);
   };
 
-  const handleRejectReturn = () => {
-    onReturnApproval(order.id, false, false);
-  };
+  // const handleRejectReturn = () => {
+  //   onReturnApproval(order._id, false, false);
+  // };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -125,10 +104,7 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusChange, onReturnAppr
                     <h3 className="text-sm font-medium text-gray-500">Order Information</h3>
                     <div className="mt-2 bg-gray-50 p-4 rounded-md">
                       <div className="flex items-center mb-2">
-                        {getStatusIcon(order.status)}
-                        <span className="ml-2 text-sm font-medium capitalize">
-                          {order.status.replace(/-/g, ' ')}
-                        </span>
+                        <StatusBadge status={order.status} /> {/* Use StatusBadge here */}
                       </div>
                       <p className="text-sm text-gray-600">
                         <span className="font-medium">Order Date:</span> {formatDate(order.orderDate)}
@@ -137,7 +113,7 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusChange, onReturnAppr
                         <span className="font-medium">Payment Method:</span> {order.paymentMethod}
                       </p>
                       <p className="text-sm text-gray-600">
-                        <span className="font-medium">Total Amount:</span> ${order.totalAmount.toFixed(2)}
+                        <span className="font-medium">Total Amount:</span> ₹{order.totalAmount.toFixed(2)}
                       </p>
                     </div>
                   </div>
@@ -148,13 +124,13 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusChange, onReturnAppr
                     <h3 className="text-sm font-medium text-gray-500">Customer Information</h3>
                     <div className="mt-2 bg-gray-50 p-4 rounded-md">
                       <p className="text-sm text-gray-600">
-                        <span className="font-medium">Name:</span> {order.customer.name}
+                        <span className="font-medium">Name:</span> {order.customerName}
                       </p>
                       <p className="text-sm text-gray-600">
-                        <span className="font-medium">Email:</span> {order.customer.email}
+                        <span className="font-medium">Email:</span> {order.shippingAddress.email}
                       </p>
                       <p className="text-sm text-gray-600">
-                        <span className="font-medium">Phone:</span> {order.customer.phone}
+                        <span className="font-medium">Phone:</span> {order.shippingAddress.phone}
                       </p>
                     </div>
                   </div>
@@ -169,14 +145,12 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusChange, onReturnAppr
                     onChange={handleStatusChange}
                     className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#3c73a8] focus:border-[#3c73a8] sm:text-sm rounded-md"
                   >
-                    <option value="pending">Pending</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="out-for-delivery">Out for Delivery</option>
-                    <option value="delivered">Delivered</option>
-                    <option value="cancelled">Cancelled</option>
-                    <option value="return-requested">Return Requested</option>
-                    <option value="return-approved">Return Approved</option>
-                    <option value="return-rejected">Return Rejected</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Out-for-Delivery">Out for Delivery</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
                   </select>
                 </div>
               </div>
@@ -211,7 +185,7 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusChange, onReturnAppr
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="h-10 w-10 flex-shrink-0">
-                              <img className="h-10 w-10 rounded-md object-cover" src={item.image || '/placeholder.svg'} alt={item.name} />
+                              <img className="h-10 w-10 rounded-md object-cover" src={item.image} alt={item.name} />
                             </div>
                             <div className="ml-4">
                               <div className="text-sm font-medium text-gray-900">{item.name}</div>
@@ -220,13 +194,13 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusChange, onReturnAppr
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          ${item.price.toFixed(2)}
+                        ₹{item.totalPrice.toFixed(2)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {item.quantity}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          ${(item.price * item.quantity).toFixed(2)}
+                        ₹{(item.totalPrice * item.quantity).toFixed(2)}
                         </td>
                       </tr>
                     ))}
@@ -251,13 +225,13 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusChange, onReturnAppr
             <div>
               <h3 className="text-lg font-medium text-gray-900 mb-4">Shipping Address</h3>
               <div className="bg-gray-50 p-4 rounded-md">
-                <p className="text-sm text-gray-600">{order.customer.name}</p>
+                <p className="text-sm text-gray-600">{order.customerName}</p>
                 <p className="text-sm text-gray-600">{order.shippingAddress.street}</p>
                 <p className="text-sm text-gray-600">
                   {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
                 </p>
                 <p className="text-sm text-gray-600">{order.shippingAddress.country}</p>
-                <p className="text-sm text-gray-600 mt-2">Phone: {order.customer.phone}</p>
+                <p className="text-sm text-gray-600 mt-2">Phone: {order.shippingAddress.phone}</p>
               </div>
             </div>
           )}
@@ -266,11 +240,11 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusChange, onReturnAppr
           {activeTab === 'actions' && (
             <div className="space-y-6">
               {/* Customer Comment */}
-              {order.comment && (
+              {order.returnRequest.reason && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Customer Comment</h3>
                   <div className="mt-2 bg-yellow-50 p-4 rounded-md">
-                    <p className="text-sm text-gray-700">{order.comment}</p>
+                    <p className="text-sm text-gray-700">{order.returnRequest.reason}</p>
                   </div>
                 </div>
               )}
@@ -288,7 +262,7 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusChange, onReturnAppr
               </div>
 
               {/* Return Request Actions */}
-              {order.status === 'return-requested' && (
+              {order.status === 'Return-Requested' && (
                 <div className="bg-gray-50 p-4 rounded-md">
                   <h3 className="text-sm font-medium text-gray-900 mb-2">Return Request</h3>
                   <p className="text-sm text-gray-600 mb-4">
@@ -312,14 +286,14 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusChange, onReturnAppr
                   
                   <div className="flex space-x-4">
                     <button
-                      onClick={handleApproveReturn}
+                      onClick={() => handleReturnAction (true)}
                       className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                     >
                       <CheckCircle className="h-4 w-4 mr-2" />
                       Approve Return
                     </button>
                     <button
-                      onClick={handleRejectReturn}
+                      onClick={() => handleReturnAction (false)}
                       className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                     >
                       <XCircle className="h-4 w-4 mr-2" />

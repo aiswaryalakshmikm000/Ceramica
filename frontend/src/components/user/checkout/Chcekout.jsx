@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import { selectUser } from "../../../features/userAuth/userAuthSlice";
 import { useGetAddressesQuery } from "../../../features/userAuth/userAddressApiSlice";
 import { useGetCartQuery } from "../../../features/userAuth/userCartApislice";
+import { usePlaceOrderMutation } from "../../../features/userAuth/userOrderApiSlice";
 import { toast } from "react-toastify";
 import AddressStep from "./AddressStep";
 import PaymentStep from "./PaymentStep";
@@ -18,27 +18,16 @@ const Checkout = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Checkout steps
   const steps = ["Address", "Payment", "Review"];
   const [activeStep, setActiveStep] = useState(0);
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
 
-  // Fetch cart data
-  const {
-    data: cart,
-    isLoading: isCartLoading,
-    error: cartError,
-  } = useGetCartQuery(userId, { skip: !userId });
+  const { data: cart, isLoading: isCartLoading, error: cartError } = useGetCartQuery(userId, { skip: !userId });
+  const { data: addresses, isLoading: addressesLoading } = useGetAddressesQuery(userId, { skip: !userId });
+  const [placeOrder, { isLoading: isPlacingOrder }] = usePlaceOrderMutation();
 
-  // Fetch addresses
-  const {
-    data: addresses,
-    isLoading: addressesLoading,
-  } = useGetAddressesQuery(userId, { skip: !userId });
-
-  // Set default address when addresses are loaded
   useEffect(() => {
     if (addresses && addresses.length > 0) {
       const defaultAddress = addresses.find(addr => addr.isDefault) || addresses[0];
@@ -46,7 +35,6 @@ const Checkout = () => {
     }
   }, [addresses]);
 
-  // Check if user is logged in
   useEffect(() => {
     if (!userId) {
       toast.error("Please login to continue checkout");
@@ -54,31 +42,26 @@ const Checkout = () => {
     }
   }, [userId, navigate, location.pathname]);
 
-  // Check if cart is empty
-  useEffect(() => {
-    if (cart && cart.items && cart.items.length === 0) {
-      toast.info("Your cart is empty");
-      navigate("/shop");
-    }
-  }, [cart, navigate]);
+  // useEffect(() => {
+  //   if (cart && cart.items && cart.items.length === 0) {
+  //     toast.info("Your cart is empty");
+  //     navigate("/shop");
+  //   }
+  // }, [cart, navigate]);
 
   if (!userId) return null;
   if (isCartLoading || addressesLoading) return <div className="min-h-screen flex items-center justify-center">Loading checkout...</div>;
-  if (cartError) {
-    return <div className="min-h-screen flex items-center justify-center">Error loading checkout: {cartError?.data?.message || cartError.message}</div>;
-  }
+  if (cartError) return <div className="min-h-screen flex items-center justify-center">Error: {cartError?.data?.message || cartError.message}</div>;
 
   const handleNextStep = () => {
     if (activeStep === 0 && !selectedAddress) {
       toast.error("Please select an address to continue");
       return;
     }
-    
     if (activeStep === 1 && !selectedPaymentMethod) {
       toast.error("Please select a payment method to continue");
       return;
     }
-
     if (activeStep < steps.length - 1) {
       setActiveStep(activeStep + 1);
       window.scrollTo(0, 0);
@@ -93,8 +76,6 @@ const Checkout = () => {
   };
 
   const applyCoupon = (coupon) => {
-    // In a real app, you would validate the coupon code with your API
-    // For now, we'll just apply a mock discount
     setAppliedCoupon({
       code: coupon,
       discount: 50,
@@ -108,10 +89,51 @@ const Checkout = () => {
     toast.success("Coupon removed");
   };
 
-  const placeOrder = () => {
-    // In a real implementation, you would call your API to create the order
-    toast.success("Your order has been placed successfully!");
-    navigate("/order-confirmation");  // You would create this page next
+  const handlePlaceOrder = async () => {
+    try {
+      const orderData = {
+        cart: {
+          items: cart.items.map(item => ({
+            productId: item.productId._id || item.productId,
+            name: item.name,
+            color: item.color,
+            image: item.image,
+            quantity: item.quantity,
+            originalPrice: item.originalPrice,
+            latestPrice: item.latestPrice,
+            discount: item.discount,
+          })),
+          totalMRP: cart.totalMRP,
+          totalDiscount: cart.totalDiscount,
+          deliveryCharge: cart.deliveryCharge || 0,
+          totalAmount: cart.totalAmount,
+          totalItems: cart.totalItems,
+        },
+        address: {
+          fullName: selectedAddress.fullname || selectedAddress.fullName,
+          phone: selectedAddress.phone,
+          email: selectedAddress.email || "user@example.com",
+          addressLine: selectedAddress.addressLine,
+          city: selectedAddress.city,
+          state: selectedAddress.state,
+          pincode: selectedAddress.pincode,
+          landmark: selectedAddress.landmark || "",
+          addressType: selectedAddress.addressType || "Home",
+        },
+        paymentMethod: selectedPaymentMethod,
+        coupon: appliedCoupon ? {
+          code: appliedCoupon.code,
+          discount: appliedCoupon.discount,
+          discountType: appliedCoupon.discountType,
+        } : null,
+      };
+
+      const result = await placeOrder(orderData).unwrap();
+      toast.success("Order placed successfully!");
+      navigate("/order-confirmation", { state: { order: result.data } });
+    } catch (error) {
+      toast.error(error?.data?.message || "Failed to place order");
+    }
   };
 
   return (
@@ -148,7 +170,7 @@ const Checkout = () => {
                 paymentMethod={selectedPaymentMethod}
                 coupon={appliedCoupon}
                 onBack={handlePreviousStep}
-                onPlaceOrder={placeOrder}
+                onPlaceOrder={handlePlaceOrder}
               />
             )}
           </div>
@@ -162,7 +184,6 @@ const Checkout = () => {
               activeStep={activeStep}
               onNext={handleNextStep}
               onBack={handlePreviousStep}
-              // onPlaceOrder={placeOrder}
             />
           </div>
         </div>

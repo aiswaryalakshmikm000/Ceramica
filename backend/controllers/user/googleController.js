@@ -9,8 +9,6 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const googleAuth = async (req, res) => {
   const { credential } = req.body;
 
-  console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$4",credential)
-
   if (!credential) {
     return res.status(400).json({
       success: false,
@@ -24,10 +22,8 @@ const googleAuth = async (req, res) => {
       idToken: credential,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
-    console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$", ticket)
     const payload = ticket.getPayload();
 
-    console.log("&&&&&&&&&&&*&^%$###################################33", payload)
     const { sub: googleId, email, name, picture } = payload;
 
     const existingUser = await User.findOne({ email });
@@ -67,7 +63,6 @@ const googleAuth = async (req, res) => {
     }
 
     if (user.isBlocked) {
-      console.log("User is blocked:", user.email);
       return res.status(403).json({
         success: false,
         message: "Account is blocked. Please contact support.",
@@ -81,7 +76,6 @@ const googleAuth = async (req, res) => {
       name: user.name,
     };
 
-    console.log("Generating tokens for Google login...");
 
     // Generate tokens
     const accessToken = generateAccessToken(userData);
@@ -98,13 +92,11 @@ const googleAuth = async (req, res) => {
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), 
     });
     await newRefreshToken.save();
-    console.log("Saved refresh token in DB:", await RefreshToken.findOne({ token: refreshToken }));
 
     // Set tokens in cookies
     setCookie("userAccessToken", accessToken, 15 * 60 * 1000, res); 
     setCookie("userRefreshToken", refreshToken, 30 * 24 * 60 * 60 * 1000, res);
 
-    console.log("Google login successful for user:", user.email);
 
     // Return user data
     res.status(200).json({

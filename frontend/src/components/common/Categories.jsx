@@ -41,7 +41,7 @@ if (isLoading) {
             <div key={category._id || category.id} className="w-1/2 md:w-1/4 px-2 mb-0">
               <Link to={{
                   pathname: "/shop",
-                  search: `?categoryId=${category._id}` // Pass category ID as query parameter
+                  search: `?categoryId=${category._id}` 
                 }} 
                 className="block category-item group">
                 <div className="relative aspect-[3/2] overflow-hidden rounded-lg">

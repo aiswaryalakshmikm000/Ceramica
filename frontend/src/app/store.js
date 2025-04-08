@@ -11,7 +11,7 @@ import { adminProductApiSlice } from "../features/adminAuth/adminProductApiSlice
 import { AdminCategoryApiSlice } from "../features/adminAuth/AdminCategoryApiSlice";
 import { adminCustomerApiSlice } from "../features/adminAuth/AdminCustomerApiSlice";
 
-import { userProductApiSlice } from "../features/userAuth/userProductApiSlice";
+import { userProductApiSlice } from "../features/userAuth/userProductApislice";
 import { userWishlistApiSlice } from "../features/userAuth/userWishlistApiSlice"
 import { userCartApiSlice } from "../features/userAuth/userCartApislice";
 import { userAddressApiSlice } from "../features/userAuth/userAddressApiSlice"

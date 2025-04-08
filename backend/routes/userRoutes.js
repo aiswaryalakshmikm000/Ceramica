@@ -9,8 +9,10 @@ const {showCategories} =require("../controllers/user/categoryController")
 const { fetchBestProducts, fetchFeaturedProducts, viewProduct,fetchProducts} =require('../controllers/user/productController')
 const {showProfile, editProfile} =require('../controllers/user/userController')
 const {addAddress, showAddresses, editAddress, deleteAddress, setDefaultAddress} = require('../controllers/user/addressController')
-const {addToCart, showCart, updateCart, removeItemFromCart} = require('../controllers/user/cartController')
+const {checkoutValidation, addToCart, showCart, updateCart, removeItemFromCart} = require('../controllers/user/cartController')
 const {updateWishlistItem, removeWishlistItem, getWishlist, toggleWishlistItem} = require("../controllers/user/wishlistController");
+const {placeOrder, getUserOrders, getOrderById, cancelOrder, cancelOrderItem, returnOrder, returnOrderItem, downloadInvoice} = require("../controllers/user/orderController");
+
 
 const userRoute = express()
 
@@ -60,11 +62,22 @@ userRoute.post('/cart/:userId/add', authenticateToken, addToCart);
 userRoute.get('/cart/:userId',authenticateToken, showCart);
 userRoute.put('/cart/:userId/update', authenticateToken, updateCart)
 userRoute.delete('/cart/:userId/remove', authenticateToken, removeItemFromCart)
+userRoute.get('/checkout', authenticateToken, checkoutValidation);
 
 //wishlist
 userRoute.post('/wishlist/:userId/toggle', authenticateToken, toggleWishlistItem);
 userRoute.delete('/wishlist/:userId/remove', authenticateToken, removeWishlistItem);
 userRoute.put('/wishlist/:userId/update', authenticateToken, updateWishlistItem);
 userRoute.get('/wishlist/:userId', authenticateToken, getWishlist);
+
+//order
+userRoute.get('/orders', authenticateToken, getUserOrders);
+userRoute.get('/orders/:orderId', authenticateToken, getOrderById);
+userRoute.post('/orders', authenticateToken, placeOrder);
+userRoute.put('/orders/:orderId/cancel', authenticateToken, cancelOrder);
+userRoute.put('/orders/:orderId/return', authenticateToken, returnOrder);
+userRoute.get('/orders/:orderId/invoice', authenticateToken, downloadInvoice);
+userRoute.post('/orders/cancel-item', authenticateToken, cancelOrderItem);
+userRoute.post('/orders/return-item', authenticateToken, returnOrderItem);
 
 module.exports = userRoute

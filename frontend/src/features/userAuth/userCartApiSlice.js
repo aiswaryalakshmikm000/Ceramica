@@ -34,6 +34,15 @@ export const userCartApiSlice = userApi.injectEndpoints({
       }),
       invalidatesTags: ["Cart"],
     }),
+
+    validateCheckout: builder.mutation({ // Changed to mutation
+      query: () => ({
+        url: '/checkout',
+        method: 'GET',
+      }),
+      invalidatesTags: ['Cart'], // Optional: refresh cart if needed
+    }),
+
   })
 });
 
@@ -42,4 +51,5 @@ export const {
   useGetCartQuery,
   useUpdateCartItemMutation,
   useRemoveFromCartMutation,
+  useValidateCheckoutMutation,
 } = userCartApiSlice;

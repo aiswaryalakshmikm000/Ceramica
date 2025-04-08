@@ -1,4 +1,3 @@
-
 import React from "react";
 import { ClipboardCheck, MapPin, CreditCard, Tag, ShoppingBag, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -8,14 +7,15 @@ const ReviewStep = ({
   paymentMethod, 
   coupon, 
   onBack, 
-  onPlaceOrder 
+  onPlaceOrder,
+  isPlacingOrder 
 }) => {
   // Payment method display name
   const getPaymentMethodName = (methodId) => {
     switch (methodId) {
       case "credit-card": return "Credit/Debit Card";
       case "upi": return "UPI Payment";
-      case "cod": return "Cash on Delivery";
+      case "Cash on Delivery": return "Cash on Delivery";
       default: return methodId;
     }
   };
@@ -35,7 +35,7 @@ const ReviewStep = ({
             <h3 className="font-medium">Shipping Address</h3>
           </div>
           <div className="ml-6 text-gray-600">
-            <p className="font-medium">{address?.fullname}</p>
+            <p className="font-medium">{address?.fullname || address?.fullName}</p>
             <p>{address?.addressLine}{address?.landmark ? `, ${address.landmark}` : ""}</p>
             <p>{address?.city}, {address?.state} - {address?.pincode}</p>
             <p>Phone: {address?.phone}</p>
@@ -82,7 +82,7 @@ const ReviewStep = ({
           <div className="ml-6 space-y-3">
             {cart.items.map((item) => (
               <div 
-                key={`${item.productId._id}-${item.color}`} 
+                key={`${item.productId._id || item.productId}-${item.color}`} 
                 className="flex items-center py-3 border-b border-gray-100"
               >
                 <div className="h-16 w-16 bg-gray-100 rounded flex-shrink-0 overflow-hidden">
@@ -118,17 +118,29 @@ const ReviewStep = ({
         <button
           onClick={onBack}
           className="flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+          disabled={isPlacingOrder}
         >
           <ChevronLeft size={16} className="mr-1" />
           Back to Payment
         </button>
         
         <button
-          onClick={onPlaceOrder}
-          className="flex items-center px-6 py-2 bg-orange-800/90 text-white rounded-lg hover:bg-orange-800 transition-colors"
+          onClick={onPlaceOrder} 
+          className={`flex items-center px-6 py-2 rounded-lg ${
+            isPlacingOrder 
+              ? "bg-orange-600/70 cursor-not-allowed" 
+              : "bg-orange-800/90 hover:bg-orange-800 text-white"
+          } transition-colors`}
+          disabled={isPlacingOrder}
         >
-          Place Order
-          <ChevronRight size={16} className="ml-1" />
+          {isPlacingOrder ? (
+            "Placing Order..."
+          ) : (
+            <>
+              Place Order
+              <ChevronRight size={16} className="ml-1" />
+            </>
+          )}
         </button>
       </div>
     </div>

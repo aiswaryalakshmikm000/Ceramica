@@ -3,10 +3,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import { User, Mail, Phone, Calendar } from "lucide-react";
 import { useShowProfileQuery } from "../../../features/userAuth/userProfileApiSlice";
 import { toast } from "react-toastify";
-import ChangePasswordRequestModal from "./ChangePasswordRequestModal"; 
+import ChangePasswordRequestModal from "./ChangePasswordRequestModal";
 import OTPEnterModal from "../OTPEnterModal";
 import ResetPasswordModal from "../ResetPasswordModal";
 import { useForgetPasswordMutation, useResetPasswordMutation } from "../../../features/userAuth/userApiSlice";
+import Breadcrumbs from "../../common/BreadCrumbs.jsx"; // Import the Breadcrumbs component
 
 const Profile = () => {
   const { id } = useParams();
@@ -28,7 +29,7 @@ const Profile = () => {
 
   useEffect(() => {
     if (userData) {
-      setEmail(userData.email); 
+      setEmail(userData.email);
     }
   }, [userData]);
 
@@ -88,13 +89,23 @@ const Profile = () => {
     }
   };
 
+  // Define breadcrumb items for the Profile page
+  const breadcrumbItems = [
+    { label: "My Account", href: "" },
+    { label: "Profile", href: `/profile/${id}` },
+  ];
+
   return (
     <div className="mx-20 px-14 my-20">
       <div className="w-full bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
         <div className="p-8">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-gray-800">My Profile</h2>
+          </div>
+          <Breadcrumbs items={breadcrumbItems} /> {/* Add Breadcrumbs here */}
+
           <div className="flex flex-col md:flex-row">
             <div className="flex-1 pr-0 md:pr-6 mb-8 md:mb-0">
-              <h2 className="text-2xl font-semibold mb-6 text-gray-800">Profile Details</h2>
               <div className="space-y-6">
                 <div className="flex items-center p-4 bg-gray-50 rounded-lg transition-all duration-200 hover:bg-gray-100">
                   <User className="mr-4 text-[#a96446]" size={27} />

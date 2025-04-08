@@ -1,6 +1,6 @@
 
 import React from "react";
-import { ShoppingCart, Trash2 } from "lucide-react";
+import { ShoppingCart, Trash2, Heart } from "lucide-react";
 import {
   useFetchWishlistQuery,
   useRemoveFromWishlistMutation,
@@ -90,6 +90,7 @@ const Wishlist = () => {
               emptyMessage="Your wishlist is empty"
               emptyActionText="Continue Shopping"
               emptyActionPath="/shop"
+              emptyIcon={<Heart/>}
             />
           ) : (
             <div className="space-y-4 mt-6">

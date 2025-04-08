@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Copy, Clock, CheckCircle } from "lucide-react";
+import { Copy, Clock, CheckCircle, Ticket } from "lucide-react";
 import { useSelector } from "react-redux";
 import { selectUser } from "../../../features/userAuth/userAuthSlice";
 import { useNavigate } from "react-router-dom";
@@ -82,6 +82,7 @@ const Coupons = () => {
         emptyMessage={null}
         emptyActionText="Continue Shopping"
         emptyActionPath="/shop"
+        emptyIcon={<Ticket/>}
       />
     );
   }
