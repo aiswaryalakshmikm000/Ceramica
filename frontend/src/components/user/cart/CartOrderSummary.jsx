@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 const THRESHOLD_AMOUNT = import.meta.env.VITE_THRESHOLD_AMOUNT 
 
 const CartOrderSummary = ({ cart, subtotal, isCartEmpty, totalAmount, setProblematicItems }) => {
+
   const navigate = useNavigate();
   const [validateCheckout, { isLoading }] = useValidateCheckoutMutation();
 

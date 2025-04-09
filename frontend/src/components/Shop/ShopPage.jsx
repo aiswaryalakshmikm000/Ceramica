@@ -40,8 +40,6 @@ const Shop = () => {
     const categoryIdsFromUrl = searchParams.get('categoryIds')?.split(',').filter(Boolean) || [];
     const searchTermFromUrl = searchParams.get('search') || '';
 
-    console.log("URL Params:", { categoryIds: categoryIdsFromUrl, search: searchTermFromUrl });
-
     setFilters(prev => ({
       ...prev,
       categoryIds: categoryIdsFromUrl.length > 0 ? categoryIdsFromUrl : prev.categoryIds,
@@ -61,11 +59,7 @@ const Shop = () => {
     ...(filters.colors.length > 0 && { colors: filters.colors.join(',') }),
   };
 
-  console.log("Query Params:", queryParams);
-
   const { data, isLoading, isFetching, error } = useFetchProductsQuery(queryParams);
-
-  console.log("API Response:", data);
 
   const handlePriceRangeChange = (priceRange) => {
     setFilters(prev => ({ ...prev, priceRange, page: 1 }));

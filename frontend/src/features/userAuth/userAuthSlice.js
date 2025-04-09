@@ -19,7 +19,6 @@ const userAuthSlice = createSlice({
     },
     updateUser: (state, action) => {
       state.user = { ...state.user, ...action.payload, lastUpdated: Date.now()};
-      console.log("Redux state updated with:", state.user);
     }
   },
 });

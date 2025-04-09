@@ -35,6 +35,10 @@ const placeOrder = async (req, res) => {
       totalPrice: item.latestPrice * item.quantity
     }));
 
+    // Calculate expected delivery date (7-10 days from now)
+    const orderDate = new Date();
+    const expectedDeliveryDate = new Date(orderDate);
+    expectedDeliveryDate.setDate(orderDate.getDate() + 7); 
 
     const order = new Order({
       orderNumber: generateOrderNumber(),
@@ -49,6 +53,8 @@ const placeOrder = async (req, res) => {
       totalAmount: cart.totalAmount,
       shippingAddress: address,
       paymentMethod: paymentMethod,
+      orderDate: orderDate,
+      expectedDeliveryDate: expectedDeliveryDate
     });
 
     await order.save();
@@ -71,7 +77,8 @@ const placeOrder = async (req, res) => {
       data: {
         orderNumber: order.orderNumber,
         totalAmount: order.totalAmount,
-        estimatedDelivery: order.expectedDeliveryDate
+        estimatedDelivery: order.expectedDeliveryDate,
+        orderDate: order.orderDate
       }
     });
   } catch (error) {
@@ -165,9 +172,13 @@ const cancelOrder = async (req, res) => {
     }
 
     order.status = 'Cancelled';
-    
-    order.items.map((item) => item.status = "Cancelled")
     order.cancelReason = cancelReason;
+
+    order.items.forEach((item) => {
+      if (item.status !== 'Cancelled') {
+        item.status = 'Cancelled';
+      }
+    });
 
     order.activityLog.push({ 
       status: 'Cancelled',
@@ -177,11 +188,13 @@ const cancelOrder = async (req, res) => {
 
     // Restore stock
     await Promise.all(order.items.map(async (item) => {
+      if (item.status === 'Cancelled' && !item.cancelProductReason) {
       await Product.updateOne(
         { _id: item.productId, 'colors.name': item.color },
         { $inc: { 'colors.$.stock': item.quantity, totalStock: item.quantity } }
       );
-    }));
+    }
+  }));
 
     await order.save();
     
@@ -366,11 +379,11 @@ const returnOrder = async (req, res) => {
 
 const returnOrderItem = async (req, res) => {
   try {
-    const { orderId, itemId, returnProductReason } = req.body;
+    const { orderId, itemId, reason } = req.body;
 
     // Find the order
     const order = await Order.findOne({ 
-      orderNumber: orderId, 
+      _id: orderId, 
       userId: req.user.id 
     });
 
@@ -404,7 +417,7 @@ const returnOrderItem = async (req, res) => {
       });
     }
 
-    if (!returnProductReason) {
+    if (!reason) {
       return res.status(400).json({ 
         success: false,
         message: 'Return reason is required',
@@ -415,11 +428,13 @@ const returnOrderItem = async (req, res) => {
     // Update item status and return reason
     item.status = 'Return-Requested';
     order.status= 'Return-Requested'
-    item.returnProductReason = returnProductReason;
+    // item.returnProductReason = returnProductReason;
     item.returnRequest = {
       isRequested: true,
-      requestedAt: new Date()
+      requestedAt: new Date(),
+      reason: reason,
     };
+
 
     // Log the activity
     order.activityLog.push({ 
@@ -435,7 +450,7 @@ const returnOrderItem = async (req, res) => {
     }
 
     await order.save();
-
+    
     res.status(200).json({ 
       success: true,
       message: 'Item return request submitted successfully',
@@ -454,7 +469,6 @@ const returnOrderItem = async (req, res) => {
     });
   }
 };
-
 const downloadInvoice = async (req, res) => {
   try {
     const order = await Order.findOne({ 
@@ -470,26 +484,110 @@ const downloadInvoice = async (req, res) => {
       });
     }
 
-    const doc = new PDFDocument();
+    const doc = new PDFDocument({ margin: 50 });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=invoice-${order.orderNumber}.pdf`);
 
     doc.pipe(res);
-    doc.fontSize(20).text('Invoice', { align: 'center' });
-    doc.moveDown();
-    doc.fontSize(12).text(`Order Number: ${order.orderNumber}`);
-    doc.text(`Date: ${order.orderDate.toLocaleDateString()}`);
-    doc.text(`Customer: ${order.customerName}`);
-    doc.moveDown();
+
+    // Company Logo/Header Section
+    doc.fontSize(14).font('Helvetica-Bold').text('CERAMICA', { align: 'center' });
+    doc.fontSize(24).font('Helvetica-Bold').text('INVOICE', { align: 'center' });
+    doc.moveDown(0.5);
     
-    order.items.forEach(item => {
-      doc.text(`${item.name} (${item.color}) - Qty: ${item.quantity} - ₹${item.totalPrice}`);
+    // Draw a horizontal line
+    doc.lineWidth(1).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+    doc.moveDown(1);
+
+    // Order & Customer Details - Two-column layout
+    const startY = doc.y;
+    
+    // Left column - Customer information
+    doc.font('Helvetica-Bold').fontSize(11).text('BILLED TO:', 50, startY);
+    doc.font('Helvetica').fontSize(10).text(order.customerName, 50, doc.y + 5);
+    
+    if (order.shippingAddress) {
+      doc.text(order.shippingAddress.addressLine);
+      doc.text(`${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.pincode}`);
+      doc.text(order.shippingAddress.email);
+      doc.text(order.shippingAddress.phone);
+    }
+
+    // Reset y position and draw right column - Order information
+    doc.font('Helvetica-Bold').fontSize(11).text('ORDER DETAILS:', 300, startY);
+    doc.font('Helvetica').fontSize(10).text(`Order Number: ${order.orderNumber}`, 300, doc.y + 5);
+    doc.text(`Date: ${order.orderDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`);
+    doc.text(`Payment Method: ${order.paymentMethod}`);
+    doc.text(`Order Status: ${order.status}`);
+    
+    // Find the lower of the two columns to continue
+    const nextY = Math.max(doc.y + 20, startY + 100);
+    doc.y = nextY;
+    
+    // Items Table Header
+    doc.lineWidth(1).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+    doc.moveDown(0.5);
+    
+    // Create table headers
+    doc.font('Helvetica-Bold').fontSize(10);
+    doc.text('ITEM', 50, doc.y);
+    doc.text('COLOR', 310, doc.y - 10);
+    doc.text('QTY', 400, doc.y - 10);
+    doc.text('PRICE', 450, doc.y - 10);
+    doc.text('TOTAL', 510, doc.y - 10);
+    
+    doc.moveDown(0.5);
+    doc.lineWidth(0.5).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+    doc.moveDown(0.5);
+
+    // Items List
+    doc.font('Helvetica').fontSize(10);
+    order.items.forEach((item) => {
+      const itemPositionY = doc.y;
+      
+      // Item name might be long, so we allow it to wrap
+      doc.text(item.name, 50, itemPositionY, { width: 240 });
+      
+      // For the rest, we align them in their respective columns
+      const itemHeight = doc.y - itemPositionY;
+      
+      doc.text(item.color, 310, itemPositionY);
+      doc.text(item.quantity.toString(), 400, itemPositionY);
+      doc.text(`₹${item.originalPrice}`, 450, itemPositionY);
+      doc.text(`₹${item.totalPrice}`, 510, itemPositionY);
+      
+      doc.moveDown(0.5);
     });
+
+    // Final separator line
+    doc.lineWidth(0.5).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+    doc.moveDown(1);
+
+    // Summary section - Right aligned
+    doc.font('Helvetica').fontSize(10);
     
-    doc.moveDown();
-    doc.text(`Total Amount: ₹${order.totalAmount}`);
+    // Place subtotal on right side
+    doc.text(`Subtotal:`, 400, doc.y);
+    doc.text(`₹${order.totalMRP}`, 510, doc.y - 10);
+    doc.moveDown(0.3);
+    
+    doc.text(`Discount:`, 400, doc.y);
+    doc.text(`₹${order.totalDiscount}`, 510, doc.y - 10);
+    doc.moveDown(0.3);
+    
+    doc.text(`Shipping Fee:`, 400, doc.y);
+    doc.text(`₹${order.shippingFee}`, 510, doc.y - 10);
+    doc.moveDown(0.5);
+    
+    doc.lineWidth(0.5).moveTo(400, doc.y).lineTo(550, doc.y).stroke();
+    doc.moveDown(0.5);
+    
+    doc.font('Helvetica-Bold');
+    doc.text(`TOTAL:`, 400, doc.y);
+    doc.text(`₹${order.totalAmount}`, 510, doc.y - 10);
     doc.end();
   } catch (error) {
+    console.error(error);
     res.status(500).json({ 
       success: false,
       message: 'Failed to generate invoice',
@@ -497,6 +595,7 @@ const downloadInvoice = async (req, res) => {
     });
   }
 };
+
 
 module.exports = {
   placeOrder,

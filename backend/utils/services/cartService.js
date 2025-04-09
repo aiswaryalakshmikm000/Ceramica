@@ -21,7 +21,6 @@ const calculateDiscountPrice = (product) => {
 const checkStock = async (productId, color, quantity) => {
     const product = await Product.findById(productId);
     if (!product) {
-        console.log("Product not found");
         return false;
     }
 
@@ -40,7 +39,6 @@ const checkStock = async (productId, color, quantity) => {
 const fetchLatestPrice = async (productId) => {
     const product = await Product.findById(productId);
     if (!product) {
-        console.log("Product not found for price fetch");
         return 0;
     }
     return product.discountedPrice; 
@@ -97,8 +95,6 @@ const recalculateCartTotals = (cart) => {
 
         const deliveryCharge = calculateDeliveryCharge();
 
-        console.log("deliveryCharge", deliveryCharge)
-
         return {
             ...cart.toObject(),
             totalItems: totals.totalItems,
@@ -113,7 +109,6 @@ const recalculateCartTotals = (cart) => {
             ),
         };
     } catch (error) {
-        console.log("Error in recalculateCartTotals:", error.stack);
         throw error;
     }
 };

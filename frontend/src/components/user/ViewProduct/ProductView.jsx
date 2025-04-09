@@ -22,11 +22,10 @@ const ProductView = () => {
 useEffect(() => {
   refetch(); 
   setSelectedColor(null); 
-}, [id, refetch]);
+}, [id, refetch, setSelectedColor]);
 
   useEffect(() => {
     if (data?.product) {
-      console.log("Product data received:", JSON.stringify(data.product, null, 2));
       setBreadcrumbItems([
         { label: 'Home', href: '/' },
         { label: 'Shop', href: '/shop' },
@@ -83,6 +82,7 @@ useEffect(() => {
     discountedPrice: product.discountedPrice,
     image: product.colors?.[0]?.images?.[0] || product.images?.[0] || product.primaryImage,
     inStock: product.totalStock > 0,
+    colors: product.colors,
   }));
 
   const galleryImages = selectedColor

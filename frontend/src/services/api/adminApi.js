@@ -9,7 +9,6 @@ const baseQuery = fetchBaseQuery({
 
 // Custom query with token refresh logic
 const baseQueryWithReauth = async (args, api, extraOptions) => {
-  console.log("RTK Query request args:", args); 
   
   let result = await baseQuery(args, api, extraOptions);
 

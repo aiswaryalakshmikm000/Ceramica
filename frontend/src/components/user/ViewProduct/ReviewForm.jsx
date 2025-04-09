@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Star, Upload, Loader2 } from 'lucide-react';
 import { Button } from '../../common/Button';
+import { Textarea } from '../../ui/input';
 
 const ReviewForm = () => {
   const [rating, setRating] = useState(0);
@@ -149,7 +150,7 @@ const ReviewForm = () => {
             <label htmlFor="comment" className="block text-sm font-medium text-gray-800 mb-2">
               Your Review
             </label>
-            <textarea
+            <Textarea
               id="comment"
               rows={4}
               value={comment}

@@ -303,7 +303,8 @@ const verifyOTP = async (req, res) => {
 
     res.status(200).json({ success: true, message: "OTP verified successfully.", user });
   } catch (error) {
-    console.log("error in otp verification", error.message);
+    const errorMessage=error.message||"OTP Verification failed."
+    res.status(error.status||500).json({success:false,message:errorMessage})
   }
 };
 

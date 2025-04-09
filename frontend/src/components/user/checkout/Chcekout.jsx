@@ -42,13 +42,6 @@ const Checkout = () => {
     }
   }, [userId, navigate, location.pathname]);
 
-  // useEffect(() => {
-  //   if (cart && cart.items && cart.items.length === 0) {
-  //     toast.info("Your cart is empty");
-  //     navigate("/shop");
-  //   }
-  // }, [cart, navigate]);
-
   if (!userId) return null;
   if (isCartLoading || addressesLoading) return <div className="min-h-screen flex items-center justify-center">Loading checkout...</div>;
   if (cartError) return <div className="min-h-screen flex items-center justify-center">Error: {cartError?.data?.message || cartError.message}</div>;

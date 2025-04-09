@@ -203,24 +203,6 @@ const Sidebar = ({ isOpen, onClose }) => {
                 >
                   Ceramica © {new Date().getFullYear()}
                 </motion.div>
-                {/* {!user && (
-                  <Link
-                    to="/login"
-                    onClick={onClose}
-                    className="flex items-center justify-center w-full mt-4 py-3 bg-orange-800 text-white rounded-lg hover:bg-orange-900 transition-colors duration-300 font-medium"
-                  >
-                    Sign In / Register
-                  </Link>
-                )} */}
-                {/* {user && (
-                  <Link
-                    to="/logout"
-                    onClick={onClose}
-                    className="flex items-center justify-center w-full mt-4 py-2 border border-orange-800 text-orange-800 rounded-lg hover:bg-orange-50 transition-colors duration-300 font-medium text-sm"
-                  >
-                    Log Out
-                  </Link>
-                )} */}
               </motion.div>
             </div>
           </motion.div>

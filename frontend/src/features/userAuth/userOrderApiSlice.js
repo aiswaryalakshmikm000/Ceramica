@@ -43,16 +43,17 @@ export const userOrderApiSlice = userApi.injectEndpoints({
       invalidatesTags: ['Order'],
     }),
     requestReturnItem: builder.mutation({ 
-      query: ({ orderId, itemId, returnProductReason }) => ({
+      query: ({ orderId, itemId, reason }) => ({
         url: '/orders/return-item',
         method: 'POST',
-        body: { orderId, itemId, returnProductReason },
+        body: { orderId, itemId, reason },
       }),
     }),
-    downloadInvoice: builder.query({
+    downloadInvoice: builder.mutation({
       query: (orderId) => ({
         url: `/orders/${orderId}/invoice`,
-        responseHandler: 'blob',
+        method: 'GET', 
+        responseHandler: (response) => response.blob(), 
       }),
     }),
   }),
@@ -66,5 +67,5 @@ export const {
   useCancelOrderItemMutation,
   useRequestReturnMutation,
   useRequestReturnItemMutation,
-  useDownloadInvoiceQuery,
+  useDownloadInvoiceMutation,
 } = userOrderApiSlice;

@@ -89,28 +89,53 @@ const addToCart = async (req, res) => {
 const showCart = async (req, res) => {
   try {
     const { userId } = req.params;
-    const cart = await Cart.findOne({ userId }).populate('items.productId');
+    const cart = await Cart.findOne({ userId })
+    .populate({
+      path: 'items.productId', 
+      populate: {
+        path: 'categoryId',
+        model: 'Category',
+      }
+    });
 
     if (!cart) {
       return res.status(404).json({ success: false, message: 'Cart not found for this user' });
     }
 
     const originalItemCount = cart.items.length;
-    let outOfStockItems = [];
     
     cart.items = cart.items.filter(item => {
       const product = item.productId;
-      return product && product.isListed === true;
+      return  product && 
+              product.isListed === true && 
+              product.categoryId && 
+              product.categoryId.isListed === true;;
     });
+
     const removedItemCount = originalItemCount - cart.items.length;
 
     const updatedCart = await cartService.recalculateCartTotals(cart);
+
+    if (removedItemCount > 0) {
     cart.set(updatedCart);
     await cart.save();
+    }
 
     const response = { 
       success: true,
-      cart: updatedCart 
+      cart: {
+        _id: cart._id,
+        userId: cart.userId,
+        items: cart.items,
+        platformFee: updatedCart.platformFee || 3,
+        totalItems: updatedCart.totalItems,
+        totalMRP: updatedCart.totalMRP,
+        totalDiscount: updatedCart.totalDiscount,
+        deliveryCharge: updatedCart.deliveryCharge,
+        totalAmount: updatedCart.totalAmount,
+        createdAt: cart.createdAt,
+        updatedAt: cart.updatedAt,
+      }, 
     };
     
     if (removedItemCount > 0) {

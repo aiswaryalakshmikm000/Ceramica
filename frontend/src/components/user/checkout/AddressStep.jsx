@@ -10,14 +10,14 @@ import {
 } from "../../../features/userAuth/userAddressApiSlice";
 import AddressForm from "../address/AddressForm";
 import { toast } from "react-toastify";
-import Modal from "../../common/Modal"; // Import the Modal component
+import Modal from "../../common/Modal";
 
 const AddressStep = ({ addresses, selectedAddress, setSelectedAddress, onNext }) => {
   const user = useSelector(selectUser);
   const [isAddingAddress, setIsAddingAddress] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false); // State for modal visibility
-  const [addressToDelete, setAddressToDelete] = useState(null); // State for address to delete
+  const [showDeleteModal, setShowDeleteModal] = useState(false); 
+  const [addressToDelete, setAddressToDelete] = useState(null); 
   const [setDefaultAddress] = useSetDefaultAddressMutation();
   const [addAddress] = useAddAddressMutation();
   const [updateAddress] = useUpdateAddressMutation();

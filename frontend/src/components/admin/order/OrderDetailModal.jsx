@@ -1,13 +1,55 @@
-import React, { useState } from 'react';
-import { X, Package, MapPin, FileText, CheckCircle, XCircle, Truck, ShoppingBag, Clock, AlertCircle, Wallet } from 'lucide-react';
-import StatusBadge from '../../common/StatusBadge';
 
-const OrderDetailModal = ({ isOpen, onClose, order, onStatusChange, onReturnApproval }) => {
+import React, { useState } from 'react';
+import { X, Package, MapPin, FileText } from 'lucide-react';
+import OrderDetailsTab from './OrderDetailTab';
+import OrderItemsTab from './OrderItemstab';
+import OrderAddressTab from './OrderAddressTab';
+import OrderActionsTab from './OrderActionsTab';
+import { useGetOrderDetailsQuery } from '../../../features/adminAuth/adminOrderApiSlice';
+
+const OrderDetailModal = ({ isOpen, onClose, orderId, onStatusChange, onReturnApproval, onItemReturnApproval }) => {
   const [activeTab, setActiveTab] = useState('details');
-  const [adminComment, setAdminComment] = useState('');
+  const [adminComments, setAdminComments] = useState({});
   const [refundToWallet, setRefundToWallet] = useState(true);
   
+
+  const {data, isLoading, error } = useGetOrderDetailsQuery(orderId,{
+    skip: !isOpen || !orderId
+  });
+
+  const order = data?.data
+
   if (!isOpen || !order) return null;
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black opacity-50" onClick={onClose}></div>
+        <div className="bg-white rounded-lg shadow-lg z-10 p-6">Loading order details...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black opacity-50" onClick={onClose}></div>
+        <div className="bg-white rounded-lg shadow-lg z-10 p-6 text-red-600">
+          Error loading order details: {error.data?.message || error.message}
+        </div>
+      </div>
+    );
+  }
+
+if (!order) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black opacity-50" onClick={onClose}></div>
+        <div className="bg-white rounded-lg shadow-lg z-10 p-6">Order not found</div>
+      </div>
+    );
+  }
+
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -21,25 +63,31 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusChange, onReturnAppr
   };
 
   const handleStatusChange = (e) => {
-    console.log("newstatus", e.target.value)
-    onStatusChange(order._id,  e.target.value);
+    onStatusChange(order._id, e.target.value);
   };
 
   const handleReturnAction = (isApproved) => {
-    onReturnApproval(order._id, isApproved, refundToWallet);
+    const adminComment = adminComments['fullOrder'] || '';
+    onReturnApproval(order._id, isApproved, refundToWallet, adminComment);
   };
 
-  // const handleRejectReturn = () => {
-  //   onReturnApproval(order._id, false, false);
-  // };
+  const handleReturnItemAction = (itemId, isApproved) => {
+    const adminComment = adminComments[itemId] || '';
+    onItemReturnApproval(order._id, itemId, isApproved, adminComment);
+  };
+
+  const handleAdminCommentChange = (key, value) => {
+    setAdminComments((prev) => ({ ...prev, [key]: value }));
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="fixed inset-0 bg-black opacity-50" onClick={onClose}></div>
-      <div className="bg-white rounded-lg shadow-lg z-10 w-full max-w-4xl mx-4 max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-lg shadow-lg z-10 w-full max-w-4xl h-[500px] mx-4 flex flex-col">
+      {/* <div className="bg-white rounded-lg shadow-lg z-10 w-full max-w-4xl mx-4 max-h-[700px] flex flex-col"> */}
         {/* Modal Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-[#3c73a8] text-white rounded-t-lg">
-          <h2 className="text-xl font-semibold">Order {order.id}</h2>
+          <h2 className="text-xl font-semibold">Order #{order.orderNumber}</h2>
           <button onClick={onClose} className="text-white hover:text-gray-200">
             <X className="h-6 w-6" />
           </button>
@@ -48,44 +96,28 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusChange, onReturnAppr
         {/* Tab Navigation */}
         <div className="flex border-b border-gray-200">
           <button
-            className={`px-4 py-3 font-medium text-sm flex items-center gap-2 ${
-              activeTab === 'details' 
-                ? 'border-b-2 border-[#3c73a8] text-[#3c73a8]' 
-                : 'text-gray-500 hover:text-[#3c73a8]'
-            }`}
+            className={`px-4 py-3 font-medium text-sm flex items-center gap-2 ${activeTab === 'details' ? 'border-b-2 border-[#3c73a8] text-[#3c73a8]' : 'text-gray-500 hover:text-[#3c73a8]'}`}
             onClick={() => setActiveTab('details')}
           >
             <FileText className="h-4 w-4" />
             Quick Details
           </button>
           <button
-            className={`px-4 py-3 font-medium text-sm flex items-center gap-2 ${
-              activeTab === 'items' 
-                ? 'border-b-2 border-[#3c73a8] text-[#3c73a8]' 
-                : 'text-gray-500 hover:text-[#3c73a8]'
-            }`}
+            className={`px-4 py-3 font-medium text-sm flex items-center gap-2 ${activeTab === 'items' ? 'border-b-2 border-[#3c73a8] text-[#3c73a8]' : 'text-gray-500 hover:text-[#3c73a8]'}`}
             onClick={() => setActiveTab('items')}
           >
             <Package className="h-4 w-4" />
             Items
           </button>
           <button
-            className={`px-4 py-3 font-medium text-sm flex items-center gap-2 ${
-              activeTab === 'address' 
-                ? 'border-b-2 border-[#3c73a8] text-[#3c73a8]' 
-                : 'text-gray-500 hover:text-[#3c73a8]'
-            }`}
+            className={`px-4 py-3 font-medium text-sm flex items-center gap-2 ${activeTab === 'address' ? 'border-b-2 border-[#3c73a8] text-[#3c73a8]' : 'text-gray-500 hover:text-[#3c73a8]'}`}
             onClick={() => setActiveTab('address')}
           >
             <MapPin className="h-4 w-4" />
             Address
           </button>
           <button
-            className={`px-4 py-3 font-medium text-sm flex items-center gap-2 ${
-              activeTab === 'actions' 
-                ? 'border-b-2 border-[#3c73a8] text-[#3c73a8]' 
-                : 'text-gray-500 hover:text-[#3c73a8]'
-            }`}
+            className={`px-4 py-3 font-medium text-sm flex items-center gap-2 ${activeTab === 'actions' ? 'border-b-2 border-[#3c73a8] text-[#3c73a8]' : 'text-gray-500 hover:text-[#3c73a8]'}`}
             onClick={() => setActiveTab('actions')}
           >
             <FileText className="h-4 w-4" />
@@ -95,214 +127,26 @@ const OrderDetailModal = ({ isOpen, onClose, order, onStatusChange, onReturnAppr
 
         {/* Tab Content */}
         <div className="p-6 overflow-y-auto">
-          {/* Quick Details Tab */}
           {activeTab === 'details' && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">Order Information</h3>
-                    <div className="mt-2 bg-gray-50 p-4 rounded-md">
-                      <div className="flex items-center mb-2">
-                        <StatusBadge status={order.status} /> {/* Use StatusBadge here */}
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        <span className="font-medium">Order Date:</span> {formatDate(order.orderDate)}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        <span className="font-medium">Payment Method:</span> {order.paymentMethod}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        <span className="font-medium">Total Amount:</span> ₹{order.totalAmount.toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">Customer Information</h3>
-                    <div className="mt-2 bg-gray-50 p-4 rounded-md">
-                      <p className="text-sm text-gray-600">
-                        <span className="font-medium">Name:</span> {order.customerName}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        <span className="font-medium">Email:</span> {order.shippingAddress.email}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        <span className="font-medium">Phone:</span> {order.shippingAddress.phone}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">Order Status</h3>
-                <div className="mt-2">
-                  <select
-                    value={order.status}
-                    onChange={handleStatusChange}
-                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#3c73a8] focus:border-[#3c73a8] sm:text-sm rounded-md"
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="Confirmed">Confirmed</option>
-                    <option value="Shipped">Shipped</option>
-                    <option value="Out-for-Delivery">Out for Delivery</option>
-                    <option value="Delivered">Delivered</option>
-                    <option value="Cancelled">Cancelled</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+            <OrderDetailsTab 
+              order={order} 
+              handleStatusChange={handleStatusChange} 
+              formatDate={formatDate} 
+            />
           )}
-
-          {/* Items Tab */}
-          {activeTab === 'items' && (
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Order Items</h3>
-              <div className="border border-gray-200 rounded-md overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Product
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Price
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Quantity
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Total
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {order.items.map((item) => (
-                      <tr key={item.id}>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="h-10 w-10 flex-shrink-0">
-                              <img className="h-10 w-10 rounded-md object-cover" src={item.image} alt={item.name} />
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">{item.name}</div>
-                              <div className="text-sm text-gray-500">SKU: {item.id}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ₹{item.totalPrice.toFixed(2)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {item.quantity}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ₹{(item.totalPrice * item.quantity).toFixed(2)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot className="bg-gray-50">
-                    <tr>
-                      <td colSpan="3" className="px-6 py-4 text-sm font-medium text-gray-900 text-right">
-                        Total:
-                      </td>
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                        ${order.totalAmount.toFixed(2)}
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* Address Tab */}
-          {activeTab === 'address' && (
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Shipping Address</h3>
-              <div className="bg-gray-50 p-4 rounded-md">
-                <p className="text-sm text-gray-600">{order.customerName}</p>
-                <p className="text-sm text-gray-600">{order.shippingAddress.street}</p>
-                <p className="text-sm text-gray-600">
-                  {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
-                </p>
-                <p className="text-sm text-gray-600">{order.shippingAddress.country}</p>
-                <p className="text-sm text-gray-600 mt-2">Phone: {order.shippingAddress.phone}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Actions Tab */}
+          {activeTab === 'items' && (<OrderItemsTab order={order} />)}
+          {activeTab === 'address' && (<OrderAddressTab order={order} />)}
           {activeTab === 'actions' && (
-            <div className="space-y-6">
-              {/* Customer Comment */}
-              {order.returnRequest.reason && (
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Customer Comment</h3>
-                  <div className="mt-2 bg-yellow-50 p-4 rounded-md">
-                    <p className="text-sm text-gray-700">{order.returnRequest.reason}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Admin Comment */}
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">Admin Comment</h3>
-                <textarea
-                  value={adminComment}
-                  onChange={(e) => setAdminComment(e.target.value)}
-                  rows={3}
-                  className="mt-2 shadow-sm focus:ring-[#3c73a8] focus:border-[#3c73a8] block w-full sm:text-sm border-gray-300 rounded-md"
-                  placeholder="Add a comment about this order..."
-                />
-              </div>
-
-              {/* Return Request Actions */}
-              {order.status === 'Return-Requested' && (
-                <div className="bg-gray-50 p-4 rounded-md">
-                  <h3 className="text-sm font-medium text-gray-900 mb-2">Return Request</h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    This order has a return request. Please review and take action.
-                  </p>
-                  
-                  <div className="mb-4">
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={refundToWallet}
-                        onChange={(e) => setRefundToWallet(e.target.checked)}
-                        className="h-4 w-4 text-[#3c73a8] focus:ring-[#3c73a8] border-gray-300 rounded"
-                      />
-                      <span className="ml-2 text-sm text-gray-700 flex items-center">
-                        <Wallet className="h-4 w-4 mr-1" />
-                        Refund amount to customer wallet
-                      </span>
-                    </label>
-                  </div>
-                  
-                  <div className="flex space-x-4">
-                    <button
-                      onClick={() => handleReturnAction (true)}
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                    >
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Approve Return
-                    </button>
-                    <button
-                      onClick={() => handleReturnAction (false)}
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                    >
-                      <XCircle className="h-4 w-4 mr-2" />
-                      Reject Return
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <OrderActionsTab
+              order={order}
+              formatDate={formatDate}
+              adminComments={adminComments}
+              handleAdminCommentChange={handleAdminCommentChange}
+              refundToWallet={refundToWallet}
+              setRefundToWallet={setRefundToWallet}
+              handleReturnAction={handleReturnAction}
+              handleReturnItemAction={handleReturnItemAction}
+            />
           )}
         </div>
 

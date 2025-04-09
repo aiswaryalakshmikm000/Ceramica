@@ -13,23 +13,11 @@ const OrderConfirmation = () => {
     if (!dateString) return 'N/A';
     try {
       const date = new Date(dateString);
-      return isNaN(date.getTime()) ? 'N/A' : date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric',  minute: '2-digit' });
     } catch {
       return 'N/A';
     }
   };
-
-  // Calculate estimated delivery dates
-  const getDeliveryDates = () => {
-    const orderDate = order?.orderDate ? new Date(order.orderDate) : new Date();
-    const startDate = new Date(orderDate);
-    startDate.setDate(startDate.getDate() + 7);
-    const endDate = new Date(orderDate);
-    endDate.setDate(endDate.getDate() + 10);
-    return { start: formatDate(startDate), end: formatDate(endDate) };
-  };
-
-  const deliveryDates = getDeliveryDates();
 
   if (!order) {
     return (
@@ -139,9 +127,7 @@ const OrderConfirmation = () => {
             transition={{ delay: 0.8, duration: 0.6 }}
           >
             <p className="text-sm text-gray-500 mb-1">Estimated Delivery</p>
-            <p className="font-medium">
-              {deliveryDates.start} - {deliveryDates.end}
-            </p>
+            <p className="font-medium">{formatDate(order.estimatedDelivery)}</p>
           </motion.div>
         </motion.div>
 

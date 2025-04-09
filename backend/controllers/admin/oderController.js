@@ -4,9 +4,7 @@ const Product = require('../../models/productModel');
 
 const getAllOrders = async (req, res) => {
   try {
-    const { search, status, page = 1, limit = 10 } = req.query;
-
-    console.log("#@@@@@@@@@@@@@@@@@@@@@@@@@ req.query", req.query)
+    const { search, status, page = 1, limit = 10, sort } = req.query;
 
     // Build the filter object
     let filter = {};
@@ -21,8 +19,8 @@ const getAllOrders = async (req, res) => {
     }
 
     // Filter by status
-    if (status) {
-      filter.status = status;
+    if (status !== undefined && status !== '') {
+      filter.status = { $regex: new RegExp(`^${status}$`, 'i') }
     }
 
     // Pagination
@@ -30,17 +28,22 @@ const getAllOrders = async (req, res) => {
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
 
-    console.log("Filter #########3333", filter)
+    let sortOption = {};
+    if (sort) {
+      const direction = sort.startsWith('-') ? -1 : 1;
+      const field = sort.startsWith('-') ? sort.substring(1) : sort; 
+      sortOption[field] = direction;
+    } else {
+      sortOption.orderDate = -1;
+    }
 
     // Get total count and orders
     const totalOrders = await Order.countDocuments(filter);
     const orders = await Order.find(filter)
       .populate('items.productId', 'name') 
-      .sort({ orderDate: -1 }) 
+      .sort(sortOption) 
       .skip(skip)
       .limit(limitNum);
-
-      console.log("Order######################################### #########3333", orders)
 
     res.status(200).json({
       success: true,
@@ -59,12 +62,11 @@ const getAllOrders = async (req, res) => {
   }
 };
 
-const getOrderDetails = async (req, res) => {
-  consoel.log("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGet order dertails")
-  try {
-    const order = await Order.findOne({ orderNumber: req.params.orderId })
-      .populate('items.productId');
 
+const getOrderDetails = async (req, res) => {
+  
+  try {
+    const order = await Order.findById(req.params.orderId).populate('items.productId');
     if (!order) {
       return res.status(404).json({
         success: false,
@@ -92,6 +94,7 @@ const updateOrderStatus = async (req, res) => {
     const { status } = req.body;
     const order = await Order.findById(req.params.orderId).populate('items.productId');
 
+ 
     if (!order) {
       return res.status(404).json({
         success: false,
@@ -101,7 +104,7 @@ const updateOrderStatus = async (req, res) => {
     }
 
     // Validate status
-    const validStatuses = ['Pending', 'Confirmed', 'Shipped', 'Out-for-Delivery', 'Delivered', 'Cancelled'];
+    const validStatuses = ['Pending', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
@@ -110,18 +113,40 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
+    // Update main order status
     order.status = status;
-    order.items.map((item) => item.status= status)
 
+    // Update status for all items
+    order.items = order.items.map((item) => {
+      item.status = status;
+      
+      // Reset returnRequest for each item when status is Delivered or Pending
+      if (status === 'Delivered' || status === 'Pending') {
+        item.returnRequest = {
+          isRequested: false,
+          requestedAt: undefined,
+          reason: '',
+          isApproved: false,
+          approvedAt: undefined,
+          adminComment: ''
+        };
+      }
+      
+      return item;
+    });
 
+    // Reset returnRequest for the main order when status is Delivered or Pending
     if (status === 'Delivered' || status === 'Pending') {
       order.returnRequest = {
         isRequested: false,
         reason: '',
-        isApproved: false
+        isApproved: false,
+        approvedAt: undefined,
+        adminComment: ''
       };
     }
-    
+
+    // Add to activity log
     order.activityLog.push({ status, changedAt: new Date() });
     await order.save();
 
@@ -131,7 +156,6 @@ const updateOrderStatus = async (req, res) => {
       data: order
     });
   } catch (error) {
-    console.log("Error", error);
     res.status(500).json({
       success: false,
       message: 'Failed to update order status',
@@ -142,8 +166,9 @@ const updateOrderStatus = async (req, res) => {
 
 const verifyReturnRequest = async (req, res) => {
   try {
-    const { isApproved } = req.body;
-    const order = await Order.findById(req.params.orderId).populate('items.productId');
+    const { isApproved, adminComment } = req.body;
+    const orderId = req.params.orderId
+    const order = await Order.findById(orderId).populate('items.productId');
 
     if (!order) {
       return res.status(404).json({
@@ -163,6 +188,7 @@ const verifyReturnRequest = async (req, res) => {
 
     order.returnRequest.isApproved = isApproved;
     order.returnRequest.approvedAt = new Date();
+    order.returnRequest.adminComment= adminComment;
     order.status = isApproved ? 'Returned' : 'Return-Rejected';
 
     if (isApproved) {
@@ -183,6 +209,7 @@ const verifyReturnRequest = async (req, res) => {
       // For rejected returns, update item statuses
       order.items.forEach(item => {
         item.status = 'Return-Rejected';
+        item.returnRequest.adminComment = adminComment;
       });
     }
 
@@ -199,7 +226,6 @@ const verifyReturnRequest = async (req, res) => {
       data: order
     });
   } catch (error) {
-    console.log("Error ", error);
     res.status(500).json({
       success: false,
       message: 'Failed to process return request',
@@ -208,10 +234,60 @@ const verifyReturnRequest = async (req, res) => {
   }
 };
 
+const verifyItemReturnRequest = async (req, res) => {
+  try {
+    const { isApproved, adminComment, itemId } = req.body;
+
+    const { orderId } = req.params;
+
+    const order = await Order.findById(orderId).populate('items.productId');
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found', data: null });
+    }
+
+    const item = order.items.id(itemId);
+    if (!item || !item.returnRequest.isRequested) {
+      return res.status(400).json({ success: false, message: 'No return request pending for this item', data: null });
+    }
+
+    item.returnRequest.isApproved = isApproved;
+    item.returnRequest.approvedAt = new Date();
+    item.status = isApproved ? 'Returned' : 'Return-Rejected';
+    item.returnRequest.adminComment = adminComment || '';
+    order.status= isApproved ? 'Returned' : 'Return-Rejected';
+
+    if (isApproved) {
+      await Product.updateOne(
+        { _id: item.productId, 'colors.name': item.color },
+        { $inc: { 'colors.$.stock': item.quantity, totalStock: item.quantity } }
+      );
+    }
+
+    order.activityLog.push({
+      status: isApproved ? `Item ${item.name} Returned` : `Item ${item.name} Return-Rejected`,
+      changedAt: new Date()
+    });
+
+    await order.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Item return request ${isApproved ? 'approved' : 'rejected'} successfully`,
+      data: order
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to process item return request',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
 
 module.exports = {
   getAllOrders,
   getOrderDetails,
   updateOrderStatus,
-  verifyReturnRequest
+  verifyReturnRequest,
+  verifyItemReturnRequest,
 };

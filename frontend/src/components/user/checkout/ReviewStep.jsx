@@ -10,7 +10,7 @@ const ReviewStep = ({
   onPlaceOrder,
   isPlacingOrder 
 }) => {
-  // Payment method display name
+
   const getPaymentMethodName = (methodId) => {
     switch (methodId) {
       case "credit-card": return "Credit/Debit Card";
@@ -39,6 +39,7 @@ const ReviewStep = ({
             <p>{address?.addressLine}{address?.landmark ? `, ${address.landmark}` : ""}</p>
             <p>{address?.city}, {address?.state} - {address?.pincode}</p>
             <p>Phone: {address?.phone}</p>
+            <p>Email: {address?.email}</p>
           </div>
         </div>
 

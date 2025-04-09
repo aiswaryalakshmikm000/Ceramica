@@ -54,10 +54,8 @@ const Navbar = () => {
   };
 
   const handleLogoutConfirm = async () => {
-    console.log("Logout confirm initiated");
     try {
       const logoutResult = await logout().unwrap();
-      console.log("Backend logout response:", logoutResult);
       dispatch(logoutUser());
       googleLogout();
       setIsLogoutModalOpen(false);
@@ -77,7 +75,6 @@ const Navbar = () => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      console.log("Search submitted:", searchQuery);
       navigate(`/shop?search=${encodeURIComponent(searchQuery)}`);
       setSearchQuery("");
       setIsMenuOpen(false);

@@ -5,8 +5,6 @@ import { Loader2 } from 'lucide-react';
 
 const Categories = () => {
   const {data: response, isLoading, isError} = useShowCategoriesQuery()
-
-  console.log(response);
  
 if (isLoading) {
       return (

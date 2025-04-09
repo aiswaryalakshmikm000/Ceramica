@@ -13,9 +13,6 @@ const FeaturedProducts = () => {
     error 
   } = useFetchFeaturedProductsQuery({ limit: 8 });
 
-  console.log(response);
-
-
   if (isLoading) {
       return (
         <div className="min-h-screen flex items-center justify-center">
@@ -73,6 +70,7 @@ const FeaturedProducts = () => {
                     discountedPrice: product.discountedPrice, 
                     image:  product.colors?.[0]?.images?.[0] || product.images?.[0],
                     inStock: product.totalStock > 0,
+                    colors: product.colors,
                   }} 
                 />
               ))}

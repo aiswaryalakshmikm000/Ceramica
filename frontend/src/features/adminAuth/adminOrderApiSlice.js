@@ -40,15 +40,28 @@ export const adminOrderApiSlice = adminApi.injectEndpoints({
     }),
 
     verifyReturnRequest: builder.mutation({
-      query: ({ orderId, isApproved }) => ({
+      query: ({ orderId, isApproved, adminComment}) => ({
         url: `/orders/${orderId}/return`,
         method: "PUT",
-        body: { isApproved },
+        body: { isApproved, adminComment },
       }),
       invalidatesTags: (result, error, { orderId }) => [
         { type: "Order", id: orderId },
         { type: "Order", id: "LIST" },
         "Product", 
+      ],
+    }),
+
+    verifyItemReturnRequest: builder.mutation({
+      query: ({ orderId, itemId, isApproved, adminComment }) => ({
+        url: `/orders/${orderId}/return-item`,
+        method: "PUT",
+        body: { isApproved, adminComment, itemId },
+      }),
+      invalidatesTags: (result, error, { orderId }) => [
+        { type: "Order", id: orderId },
+        { type: "Order", id: "LIST" },
+        "Product",
       ],
     }),
   }),
@@ -59,4 +72,5 @@ export const {
   useGetOrderDetailsQuery,
   useUpdateOrderStatusMutation,
   useVerifyReturnRequestMutation,
+  useVerifyItemReturnRequestMutation,
 } = adminOrderApiSlice;

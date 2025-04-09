@@ -17,7 +17,6 @@ const GoogleAuth = () => {
       const result = await googleAuth({
         credential: credentialResponse.credential,
       }).unwrap();
-      console.log("Google login result:", result);
       dispatch(setUserCredentials({ user: result.user }));
       toast.success(result.message || "Google login successful");
       navigate("/");

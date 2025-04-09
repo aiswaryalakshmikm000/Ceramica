@@ -32,7 +32,6 @@ const PriceRangeFilter = ({ onChange, initialRange = { min: 0, max: 5000 }, rese
     const newValue = value === '' ? 0 : parseInt(value, 10);
     setRange(prev => {
       const newRange = { ...prev, [name]: newValue };
-      console.log('Range updated:', newRange);
       return newRange;
     });
   };
@@ -42,7 +41,6 @@ const PriceRangeFilter = ({ onChange, initialRange = { min: 0, max: 5000 }, rese
       min: Math.min(range.min, range.max),
       max: Math.max(range.min, range.max),
     };
-    console.log('Applying range:', validRange);
     setRange(validRange);
     onChange(validRange);
     setIsOpen(false);

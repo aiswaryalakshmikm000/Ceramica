@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import ProductCard from "../../common/ProductCard";
 
 const RelatedProducts = ({ products }) => {
+
   const scrollContainerRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -82,7 +83,7 @@ const RelatedProducts = ({ products }) => {
           {products.map((product) => (
             <div
               key={product.id}
-              className="w-full max-w-[50%] md:max-w-[25%] flex-shrink-0" // Match FeaturedProducts grid sizing
+              className="w-full max-w-[50%] md:max-w-[25%] flex-shrink-0" 
             >
               <ProductCard product={product} />
             </div>

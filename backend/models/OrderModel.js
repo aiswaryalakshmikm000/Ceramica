@@ -23,10 +23,13 @@ const orderItemSchema = new mongoose.Schema({
     type: String,
   },
   cancelProductReason: { type: String },
-  returnProductReason: { type: String },
-  returnRequest: { 
+  returnRequest: {
     isRequested: { type: Boolean, default: false },
     requestedAt: { type: Date },
+    reason: { type: String }, 
+    isApproved: { type: Boolean, default: null },
+    approvedAt: { type: Date }, 
+    adminComment: { type: String } 
   },
   originalPrice: {
     type: Number,
@@ -137,9 +140,11 @@ const orderSchema = new mongoose.Schema({
   expectedDeliveryDate: { type: Date },
   returnRequest: {
     isRequested: { type: Boolean, default: false },
+    requestedAt: { type: Date },
     reason: { type: String },
     isApproved: { type: Boolean, default: false },
-    approvedAt: { type: Date }
+    approvedAt: { type: Date },
+    adminComment: { type: String }
   },
   cancelReason: { type: String },
   status: {
