@@ -97,11 +97,16 @@ const OrderItems = ({
                     <h4 className="text-sm font-medium text-gray-800">
                       {item.name} <span className="text-gray-500">({item.color})</span>
                     </h4>
-                    <p className="text-sm py-2 font-semibold text-gray-900">₹{item.totalPrice}</p>
+                    <p className="text-sm py-2 font-semibold text-gray-900">₹{item.productId.price}</p>
                     <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                   
+
                   </div>
-                  <div className="flex items-center">
-                    <StatusBadge status={item.status} />
+                  <div className="flex flex-col items-end space-y-6 ">
+                  <p className="text-sm font-semibold text-gray-900">Total Amount: ₹{item.totalPrice}</p>
+               
+    <StatusBadge status={item.status} />
+
                   </div>
                 </div>
               </div>

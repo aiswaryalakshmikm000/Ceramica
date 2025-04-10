@@ -18,7 +18,6 @@ const AddressStep = ({ addresses, selectedAddress, setSelectedAddress, onNext })
   const [editingAddress, setEditingAddress] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false); 
   const [addressToDelete, setAddressToDelete] = useState(null); 
-  const [setDefaultAddress] = useSetDefaultAddressMutation();
   const [addAddress] = useAddAddressMutation();
   const [updateAddress] = useUpdateAddressMutation();
   const [deleteAddress] = useDeleteAddressMutation();

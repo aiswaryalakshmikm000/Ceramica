@@ -83,18 +83,20 @@ const Checkout = () => {
   };
 
   const handlePlaceOrder = async () => {
+    console.log("#@@@@@@@@@@@@@22" , cart)
     try {
+      console.log("#@@@@@@@@@@@@@22")
       const orderData = {
         cart: {
           items: cart.items.map(item => ({
             productId: item.productId._id || item.productId,
-            name: item.name,
+            name: item.productId.name,
             color: item.color,
             image: item.image,
             quantity: item.quantity,
-            originalPrice: item.originalPrice,
-            latestPrice: item.latestPrice,
-            discount: item.discount,
+            originalPrice: item.productId.price,
+            latestPrice: item.productId.discountedPrice,
+            discount: item.productId.discount,
           })),
           totalMRP: cart.totalMRP,
           totalDiscount: cart.totalDiscount,
@@ -120,6 +122,8 @@ const Checkout = () => {
           discountType: appliedCoupon.discountType,
         } : null,
       };
+
+      console.log("orrder Dataaaaaaaaaaa" , orderData)
 
       const result = await placeOrder(orderData).unwrap();
       toast.success("Order placed successfully!");

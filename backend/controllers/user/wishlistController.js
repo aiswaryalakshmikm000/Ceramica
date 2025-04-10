@@ -4,13 +4,11 @@ const Product = require("../../models/productModel");
 const Cart = require("../../models/cartModel");
 const {
   checkStock,
-  fetchLatestPrice,
   calculateDiscountPrice,
 } = require("../../utils/services/cartService");
 
 // Toggle item in wishlist
 const toggleWishlistItem = async (req, res) => {
-
   try {
     const { userId } = req.params;
     const { productId, color } = req.body;
@@ -26,25 +24,22 @@ const toggleWishlistItem = async (req, res) => {
     }
 
     let wishlist = await Wishlist.findOne({ userId });
+
     if (!wishlist) {
       wishlist = new Wishlist({ userId, items: [] });
     }
 
     const itemIndex = wishlist.items.findIndex(
-      (item) =>
-        item.productId.toString() === productId &&
-        item.color === color.toLowerCase()
+      (item) => item.productId.toString() === productId && item.color === color.toLowerCase()
     );
 
     const isInStock = await checkStock(productId, color, 1);
-    if (!isInStock && itemIndex === -1) { 
+    if (!isInStock && itemIndex === -1) {
       return res.status(400).json({ message: "Selected color variant is out of stock" });
     }
 
-    const latestPrice = await fetchLatestPrice(productId);
-    const colorData = product.colors.find(c => c.name.toLowerCase() === color.toLowerCase());
+    const colorData = product.colors.find((c) => c.name.toLowerCase() === color.toLowerCase());
     const image = colorData?.images?.[0] || "";
-
 
     if (itemIndex > -1) {
       wishlist.items.splice(itemIndex, 1);
@@ -58,13 +53,11 @@ const toggleWishlistItem = async (req, res) => {
       wishlist.items.push({
         productId,
         color: color.toLowerCase(),
-        originalPrice: product.price,
-        discount: product.discount,
-        discountedPrice: latestPrice,
         inStock: true,
         image,
       });
       await wishlist.save();
+
       return res.status(200).json({
         message: "Item added to wishlist",
         action: "added",
@@ -72,9 +65,11 @@ const toggleWishlistItem = async (req, res) => {
       });
     }
   } catch (error) {
+    console.error("EEEEEEEErrroer", error);
     return res.status(500).json({ message: error.message });
   }
 };
+
 
 // Remove item from wishlist
 const removeWishlistItem = async (req, res) => {
@@ -135,7 +130,7 @@ const updateWishlistItem = async (req, res) => {
       return res.status(400).json({ success: false, message: "New color variant is out of stock" });
     }
 
-    const latestPrice = await fetchLatestPrice(productId);
+    // const latestPrice = await fetchLatestPrice(productId);
     wishlist.items[itemIndex].color = newColor.toLowerCase();
     wishlist.items[itemIndex].discountedPrice = latestPrice;
     wishlist.items[itemIndex].inStock = true;
@@ -158,7 +153,7 @@ const getWishlist = async (req, res) => {
     const { userId } = req.params;
     const wishlist = await Wishlist.findOne({ userId }).populate({
       path: "items.productId",
-      select: "name price discount color image",
+      select: "name price discount color image discountedPrice",
     });
 
     if (!wishlist) {
@@ -167,7 +162,7 @@ const getWishlist = async (req, res) => {
 
     for (let item of wishlist.items) {
       item.inStock = await checkStock(item.productId._id, item.color, 1);
-      item.discountedPrice = await fetchLatestPrice(item.productId._id);
+      // item.discountedPrice = await fetchLatestPrice(item.productId._id);
     }
 
     await wishlist.save();

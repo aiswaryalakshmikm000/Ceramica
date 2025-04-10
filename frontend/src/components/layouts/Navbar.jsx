@@ -91,7 +91,6 @@ const Navbar = () => {
 
   const userName = user ? `${user.name || ""}`.trim() || user.username || "User" : "";
   const userImage = user?.images;
-  console.log("User Image URL:", userImage);
 
   return (
     <>

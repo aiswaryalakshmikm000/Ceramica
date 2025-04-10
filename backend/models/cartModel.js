@@ -6,36 +6,17 @@ const cartItemSchema = new mongoose.Schema({
         ref: 'Product',
         required: [true, 'Product ID is required']
     },
-    name: {
-        type: String,
-    },
     color: {
         type: String,
         required: [true, 'Color selection is required']
-    },
-    originalPrice: { 
-        type: Number,
-        required: [true, 'Original price is required'],
-        min: [0, 'Price cannot be negative']
     },
     quantity: {
         type: Number,
         required: [true, 'Quantity is required'],
         min: [1, 'Quantity must be at least 1']
     },
-    latestPrice: {
-        type: Number,
-        required: [true, 'Price is required'],
-        min: [0, 'Price cannot be negative']
-    },
     image: {  
         type: String,
-    },
-    discount: {
-        type: Number,
-        required: [true, 'Discount is required'],
-        min: [0, 'Discount cannot be negative'],
-        max: [100, 'Discount cannot exceed 100%']
     },
     maxQtyPerUser: {
         type: Number,

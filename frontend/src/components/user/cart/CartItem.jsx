@@ -14,6 +14,7 @@ const CartItem = ({
   image,
   color,
   inStock,
+  stock,
   onRemove,
   onUpdateQuantity,
 }) => {
@@ -27,7 +28,7 @@ const CartItem = ({
   return (
     <div
       className={`bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow p-4 flex items-start space-x-6 mb-4 animate-fade-in ${
-        !inStock ? "opacity-75 border border-red-300" : ""
+        !inStock || stock === 0 ? "bg-red opacity-75 border border-red-800/50" : ""
       }`}
     >
       {/* Larger Image */}
@@ -66,10 +67,14 @@ const CartItem = ({
           </div>
 
           {/* Stock Status */}
-          {!inStock && (
-            <p className="text-red-600 text-sm mt-1">Out of Stock</p>
-          )}
-
+          <div className="mt-1">
+            {(!inStock || stock === 0) ? (
+              <p className="text-red-600 text-sm font-medium">Out of Stock</p>
+            ) : stock < 5 ? (
+              <p className="text-orange-600 text-m font-medium ">{stock} left</p>
+            ) : null}
+          </div>
+          
           {/* Price Information */}
           <div className="flex items-center space-x-3 mt-2">
             <p className="text-gray-800 font-semibold text-lg">

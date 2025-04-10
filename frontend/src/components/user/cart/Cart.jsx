@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Lock, RotateCcw, Shield, Trash2, } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -87,7 +87,7 @@ const Cart = () => {
   };
 
   const subtotal = cart.items
-    .reduce((acc, item) => acc + item.latestPrice * item.quantity, 0)
+    .reduce((acc, item) => acc + item.productId.discountedPrice * item.quantity, 0)
     .toFixed(2);
 
   const isCartEmpty = !cart || cart.items.length === 0;
@@ -157,13 +157,14 @@ const Cart = () => {
                     >
                       <CartItem
                         id={item.productId._id}
-                        name={item.name}
-                        originalPrice={item.originalPrice}
-                        latestPrice={item.latestPrice}
-                        discount={item.discount}
+                        name={item.productId.name}
+                        originalPrice={item.productId.price}
+                        latestPrice={item.productId.discountedPrice}
+                        discount={item.productId.discount}
                         quantity={item.quantity}
                         image={item.image}
                         color={item.color}
+                        stock={item.productId.colors.find(c => c.name === item.color)?.stock || 0}
                         inStock={item.inStock}
                         onRemove={() => handleRemoveItem(item.productId, item.color)}
                         onUpdateQuantity={(newQuantity) =>

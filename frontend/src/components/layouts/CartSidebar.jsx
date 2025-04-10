@@ -21,7 +21,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
   const calculateSubtotal = () => {
     if (!cart || !cart.items) return "0.00";
     return cart.items
-      .reduce((total, item) => total + item.latestPrice * item.quantity, 0)
+      .reduce((total, item) => total + item.productId.discountedPrice * item.quantity, 0)
       .toFixed(2);
   };
 
@@ -193,11 +193,11 @@ const CartSidebar = ({ isOpen, onClose }) => {
                             {item.color}
                           </p>
                           <p className="text-xs text-orange-800 font-medium mt-1">
-                            ₹{item.latestPrice.toFixed(0)} × {item.quantity}
+                            ₹{item.productId.discountedPrice.toFixed(0)} × {item.quantity}
                           </p>
                         </div>
                         <p className="font-bold text-orange-800">
-                          ₹{(item.latestPrice * item.quantity).toFixed(2)}
+                          ₹{(item.productId.discountedPrice * item.quantity).toFixed(2)}
                         </p>
                       </motion.div>
                     ))}

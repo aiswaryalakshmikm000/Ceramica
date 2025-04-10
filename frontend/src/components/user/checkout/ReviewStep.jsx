@@ -101,7 +101,7 @@ const ReviewStep = ({
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold">₹{item.latestPrice}</p>
+                  <p className="font-semibold">₹{item.productId.discountedPrice}</p>
                   {item.discount > 0 && (
                     <p className="text-sm">
                       <span className="line-through text-gray-400">₹{item.originalPrice}</span>

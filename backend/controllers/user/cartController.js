@@ -8,11 +8,10 @@ const addToCart = async (req, res) => {
     const userId = req.params.userId;
     const { productId, quantity, color } = req.body;
 
-    // Validate input
+
     if (!productId || !quantity || !color) {
       return res.status(400).json({ success: false, message: 'Product ID, quantity, and color are required' });
     }
-
     if (quantity < 1) {
       return res.status(400).json({ success: false, message: 'Quantity must be at least 1' });
     }
@@ -27,13 +26,10 @@ const addToCart = async (req, res) => {
     if (!product || !product.isListed) {
       return res.status(404).json({ success: false, message: 'Product not found or unavailable' });
     }
-
-    // Fetch latest price
-    const latestPrice = await cartService.fetchLatestPrice(productId);
-
+    
     // Find or create cart
     let cart = await Cart.findOne({ userId });
-    
+
     if (!cart) {
       cart = new Cart({ userId, items: [] });
     }
@@ -51,18 +47,16 @@ const addToCart = async (req, res) => {
       }
     } else {
       // Add new item
-      const colorData = product.colors.find(c => c.name.toLowerCase() === color.toLowerCase());
-      if (quantity > 5) { 
+      const colorData = product.colors.find((c) => c.name.toLowerCase() === color.toLowerCase());
+      if (quantity > 5) {
         return res.status(400).json({ success: false, message: 'Maximum quantity per user exceeded' });
       }
       cart.items.push({
         productId,
-        name: product.name,
         color,
         quantity,
-        originalPrice: product.price,
-        latestPrice,
-        discount: product.discount,
+        // latestPrice: priceData.discountedPrice, 
+        // discount: product.discount,
         image: colorData?.images[0],
         inStock: true,
       });
@@ -76,12 +70,13 @@ const addToCart = async (req, res) => {
     // Remove from wishlist after successful cart addition
     await cartService.checkAndRemoveFromCart(userId, productId, color);
 
-    res.status(200).json({ 
-      success: true, 
-      message: existingItemIndex > -1 ? 'Item quantity updated in cart' : 'Item successfully added to cart', 
-      cart: updatedCart 
+    res.status(200).json({
+      success: true,
+      message: existingItemIndex > -1 ? 'Item quantity updated in cart' : 'Item successfully added to cart',
+      cart: updatedCart,
     });
   } catch (error) {
+    console.error("Error in addToCart:", error);
     res.status(500).json({ success: false, message: 'Failed to add item to cart', error: error.message });
   }
 };
@@ -89,12 +84,15 @@ const addToCart = async (req, res) => {
 const showCart = async (req, res) => {
   try {
     const { userId } = req.params;
+
     const cart = await Cart.findOne({ userId })
     .populate({
       path: 'items.productId', 
+      select: '_id name price discount discountedPrice isListed colors',
       populate: {
         path: 'categoryId',
         model: 'Category',
+        select: 'isListed',
       }
     });
 
@@ -126,7 +124,18 @@ const showCart = async (req, res) => {
       cart: {
         _id: cart._id,
         userId: cart.userId,
-        items: cart.items,
+        items: cart.items.map((item) => ({
+          ...item.toObject(),
+          productId: {
+            _id: item.productId._id,
+            name: item.productId.name,
+            price: item.productId.price,
+            discount: item.productId.discount,
+            discountedPrice: item.productId.discountedPrice,
+            isListed: item.productId.isListed,
+            colors: item.productId.colors,
+          },
+        })),
         platformFee: updatedCart.platformFee || 3,
         totalItems: updatedCart.totalItems,
         totalMRP: updatedCart.totalMRP,

@@ -12,6 +12,7 @@ const OrderSummary = ({
   onBack,
   // onPlaceOrder
 }) => {
+
   const [couponCode, setCouponCode] = useState("");
   const [couponError, setCouponError] = useState("");
 
@@ -20,7 +21,7 @@ const OrderSummary = ({
     if (!cart) return { subtotal: 0, discount: 0, total: 0 };
     
     let subtotal = cart.items.reduce(
-      (acc, item) => acc + item.latestPrice * item.quantity, 
+      (acc, item) => acc + item.productId.discountedPrice * item.quantity, 
       0
     );
     

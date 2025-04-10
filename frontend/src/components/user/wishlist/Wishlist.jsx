@@ -23,6 +23,7 @@ const Wishlist = () => {
     skip: !userId,
   });
   const wishlistItems = data?.items || [];
+
   const [removeFromWishlist] = useRemoveFromWishlistMutation();
   const [addToCart] = useAddToCartMutation();
 
@@ -145,18 +146,18 @@ const Wishlist = () => {
                       {/* Price Information */}
                       <div className="flex items-center space-x-3 mt-2">
                         <p className="text-gray-800 font-semibold text-lg">
-                          ₹{item.discountedPrice.toFixed(2)}
+                          ₹{item.productId?.discountedPrice.toFixed(2)}
                         </p>
-                        {item.originalPrice > item.discountedPrice && (
+                        {item.price > item.discountedPrice && (
                           <>
                             <p className="text-gray-400 line-through text-sm">
-                              ₹{item.originalPrice.toFixed(2)}
+                              ₹{item.price.toFixed(2)}
                             </p>
                             <p className="text-green-600 text-sm">
                               (
                               {Math.round(
-                                ((item.originalPrice - item.discountedPrice) /
-                                  item.originalPrice) *
+                                ((item.price - item.discountedPrice) /
+                                  item.price) *
                                   100
                               )}
                               % off)

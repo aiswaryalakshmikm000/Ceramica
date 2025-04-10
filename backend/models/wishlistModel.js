@@ -15,9 +15,6 @@ const wishlistSchema = new mongoose.Schema(
           ref: 'Product',
           required: [true, 'Product ID is required']
         },
-        name: {
-          type: String,
-      },
         color: {
           type: String,
           required: [true, 'Color variant is required'],
@@ -30,22 +27,6 @@ const wishlistSchema = new mongoose.Schema(
         image: {  
           type: String,
       },
-        originalPrice: {
-          type: Number,
-          required: true,
-          min: [0, 'Price cannot be negative']
-        },
-        discount: {
-          type: Number,
-          required: true,
-          min: [0, 'Discount cannot be negative'],
-          max: [90, 'Discount cannot exceed 90%']
-        },
-        discountedPrice: {
-          type: Number,
-          required: true,
-          min: [0, 'Price cannot be negative']
-        },
         inStock: {
           type: Boolean,
           default: true

@@ -89,9 +89,6 @@ const AdminEditProductPage = () => {
       : [{ name: "", stock: "", images: [] }],
   };
 
-  console.log("Product categoryId:", product.categoryId);
-  console.log("Available categories:", categories);
-
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />

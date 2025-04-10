@@ -6,39 +6,61 @@ const PDFDocument = require('pdfkit');
 const cartService = require('../../utils/services/cartService');
 
 const placeOrder = async (req, res) => {
-
   try {
     const { cart, address, paymentMethod, coupon } = req.body;
     const userId = req.user.id;
 
-    // Validate cart items stock
-    for (const item of cart.items) {
-      const isInStock = await cartService.checkStock(item.productId, item.color, item.quantity);
-      if (!isInStock) {
-        return res.status(400).json({ 
-          success: false,
-          message: `${item.name} (${item.color}) is out of stock. Please remove from cart to place order`,
-          data: null
-        });
-      }
+    // Validate required fields
+    if (!cart || !cart.items || !cart.items.length) {
+      return res.status(400).json({
+        success: false,
+        message: "Cart is empty or missing items",
+        data: null,
+      });
+    }
+    if (!address || !paymentMethod) {
+      return res.status(400).json({
+        success: false,
+        message: "Address and payment method are required",
+        data: null,
+      });
     }
 
-    const orderItems = cart.items.map(item => ({
-      productId: item.productId,
-      name: item.name,
-      color: item.color,
-      quantity: item.quantity,
-      image: item.image,
-      originalPrice: item.originalPrice,
-      latestPrice: item.latestPrice,
-      discount: item.discount,
-      totalPrice: item.latestPrice * item.quantity
-    }));
+    // Validate cart items stock and fetch product details
+    const orderItems = await Promise.all(
+      cart.items.map(async (item) => {
+        const product = await Product.findById(item.productId);
+        if (!product) {
+          throw new Error(`Product not found: ${item.productId}`);
+        }
+
+        const isInStock = await cartService.checkStock(item.productId, item.color, item.quantity);
+        if (!isInStock) {
+          return res.status(400).json({
+            success: false,
+            message: `${product.name} (${item.color}) is out of stock. Please remove from cart to place order`,
+            data: null,
+          });
+        }
+
+        return {
+          productId: item.productId,
+          name: product.name,
+          color: item.color,
+          quantity: item.quantity,
+          image: item.image,
+          originalPrice: product.price,
+          latestPrice: product.discountedPrice,
+          discount: product.discount,
+          totalPrice: product.discountedPrice * item.quantity,
+        };
+      })
+    );
 
     // Calculate expected delivery date (7-10 days from now)
     const orderDate = new Date();
     const expectedDeliveryDate = new Date(orderDate);
-    expectedDeliveryDate.setDate(orderDate.getDate() + 7); 
+    expectedDeliveryDate.setDate(orderDate.getDate() + 7);
 
     const order = new Order({
       orderNumber: generateOrderNumber(),
@@ -54,39 +76,53 @@ const placeOrder = async (req, res) => {
       shippingAddress: address,
       paymentMethod: paymentMethod,
       orderDate: orderDate,
-      expectedDeliveryDate: expectedDeliveryDate
+      expectedDeliveryDate: expectedDeliveryDate,
     });
 
     await order.save();
 
     // Clear cart
-    const cartUpdateResult = await Cart.findOneAndUpdate({ userId }, { items: [], totalAmount: 0 });
+    const cartUpdateResult = await Cart.findOneAndUpdate(
+      { userId },
+      { items: [], totalAmount: 0 },
+      { new: true }
+    );
 
+    if (!cartUpdateResult) {
+      console.warn("Cart not found or not updated for user:", userId);
+    }
 
     // Decrease stock
     for (const item of orderItems) {
       await Product.updateOne(
-        { _id: item.productId, 'colors.name': item.color },
-        { $inc: { 'colors.$.stock': -item.quantity, totalStock: -item.quantity } }
+        { _id: item.productId, "colors.name": item.color },
+        { $inc: { "colors.$.stock": -item.quantity, totalStock: -item.quantity } }
       );
     }
 
-    res.status(201).json({ 
+    res.status(201).json({
       success: true,
-      message: 'Order placed successfully',
+      message: "Order placed successfully",
       data: {
         orderNumber: order.orderNumber,
         totalAmount: order.totalAmount,
         estimatedDelivery: order.expectedDeliveryDate,
-        orderDate: order.orderDate
-      }
+        orderDate: order.orderDate,
+      },
     });
   } catch (error) {
     console.error("Error in placeOrder:", error.stack);
-    res.status(500).json({ 
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: "Order validation failed",
+        error: Object.values(error.errors).map((err) => err.message),
+      });
+    }
+    res.status(500).json({
       success: false,
-      message: 'Failed to place order',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: "Failed to place order",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
