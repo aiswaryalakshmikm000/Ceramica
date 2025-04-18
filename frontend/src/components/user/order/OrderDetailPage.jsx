@@ -225,12 +225,6 @@ const OrderDetailPage = () => {
             >
               Back to Orders
             </Button>
-            {isShipped && (
-              <Button variant="outline" size="sm" className="border-gray-200 hover:bg-gray-100">
-                <ExternalLink size={14} className="mr-2" />
-                Track Order
-              </Button>
-            )}
           </div>
         </div>
       </div>

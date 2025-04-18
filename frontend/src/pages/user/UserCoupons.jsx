@@ -1,4 +1,4 @@
-import Coupons from "../../components/user/coupons/Coupons";
+import Coupons from "../../components/user/coupons/UserCoupon";
 import Navbar from "../../components/layouts/Navbar"
 import Footer from "../../components/layouts/Footer"
 

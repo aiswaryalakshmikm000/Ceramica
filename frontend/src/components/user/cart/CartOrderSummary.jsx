@@ -84,10 +84,10 @@ const CartOrderSummary = ({ cart, subtotal, isCartEmpty, totalAmount, setProblem
                 <span>Delivery Charges</span>
                 <span>₹{cart.deliveryCharge.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between">
+              {/* <div className="flex justify-between">
                 <span>Platform Fee</span>
                 <span>₹{cart.platformFee.toFixed(2)}</span>
-              </div>
+              </div> */}
             </>
           )}
           <div className="pt-4 border-t border-gray-200 flex justify-between font-semibold text-lg text-gray-800">

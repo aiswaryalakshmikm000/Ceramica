@@ -6,18 +6,21 @@ const Pagination = ({ currentPage, totalPages, totalItems, itemsPerPage, onPageC
   const handlePrevious = () => {
     if (currentPage > 1) {
       onPageChange(currentPage - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handleNext = () => {
     if (currentPage < totalPages) {
       onPageChange(currentPage + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handlePageClick = (page) => {
     if (page >= 1 && page <= totalPages) {
       onPageChange(page);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -47,11 +50,6 @@ const Pagination = ({ currentPage, totalPages, totalItems, itemsPerPage, onPageC
       <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-gray-700">
-            Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
-            <span className="font-medium">
-              {Math.min(currentPage * itemsPerPage, totalItems)}
-            </span>{' '}
-            of <span className="font-medium">{totalItems}</span> results
           </p>
         </div>
         <div>

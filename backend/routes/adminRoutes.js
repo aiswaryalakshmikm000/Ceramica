@@ -8,6 +8,7 @@ const {getCustomerDetails,editCustomerStatus,} = require('../controllers/admin/u
 const{addCategory,showCategories,editCategory,listCategory,showCategory} = require('../controllers/admin/categoryController')
 const {addProduct,showProducts,updateProductStatus, showProduct, editProduct} = require('../controllers/admin/productController')
 const {getAllOrders, updateOrderStatus, verifyReturnRequest, verifyItemReturnRequest, getOrderDetails} = require('../controllers/admin/oderController');
+const { createCoupon, getCoupons, deleteCoupon, } = require("../controllers/admin/couponController");
 
 const adminRoute = express()
 
@@ -43,6 +44,13 @@ adminRoute.put('/orders/:orderId/status', authenticateAdminToken, updateOrderSta
 adminRoute.put('/orders/:orderId/return', authenticateAdminToken, verifyReturnRequest)
 adminRoute.put('/orders/:orderId/return-item', authenticateAdminToken, verifyItemReturnRequest);
 adminRoute.get('/orders/:orderId', authenticateAdminToken, getOrderDetails)
+
+
+//coupon
+adminRoute.get("/coupons", authenticateAdminToken, getCoupons);
+adminRoute.post("/coupons/add-coupon", authenticateAdminToken, createCoupon);
+adminRoute.delete("/coupons/:couponId", authenticateAdminToken, deleteCoupon);
+
 
 module.exports = adminRoute
 

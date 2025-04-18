@@ -39,11 +39,6 @@ const CartSchema = new mongoose.Schema({
         unique: true // One cart per user
     },
     items: [cartItemSchema],
-    platformFee: {
-        type: Number,
-        default: 3,
-        min: [0, 'Platform fee cannot be negative']
-    },
     totalAmount: {
         type: Number,
         default: 0,

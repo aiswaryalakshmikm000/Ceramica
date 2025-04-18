@@ -8,7 +8,6 @@ const addToCart = async (req, res) => {
     const userId = req.params.userId;
     const { productId, quantity, color } = req.body;
 
-
     if (!productId || !quantity || !color) {
       return res.status(400).json({ success: false, message: 'Product ID, quantity, and color are required' });
     }
@@ -55,8 +54,6 @@ const addToCart = async (req, res) => {
         productId,
         color,
         quantity,
-        // latestPrice: priceData.discountedPrice, 
-        // discount: product.discount,
         image: colorData?.images[0],
         inStock: true,
       });
@@ -136,7 +133,7 @@ const showCart = async (req, res) => {
             colors: item.productId.colors,
           },
         })),
-        platformFee: updatedCart.platformFee || 3,
+        // platformFee: updatedCart.platformFee || 3,
         totalItems: updatedCart.totalItems,
         totalMRP: updatedCart.totalMRP,
         totalDiscount: updatedCart.totalDiscount,

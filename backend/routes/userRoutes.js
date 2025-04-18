@@ -11,8 +11,9 @@ const {showProfile, editProfile} =require('../controllers/user/userController')
 const {addAddress, showAddresses, editAddress, deleteAddress, setDefaultAddress} = require('../controllers/user/addressController')
 const {checkoutValidation, addToCart, showCart, updateCart, removeItemFromCart} = require('../controllers/user/cartController')
 const {updateWishlistItem, removeWishlistItem, getWishlist, toggleWishlistItem} = require("../controllers/user/wishlistController");
-const {placeOrder, getUserOrders, getOrderById, cancelOrder, cancelOrderItem, returnOrder, returnOrderItem, downloadInvoice} = require("../controllers/user/orderController");
-
+const {createRazorpayOrder, verifyRazorpayPayment, placeCODOrder, placeWalletOrder, getUserOrders, getOrderById, cancelOrder, cancelOrderItem, returnOrder, returnOrderItem, downloadInvoice} = require("../controllers/user/orderController");
+const { getUserCoupons, applyCoupon} = require("../controllers/user/userCouponController");
+const {fetchWallet, addFunds} = require ('../controllers/user/walletController')
 
 const userRoute = express()
 
@@ -73,11 +74,26 @@ userRoute.get('/wishlist/:userId', authenticateToken, getWishlist);
 //order
 userRoute.get('/orders', authenticateToken, getUserOrders);
 userRoute.get('/orders/:orderId', authenticateToken, getOrderById);
-userRoute.post('/orders', authenticateToken, placeOrder);
+
+userRoute.post('/orders/cod', authenticateToken, placeCODOrder);
+userRoute.post('/orders/wallet', authenticateToken, placeWalletOrder);
+userRoute.post('/orders/create-razorpay-order', authenticateToken, createRazorpayOrder);
+userRoute.post('/orders/verify-razorpay-payment', authenticateToken, verifyRazorpayPayment);
+
 userRoute.put('/orders/:orderId/cancel', authenticateToken, cancelOrder);
 userRoute.put('/orders/:orderId/return', authenticateToken, returnOrder);
 userRoute.get('/orders/:orderId/invoice', authenticateToken, downloadInvoice);
 userRoute.post('/orders/cancel-item', authenticateToken, cancelOrderItem);
 userRoute.post('/orders/return-item', authenticateToken, returnOrderItem);
+
+//coupon
+userRoute.get("/coupons", authenticateToken, getUserCoupons);
+userRoute.post("/coupons/apply", authenticateToken, applyCoupon);
+
+//wallet
+userRoute.get('/wallet', authenticateToken, fetchWallet);
+userRoute.post('/wallet/add', authenticateToken, addFunds);
+
+
 
 module.exports = userRoute

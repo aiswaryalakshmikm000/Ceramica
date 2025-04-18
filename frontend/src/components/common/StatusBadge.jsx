@@ -18,6 +18,8 @@ const StatusBadge = ({ status }) => {
     switch (status) {
       case 'Pending': 
         return 'bg-yellow-100 text-yellow-900 border-yellow-200';
+        case 'Confirmed': 
+        return 'bg-violet-100 text-yellow-900 border-violet-200';
       case 'Shipped': 
         return 'bg-blue-100 text-blue-900 border-blue-200';
       case 'Out for Delivery': 

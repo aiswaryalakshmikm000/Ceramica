@@ -57,6 +57,8 @@ const fetchProducts = async (req, res) => {
   try {
     let { search, categoryIds, minPrice, maxPrice, colors, sort, page = 1, limit, reset } = req.query;
 
+    console.log("$$$$$$$$$$$$$$",req.query)
+
     if (reset === "true") {
       search = categoryIds = minPrice = maxPrice = sort = null;
     }

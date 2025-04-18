@@ -19,24 +19,24 @@ const AuthInitializer = ({ children }) => {
   const { data: userData, isSuccess: userSuccess, error: userError } = userCheck;
   const { data: adminData, isSuccess: adminSuccess, error: adminError } = adminCheck;
 
-  console.log('--- AuthInitializer ---');
-  console.log('Path:', location.pathname);
-  console.log('isAdminRoute:', isAdminRoute);
-  console.log('User Check - Data:', userData, 'Success:', userSuccess, 'Error:', userError);
-  console.log('Admin Check - Data:', adminData, 'Success:', adminSuccess, 'Error:', adminError);
+  // console.log('--- AuthInitializer ---');
+  // console.log('Path:', location.pathname);
+  // console.log('isAdminRoute:', isAdminRoute);
+  // console.log('User Check - Data:', userData, 'Success:', userSuccess, 'Error:', userError);
+  // console.log('Admin Check - Data:', adminData, 'Success:', adminSuccess, 'Error:', adminError);
 
   useEffect(() => {
     if (userSuccess && userData) {
-      console.log('User Success - Role:', userData.role);
+      // console.log('User Success - Role:', userData.role);
       if (userData.role === 'user') {
         dispatch(setUserCredentials({ user: userData }));
       } else {
-        console.log('User role mismatch, logging out');
+        // console.log('User role mismatch, logging out');
         dispatch(logoutUser());
       }
     }
     if (userError) {
-      console.log('User Error:', userError);
+      // console.log('User Error:', userError);
       if (userError.status === 403) {
         toast.error('Your account is blocked. Please contact support.');
         dispatch(logoutUser());
@@ -46,11 +46,11 @@ const AuthInitializer = ({ children }) => {
 
   useEffect(() => {
     if (adminSuccess && adminData) {
-      console.log('Admin Success - Role:', adminData.role);
+      // console.log('Admin Success - Role:', adminData.role);
       if (adminData.role === 'admin') {
         dispatch(setAdminCredentials({ admin: adminData }));
       } else {
-        console.log('Admin role mismatch, logging out');
+        // console.log('Admin role mismatch, logging out');
         dispatch(logoutAdmin());
       }
     }

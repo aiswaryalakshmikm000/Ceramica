@@ -26,8 +26,8 @@ const Navbar = () => {
   const [logout, { isLoading }] = useLogoutMutation();
 
   // Debug user data
-  console.log("User from Redux:", user);
-  console.log("Is Authenticated:", isAuthenticated);
+  // console.log("User from Redux:", user);
+  // console.log("Is Authenticated:", isAuthenticated);
 
   useEffect(() => {
     const handleScroll = () => {

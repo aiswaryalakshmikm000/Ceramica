@@ -3,9 +3,33 @@ import { userApi } from '../../services/api/userApi';
 
 export const userOrderApiSlice = userApi.injectEndpoints({
   endpoints: (builder) => ({
-    placeOrder: builder.mutation({
+    createRazorpayOrder: builder.mutation({
       query: (orderData) => ({
-        url: '/orders',
+        url: '/orders/create-razorpay-order',
+        method: 'POST',
+        body: orderData,
+      }),
+      invalidatesTags: ['Cart'],
+    }),
+    verifyRazorpayPayment: builder.mutation({
+      query: (paymentData) => ({
+        url: '/orders/verify-razorpay-payment',
+        method: 'POST',
+        body: paymentData,
+      }),
+      invalidatesTags: ['Order', 'Cart'],
+    }),
+    placeCODOrder: builder.mutation({
+      query: (orderData) => ({
+        url: '/orders/cod',
+        method: 'POST',
+        body: orderData,
+      }),
+      invalidatesTags: ['Cart', 'Order'],
+    }),
+    placeWalletOrder: builder.mutation({
+      query: (orderData) => ({
+        url: '/orders/wallet',
         method: 'POST',
         body: orderData,
       }),
@@ -60,7 +84,10 @@ export const userOrderApiSlice = userApi.injectEndpoints({
 });
 
 export const {
-  usePlaceOrderMutation,
+  useCreateRazorpayOrderMutation,
+  useVerifyRazorpayPaymentMutation,
+  usePlaceCODOrderMutation,
+  usePlaceWalletOrderMutation,
   useGetUserOrdersQuery,
   useGetOrderByIdQuery,
   useCancelOrderMutation,

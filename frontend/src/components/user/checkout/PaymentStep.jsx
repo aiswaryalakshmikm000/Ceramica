@@ -1,18 +1,21 @@
+
+
 import React from "react";
 import { CreditCard, Wallet, BanknoteIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { toast } from "react-toastify";
 
 const paymentMethods = [
   {
-    id: "credit-card",
-    title: "Credit / Debit Card",
+    id: "Razorpay",
+    title: "Razorpay",
     icon: <CreditCard className="text-gray-600" />,
-    description: "Pay securely with your card",
+    description: "Pay via UPI, Credit/Debit Card, Net Banking & more",
   },
   {
-    id: "upi",
-    title: "UPI Payment",
+    id: "Wallet",
+    title: "Wallet",
     icon: <Wallet className="text-gray-600" />,
-    description: "Google Pay, PhonePe, Paytm & more",
+    description: "Pay using your digital wallet balance",
   },
   {
     id: "Cash on Delivery",
@@ -22,9 +25,32 @@ const paymentMethods = [
   },
 ];
 
-const PaymentStep = ({ onNext, onBack, selectedPaymentMethod, setSelectedPaymentMethod }) => {
+const PaymentStep = ({
+  onNext,
+  onBack,
+  selectedPaymentMethod,
+  setSelectedPaymentMethod,
+  cart,
+  selectedAddress,
+}) => {
   const handleSelectPayment = (paymentId) => {
     setSelectedPaymentMethod(paymentId);
+  };
+
+  const handleNext = () => {
+    if (!selectedPaymentMethod) {
+      toast.error("Please select a payment method");
+      return;
+    }
+    if (!selectedAddress) {
+      toast.error("Shipping address is required");
+      return;
+    }
+    if (!cart?.totalAmount || cart.totalAmount <= 0) {
+      toast.error("Cart amount is invalid");
+      return;
+    }
+    onNext();
   };
 
   return (
@@ -65,66 +91,6 @@ const PaymentStep = ({ onNext, onBack, selectedPaymentMethod, setSelectedPayment
                 </div>
               </div>
             </div>
-
-            {selectedPaymentMethod === method.id && method.id === "credit-card" && (
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Card Number
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="XXXX XXXX XXXX XXXX"
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-300 focus:border-gray-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Cardholder Name
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Name on card"
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-300 focus:border-gray-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Expiry Date
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="MM/YY"
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-300 focus:border-gray-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      CVV
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="XXX"
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-gray-300 focus:border-gray-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-3">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      className="rounded text-orange-800 focus:ring-gray-300 h-4 w-4 mr-2"
-                    />
-                    <span className="text-sm text-gray-600">Save card for future payments</span>
-                  </label>
-                </div>
-              </div>
-            )}
           </div>
         ))}
       </div>
@@ -139,7 +105,7 @@ const PaymentStep = ({ onNext, onBack, selectedPaymentMethod, setSelectedPayment
         </button>
 
         <button
-          onClick={onNext}
+          onClick={handleNext}
           disabled={!selectedPaymentMethod}
           className={`flex items-center px-6 py-2 rounded-lg text-white ${
             !selectedPaymentMethod

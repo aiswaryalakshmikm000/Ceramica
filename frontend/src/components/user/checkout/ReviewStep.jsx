@@ -1,24 +1,38 @@
+
 import React from "react";
 import { ClipboardCheck, MapPin, CreditCard, Tag, ShoppingBag, ChevronLeft, ChevronRight } from "lucide-react";
+import { toast } from "react-toastify";
 
-const ReviewStep = ({ 
-  cart, 
-  address, 
-  paymentMethod, 
-  coupon, 
-  onBack, 
+const ReviewStep = ({
+  cart,
+  address,
+  paymentMethod,
+  coupon,
+  onBack,
   onPlaceOrder,
-  isPlacingOrder 
+  isPlacingOrder,
 }) => {
-
   const getPaymentMethodName = (methodId) => {
     switch (methodId) {
-      case "credit-card": return "Credit/Debit Card";
-      case "upi": return "UPI Payment";
-      case "Cash on Delivery": return "Cash on Delivery";
-      default: return methodId;
+      case "Razorpay":
+        return "Razorpay (UPI, Card, Net Banking)";
+      case "Cash on Delivery":
+        return "Cash on Delivery";
+      case "Wallet":
+        return "Wallet";
+      default:
+        return methodId || "Unknown";
     }
   };
+
+  console.log("CART ", cart)
+  console.log("COUPON ", coupon)
+
+
+  if (!cart || !address || !paymentMethod) {
+    toast.error("Incomplete order details");
+    return null;
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-6">
@@ -35,7 +49,7 @@ const ReviewStep = ({
             <h3 className="font-medium">Shipping Address</h3>
           </div>
           <div className="ml-6 text-gray-600">
-            <p className="font-medium">{address?.fullname || address?.fullName}</p>
+            <p className="font-medium">{address?.fullName || address?.fullname}</p>
             <p>{address?.addressLine}{address?.landmark ? `, ${address.landmark}` : ""}</p>
             <p>{address?.city}, {address?.state} - {address?.pincode}</p>
             <p>Phone: {address?.phone}</p>
@@ -66,8 +80,8 @@ const ReviewStep = ({
                 {coupon.code}
               </span>
               <span className="ml-2 text-green-600 text-sm">
-                {coupon.discountType === "percentage" 
-                  ? `${coupon.discount}% OFF` 
+                {coupon.discountType === "percentage"
+                  ? `${coupon?.discountPercentage}% OFF`
                   : `₹${coupon.discount} OFF`}
               </span>
             </div>
@@ -82,19 +96,19 @@ const ReviewStep = ({
           </div>
           <div className="ml-6 space-y-3">
             {cart.items.map((item) => (
-              <div 
-                key={`${item.productId._id || item.productId}-${item.color}`} 
+              <div
+                key={`${item.productId._id || item.productId}-${item.color}`}
                 className="flex items-center py-3 border-b border-gray-100"
               >
                 <div className="h-16 w-16 bg-gray-100 rounded flex-shrink-0 overflow-hidden">
-                  <img 
-                    src={item.image} 
-                    alt={item.name} 
+                  <img
+                    src={item.image}
+                    alt={item.productId.name}
                     className="h-full w-full object-cover"
                   />
                 </div>
                 <div className="ml-4 flex-grow">
-                  <h4 className="font-medium text-gray-800">{item.name}</h4>
+                  <h4 className="font-medium text-gray-800">{item.productId.name}</h4>
                   <div className="flex text-sm text-gray-500 space-x-4">
                     <span>Color: {item.color}</span>
                     <span>Quantity: {item.quantity}</span>
@@ -102,10 +116,10 @@ const ReviewStep = ({
                 </div>
                 <div className="text-right">
                   <p className="font-semibold">₹{item.productId.discountedPrice}</p>
-                  {item.discount > 0 && (
+                  {item.productId.discount > 0 && (
                     <p className="text-sm">
-                      <span className="line-through text-gray-400">₹{item.originalPrice}</span>
-                      <span className="ml-1 text-green-600">{item.discount}% off</span>
+                      <span className="line-through text-gray-400">₹{item.productId.price}</span>
+                      <span className="ml-1 text-green-600">{item.productId.discount}% off</span>
                     </p>
                   )}
                 </div>
@@ -124,18 +138,18 @@ const ReviewStep = ({
           <ChevronLeft size={16} className="mr-1" />
           Back to Payment
         </button>
-        
+
         <button
-          onClick={onPlaceOrder} 
+          onClick={onPlaceOrder}
           className={`flex items-center px-6 py-2 rounded-lg ${
-            isPlacingOrder 
-              ? "bg-orange-600/70 cursor-not-allowed" 
+            isPlacingOrder
+              ? "bg-orange-600/70 cursor-not-allowed"
               : "bg-orange-800/90 hover:bg-orange-800 text-white"
           } transition-colors`}
           disabled={isPlacingOrder}
         >
           {isPlacingOrder ? (
-            "Placing Order..."
+            "Processing..."
           ) : (
             <>
               Place Order

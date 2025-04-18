@@ -96,6 +96,10 @@ const orderSchema = new mongoose.Schema({
     default: 0,
     min: 0
   },
+  couponId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Coupon",
+  },
   couponCode: { type: String },
   shippingFee: {
     type: Number,
@@ -124,7 +128,7 @@ const orderSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['Credit / Debit Card', 'UPI Payment', 'Cash on Delivery'],
+    enum: ['Razorpay', 'Wallet', 'Cash on Delivery'],
     required: true
   },
   paymentStatus: {

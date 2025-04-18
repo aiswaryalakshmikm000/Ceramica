@@ -71,9 +71,9 @@ if (!order) {
     onReturnApproval(order._id, isApproved, refundToWallet, adminComment);
   };
 
-  const handleReturnItemAction = (itemId, isApproved) => {
+  const handleReturnItemAction = (itemId, isApproved, refundToWallet) => {
     const adminComment = adminComments[itemId] || '';
-    onItemReturnApproval(order._id, itemId, isApproved, adminComment);
+    onItemReturnApproval(order._id, itemId, isApproved, refundToWallet, adminComment );
   };
 
   const handleAdminCommentChange = (key, value) => {

@@ -94,7 +94,7 @@ const Cart = () => {
 
   const totalAmount = isCartEmpty
     ? subtotal
-    : (parseFloat(subtotal) + cart.deliveryCharge + cart.platformFee).toFixed(2);
+    : (parseFloat(subtotal) + cart.deliveryCharge ).toFixed(2);
 
   const breadcrumbItems = [
     { label: "My Account", href: "" },

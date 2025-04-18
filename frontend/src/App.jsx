@@ -35,6 +35,7 @@ const AdminShowCustomers = lazy(() => import("./components/admin/customer/AdminS
 const AdminDashboard = lazy(() => import("./components/admin/dashboard/AdminDashboard"));
 const AdminOrder = lazy(() => import("./components/admin/order/Order"));
 const AdminWallet = lazy(() => import("./components/admin/wallet/WalletListing"));
+const AdminCoupons = lazy(() => import("./components/admin/coupon/CouponPage"));
 
 
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -88,7 +89,7 @@ function App() {
           <Route path="/coupons" element={<IsUserLogin><UserCoupons /></IsUserLogin>} />
           <Route path="/cart/:userId" element={<IsUserLogin><UserCart /></IsUserLogin>} />
           <Route path="/checkout" element={<IsUserLogin><UserCheckout /></IsUserLogin>} />
-          <Route path="/order-confirmation" element={<IsUserLogin><UserOderConfrimation /></IsUserLogin>} />
+          <Route path="/order-confirmation/:orderId" element={<IsUserLogin><UserOderConfrimation /></IsUserLogin>} />
 
           {/* Public Admin Routes */}
           <Route path="/admin/register" element={<IsAdminLogout><AdminRegister /></IsAdminLogout>} />
@@ -103,6 +104,7 @@ function App() {
           <Route path="/admin/dashboard" element={<IsAdminLogin><AdminDashboard /></IsAdminLogin>} />
           <Route path="/admin/orders" element={<IsAdminLogin><AdminOrder /></IsAdminLogin>} />
           <Route path="/admin/wallet" element={<IsAdminLogin><AdminWallet /></IsAdminLogin>} />
+          <Route path="/admin/coupons" element={<IsAdminLogin><AdminCoupons /></IsAdminLogin>} />
 
           {/* 404 Route */}
           <Route path="*" element={<NotFound />} />

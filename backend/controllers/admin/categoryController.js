@@ -14,6 +14,7 @@ const showCategories = async (req, res) => {
           .status(404)
           .json({ success: false, message: "No categories available." });
       }
+      
       res
         .status(200)
         .json({ success: true, message: "Categories fetched successfully.", categories });

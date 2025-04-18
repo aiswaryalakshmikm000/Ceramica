@@ -9,8 +9,20 @@ const PaymentInfo = ({ order }) => (
         <span>{order.paymentMethod}</span>
       </div>
       <div className="flex justify-between">
-        <span>Tracking:</span>
-        <span>{order.trackingNumber || "N/A"}</span>
+        <span>Total MRP:</span>
+        <span>{order.totalMRP}</span>
+      </div>
+      <div className="flex justify-between">
+        <span>Product Discount:</span>
+        <span>{order.totalDiscount}</span>
+      </div>
+      <div className="flex justify-between">
+        <span>Coupon Discount:</span>
+        <span>{order.couponDiscount}</span>
+      </div>
+      <div className="flex justify-between">
+        <span>Shipping Fee:</span>
+        <span>{order.shippingFee}</span>
       </div>
       <div className="flex justify-between font-medium pt-2  border-gray-200">
         <span>Total:</span>

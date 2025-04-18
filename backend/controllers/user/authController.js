@@ -440,7 +440,7 @@ if(currentPassword===newPassword){
 
 const checkAuth = async (req, res) => {
   try {
-    const userId = req.user.id; // From authenticateToken middleware
+    const userId = req.user.id; 
     const user = await User.findById(userId).select('name email role phone images isBlocked');
 
     if (!user) {

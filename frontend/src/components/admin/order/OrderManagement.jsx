@@ -93,7 +93,6 @@ const OrderManagement = () => {
       refetch(); 
       toast.success(result.message || `Status Changed ${newStatus} succesfully`)
     } catch (err) {
-      console.error("Failed to update status:", err);
       toast.error(err.data?.message || "Failed to change the status")
     }
   };
@@ -116,7 +115,6 @@ const OrderManagement = () => {
       toast.success(result.message || "Return varified")
     } catch (err) {
       toast.error(err.data?.message || "Unknown error");
-      console.error("Failed to varify return:", err);
     }
   };
 
@@ -124,6 +122,7 @@ const OrderManagement = () => {
     orderId,
     itemId,
     isApproved,
+    refundToWallet,
     adminComment
   ) => {
     try {
@@ -131,12 +130,12 @@ const OrderManagement = () => {
         orderId,
         itemId,
         isApproved,
+        refundToWallet,
         adminComment,
       }).unwrap();
       refetch(); 
       toast.success(result.message || "Item Return varified")
     } catch (err) {
-      console.error("Failed to process item return:", err);
       toast.error(err.data?.message || "Unknown error");
     }
   };
@@ -270,25 +269,25 @@ const OrderManagement = () => {
               ) : (
                 orders.map((order) => (
                   <tr key={order.orderNumber} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {order.orderNumber}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(order.orderDate)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="font-medium">{order.customerName}</div>
                       <div className="text-xs text-gray-400">
                         {order.shippingAddress.email}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">
                       ₹{order.totalAmount.toFixed(2)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-5 py-4 whitespace-nowrap">
                       <StatusBadge status={order.status} />
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <td className="px-5 py-4 whitespace-nowrap text-sm font-medium">
                       <button
                         onClick={() => handleViewOrder(order)}
                         className="text-[#3c73a8] hover:text-[#2c5580] flex items-center gap-1"
@@ -319,7 +318,7 @@ const OrderManagement = () => {
         <OrderDetailModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          orderId={selectedOrderId} // Pass the ID, not an object
+          orderId={selectedOrderId} 
           onStatusChange={handleStatusChange}
           onReturnApproval={handleReturnAction}
           onItemReturnApproval={handleItemReturnAction}
