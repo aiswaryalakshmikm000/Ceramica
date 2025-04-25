@@ -17,7 +17,7 @@ const categorySchema = new mongoose.Schema(
     },
     isListed: {
       type: Boolean,
-      default: true, // Determines whether the category is visible to users
+      default: true, 
     },
   },
   { timestamps: true }

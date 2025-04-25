@@ -4,10 +4,8 @@ const Product = require("../../models/productModel");
 const Cart = require("../../models/cartModel");
 const {
   checkStock,
-  calculateDiscountPrice,
 } = require("../../utils/services/cartService");
 
-// Toggle item in wishlist
 const toggleWishlistItem = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -71,7 +69,6 @@ const toggleWishlistItem = async (req, res) => {
 };
 
 
-// Remove item from wishlist
 const removeWishlistItem = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -104,7 +101,7 @@ const removeWishlistItem = async (req, res) => {
   }
 };
 
-// Update wishlist item
+
 const updateWishlistItem = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -130,7 +127,6 @@ const updateWishlistItem = async (req, res) => {
       return res.status(400).json({ success: false, message: "New color variant is out of stock" });
     }
 
-    // const latestPrice = await fetchLatestPrice(productId);
     wishlist.items[itemIndex].color = newColor.toLowerCase();
     wishlist.items[itemIndex].discountedPrice = latestPrice;
     wishlist.items[itemIndex].inStock = true;
@@ -147,7 +143,7 @@ const updateWishlistItem = async (req, res) => {
   }
 };
 
-// Get wishlist
+
 const getWishlist = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -162,7 +158,6 @@ const getWishlist = async (req, res) => {
 
     for (let item of wishlist.items) {
       item.inStock = await checkStock(item.productId._id, item.color, 1);
-      // item.discountedPrice = await fetchLatestPrice(item.productId._id);
     }
 
     await wishlist.save();

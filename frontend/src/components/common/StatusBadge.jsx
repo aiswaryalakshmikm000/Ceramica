@@ -1,16 +1,16 @@
 
 import React from 'react';
 import {
-  Clock, // Pending
-  Package, // Shipped
-  Truck, // Out for Delivery
-  CheckCircle, // Delivered
-  XCircle, // Cancelled
-  Box, // Return-Requested
-  CheckSquare, // Return-Approved
-  XSquare, // Return-Rejected
-  RotateCcw, // Returned
-  Info, // Default
+  Clock,
+  Package,
+  Truck,
+  CheckCircle,
+  XCircle, 
+  Box, 
+  CheckSquare,
+  XSquare, 
+  RotateCcw, 
+  Info,
 } from 'lucide-react';
 
 const StatusBadge = ({ status }) => {

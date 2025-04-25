@@ -6,7 +6,6 @@ const mongoose = require("mongoose");
 const { cloudinaryImageUploadMethod } = require("../../utils/cloudinary/cloudinaryUpload");
 const cloudinaryDeleteImages = require('../../utils/cloudinary/deleteImages')
 
-// Add product function
 const addProduct = async (req, res) => {
 
   const { name, description, price, discount, offerId, categoryId, tags, colors, isFeatured } = req.body;
@@ -18,10 +17,8 @@ const addProduct = async (req, res) => {
       return res.status(400).json({ message: "Product already exists" });
     }
 
-    // Parse colors (JSON string from FormData)
     const parsedColors = JSON.parse(colors);
 
-    // Validate images (at least 3 total across all variants)
     if (!req.files || Object.keys(req.files).length === 0) {
       return res.status(400).json({ message: "Images are required for color variants." });
     }
@@ -40,7 +37,6 @@ const addProduct = async (req, res) => {
 
         totalImages += files.length;
 
-        // Upload images for this variant to Cloudinary
         const imageUrls = await Promise.all(
           files.map((file) => cloudinaryImageUploadMethod(file.buffer))
         );
@@ -57,7 +53,6 @@ const addProduct = async (req, res) => {
       return res.status(400).json({ message: "At least 3 images are required across all color variants." });
     }
 
-    // Create new product
     const newProduct = new Product({
       name,
       description,
@@ -101,12 +96,10 @@ const showProducts = async (req, res) => {
       filter.categoryId = { $in: categoriesArray };
     }
 
-    // Filter by listing status
     if (isListed !== undefined) {
       filter.isListed = isListed === "true";
     }
 
-    // Filter by stock status
     if (stockFilter) {
       if (stockFilter === "inStock") {
         filter.totalStock = { $gt: 0 };
@@ -115,7 +108,6 @@ const showProducts = async (req, res) => {
       }
     }
 
-    // Pagination
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
@@ -140,7 +132,7 @@ const showProducts = async (req, res) => {
   }
 };
 
-//to list or unlist products
+
 const updateProductStatus = async (req, res) => {
 
   const { id } = req.params;
@@ -162,7 +154,6 @@ const updateProductStatus = async (req, res) => {
 
     await product.save();
    
-    // Fetch the updated product to send fresh data
     const updatedProduct = await Product.findById(id);
 
     res.status(200).json({ success: true, message: "Poduct status changed", product: updatedProduct });
@@ -224,12 +215,10 @@ const editProduct = async (req, res) => {
       return res.status(400).json({ message: "Product with same name already exists" });
     }
 
-    // Parse incoming data
     const parsedColors = colors ? JSON.parse(colors) : productExist.colors;
     updatedUrls = updatedUrls ? JSON.parse(updatedUrls) : [];
     deletedImages = deletedImages ? JSON.parse(deletedImages) : [];
 
-    // Handle new image uploads per color variant
     const imageUploads = {};
     for (let fieldName in files) {
       const uploadedFiles = files[fieldName];
@@ -239,14 +228,12 @@ const editProduct = async (req, res) => {
       imageUploads[fieldName] = imageUrls;
     }
 
-    // Update colors with images
     const colorsWithImages = parsedColors.map((color, index) => {
       const existingColor = productExist.colors.find(c => c.name === color.name) || {};
       const fieldName = `color${index}Images`;
       const newImages = imageUploads[fieldName] || []; 
       const existingImages = existingColor.images || [];
 
-      // Filter out deleted images and retain only those in updatedUrls for this variant
       const retainedImages = existingImages.filter(img => 
         !deletedImages.includes(img) && (updatedUrls.includes(img) || newImages.includes(img))
       );
@@ -258,7 +245,6 @@ const editProduct = async (req, res) => {
       };
     });
 
-    // Update product fields
     const updatedProduct = {
       name: name || productExist.name,
       description: description || productExist.description,

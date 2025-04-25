@@ -35,12 +35,12 @@ export const userCartApiSlice = userApi.injectEndpoints({
       invalidatesTags: ["Cart"],
     }),
 
-    validateCheckout: builder.mutation({ // Changed to mutation
+    validateCheckout: builder.mutation({ 
       query: () => ({
         url: '/checkout',
         method: 'GET',
       }),
-      invalidatesTags: ['Cart'], // Optional: refresh cart if needed
+      invalidatesTags: ['Cart'], 
     }),
 
   })

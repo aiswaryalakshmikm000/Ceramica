@@ -15,7 +15,6 @@ const addToCart = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Quantity must be at least 1' });
     }
 
-    // Check stock
     const inStock = await cartService.checkStock(productId, color, quantity);
     if (!inStock) {
       return res.status(400).json({ success: false, message: 'Product is currently out of stock' });
@@ -26,26 +25,22 @@ const addToCart = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Product not found or unavailable' });
     }
     
-    // Find or create cart
     let cart = await Cart.findOne({ userId });
 
     if (!cart) {
       cart = new Cart({ userId, items: [] });
     }
 
-    // Check if item already exists in cart
     const existingItemIndex = cart.items.findIndex(
       (item) => item.productId.toString() === productId && item.color === color
     );
 
     if (existingItemIndex > -1) {
-      // Update existing item
       cart.items[existingItemIndex].quantity += quantity;
       if (cart.items[existingItemIndex].quantity > cart.items[existingItemIndex].maxQtyPerUser) {
         return res.status(400).json({ success: false, message: 'Maximum quantity per user exceeded' });
       }
     } else {
-      // Add new item
       const colorData = product.colors.find((c) => c.name.toLowerCase() === color.toLowerCase());
       if (quantity > 5) {
         return res.status(400).json({ success: false, message: 'Maximum quantity per user exceeded' });
@@ -59,12 +54,10 @@ const addToCart = async (req, res) => {
       });
     }
 
-    // Recalculate totals
     const updatedCart = await cartService.recalculateCartTotals(cart);
     cart.set(updatedCart);
     await cart.save();
 
-    // Remove from wishlist after successful cart addition
     await cartService.checkAndRemoveFromCart(userId, productId, color);
 
     res.status(200).json({
@@ -82,41 +75,46 @@ const showCart = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const cart = await Cart.findOne({ userId })
-    .populate({
-      path: 'items.productId', 
+    const cart = await Cart.findOne({ userId }).populate({
+      path: 'items.productId',
       select: '_id name price discount discountedPrice isListed colors',
       populate: {
         path: 'categoryId',
         model: 'Category',
         select: 'isListed',
-      }
+      },
     });
 
     if (!cart) {
-      return res.status(404).json({ success: false, message: 'Cart not found for this user' });
+      return res.status(404).json({
+        success: false,
+        message: 'Cart not found for this user',
+      });
     }
 
     const originalItemCount = cart.items.length;
-    
-    cart.items = cart.items.filter(item => {
+
+    cart.items = cart.items.filter((item) => {
       const product = item.productId;
-      return  product && 
-              product.isListed === true && 
-              product.categoryId && 
-              product.categoryId.isListed === true;;
+      return (
+        product &&
+        product.isListed === true &&
+        product.categoryId &&
+        product.categoryId.isListed === true
+      );
     });
 
     const removedItemCount = originalItemCount - cart.items.length;
 
     const updatedCart = await cartService.recalculateCartTotals(cart);
 
-    if (removedItemCount > 0) {
-    cart.set(updatedCart);
+    cart.set({
+      items: cart.items,
+      totalAmount: updatedCart.totalAmount,
+    });
     await cart.save();
-    }
 
-    const response = { 
+    const response = {
       success: true,
       cart: {
         _id: cart._id,
@@ -133,17 +131,21 @@ const showCart = async (req, res) => {
             colors: item.productId.colors,
           },
         })),
-        // platformFee: updatedCart.platformFee || 3,
         totalItems: updatedCart.totalItems,
         totalMRP: updatedCart.totalMRP,
         totalDiscount: updatedCart.totalDiscount,
+        offerDiscount: updatedCart.offerDiscount, 
+        couponDiscount: updatedCart.couponDiscount,
+        couponId: updatedCart.couponId,
+        couponCode: updatedCart.couponCode,
+        discountPercentage: updatedCart.discountPercentage,
         deliveryCharge: updatedCart.deliveryCharge,
         totalAmount: updatedCart.totalAmount,
         createdAt: cart.createdAt,
         updatedAt: cart.updatedAt,
-      }, 
+      },
     };
-    
+
     if (removedItemCount > 0) {
       response.message = `${removedItemCount} item(s) were removed from your cart as they are no longer available`;
     } else {
@@ -153,7 +155,11 @@ const showCart = async (req, res) => {
     res.status(200).json(response);
   } catch (error) {
     console.error('Error fetching cart:', error.stack);
-    res.status(500).json({ success: false, message: 'Failed to retrieve cart', error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve cart',
+      error: error.message,
+    });
   }
 };
 
@@ -173,7 +179,7 @@ const updateCart = async (req, res) => {
     }
 
     const itemIndex = cart.items.findIndex(
-      item => item.productId.toString() === productId && item.color === color
+      (item) => item.productId.toString() === productId && item.color === color
     );
 
     if (itemIndex === -1) {
@@ -184,29 +190,68 @@ const updateCart = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Quantity must be at least 1' });
     }
 
-    // Check stock
     const inStock = await cartService.checkStock(productId, color, quantity);
     if (!inStock) {
       return res.status(400).json({ success: false, message: 'Product is currently out of stock' });
     }
 
-    // Update quantity
     cart.items[itemIndex].quantity = quantity;
     if (cart.items[itemIndex].quantity > cart.items[itemIndex].maxQtyPerUser) {
-      return res.status(400).json({ success: false, message: 'Maximum quantity per user exceeded' });
+      return res.status(400).json({
+        success: false,
+        message: 'Maximum quantity per user exceeded',
+      });
     }
 
     const updatedCart = await cartService.recalculateCartTotals(cart);
-    cart.set(updatedCart);
+
+    cart.set({
+      items: cart.items,
+      totalAmount: updatedCart.totalAmount,
+    });
     await cart.save();
 
-    res.status(200).json({ 
-      success: true, 
-      message: 'Cart item quantity updated successfully', 
-      cart: updatedCart 
-    });
+    const response = {
+      success: true,
+      message: 'Cart item quantity updated successfully',
+      cart: {
+        _id: cart._id,
+        userId: cart.userId,
+        items: cart.items.map((item) => ({
+          ...item.toObject(),
+          productId: {
+            _id: product._id,
+            name: product.name,
+            price: product.price,
+            discount: product.discount,
+            discountedPrice: product.discountedPrice,
+            isListed: product.isListed,
+            colors: product.colors,
+          },
+        })),
+        totalItems: updatedCart.totalItems,
+        totalMRP: updatedCart.totalMRP,
+        totalDiscount: updatedCart.totalDiscount,
+        offerDiscount: updatedCart.offerDiscount, 
+        couponDiscount: updatedCart.couponDiscount,
+        couponId: updatedCart.couponId,
+        couponCode: updatedCart.couponCode,
+        discountPercentage: updatedCart.discountPercentage,
+        deliveryCharge: updatedCart.deliveryCharge,
+        totalAmount: updatedCart.totalAmount,
+        createdAt: cart.createdAt,
+        updatedAt: cart.updatedAt,
+      },
+    };
+
+    res.status(200).json(response);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to update cart', error: error.message });
+    console.error('Error updating cart:', error.stack);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update cart',
+      error: error.message,
+    });
   }
 };
 
@@ -221,7 +266,7 @@ const removeItemFromCart = async (req, res) => {
     }
 
     const itemIndex = cart.items.findIndex(
-      item => item.productId.toString() === productId && item.color === color
+      (item) => item.productId.toString() === productId && item.color === color
     );
 
     if (itemIndex === -1) {
@@ -229,22 +274,60 @@ const removeItemFromCart = async (req, res) => {
     }
 
     cart.items.splice(itemIndex, 1);
+
     const updatedCart = await cartService.recalculateCartTotals(cart);
-    cart.set(updatedCart);
+
+    cart.set({
+      items: cart.items,
+      totalAmount: updatedCart.totalAmount,
+    });
     await cart.save();
 
-    res.status(200).json({ 
-      success: true, 
-      message: 'Item successfully removed from cart', 
-      cart: updatedCart 
-    });
+    const response = {
+      success: true,
+      message: 'Item successfully removed from cart',
+      cart: {
+        _id: cart._id,
+        userId: cart.userId,
+        items: cart.items.map((item) => ({
+          ...item.toObject(),
+          productId: {
+            _id: item.productId._id,
+            name: item.productId.name,
+            price: item.productId.price,
+            discount: item.productId.discount,
+            discountedPrice: item.productId.discountedPrice,
+            isListed: item.productId.isListed,
+            colors: item.productId.colors,
+          },
+        })),
+        totalItems: updatedCart.totalItems,
+        totalMRP: updatedCart.totalMRP,
+        totalDiscount: updatedCart.totalDiscount,
+        offerDiscount: updatedCart.offerDiscount, 
+        couponDiscount: updatedCart.couponDiscount,
+        couponId: updatedCart.couponId,
+        couponCode: updatedCart.couponCode,
+        discountPercentage: updatedCart.discountPercentage,
+        deliveryCharge: updatedCart.deliveryCharge,
+        totalAmount: updatedCart.totalAmount,
+        createdAt: cart.createdAt,
+        updatedAt: cart.updatedAt,
+      },
+    };
+
+    res.status(200).json(response);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to remove item from cart', error: error.message });
+    console.error('Error removing item from cart:', error.stack);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to remove item from cart',
+      error: error.message,
+    });
   }
 };
 
 
-// checkoutValidation.js
 const checkoutValidation = async (req, res) => {
   try {
     const userId = req.user.id;

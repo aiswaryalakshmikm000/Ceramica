@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Removed Suspense, lazy from here
-import { Suspense, lazy } from "react"; // Correct import for Suspense and lazy
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Suspense, lazy } from "react"; 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
@@ -23,7 +23,9 @@ const UserWallet = lazy(() => import ('./pages/user/UserWallet'))
 const UserCoupons = lazy(() => import ('./pages/user/UserCoupons'))
 const UserCart = lazy(() => import ('./pages/user/UserCart'))
 const UserCheckout = lazy(() => import ('./pages/user/UserCheckout'))
+const UserReferAndEarn = lazy(() => import ('./pages/user/UserReferAndEarn'))
 const UserOderConfrimation = lazy(() => import ('./pages/user/UserOrderConfirmation'))
+const UserOderFailure = lazy(() => import ('./pages/user/UserOrderFailure'))
 
 const AdminLogin = lazy(() => import("./components/admin/AdminLogin"));
 const AdminRegister = lazy(() => import("./components/admin/AdminRegister"));
@@ -34,8 +36,10 @@ const AdminCategoryManagement = lazy(() => import("./components/admin/category/A
 const AdminShowCustomers = lazy(() => import("./components/admin/customer/AdminShowCustomers"));
 const AdminDashboard = lazy(() => import("./components/admin/dashboard/AdminDashboard"));
 const AdminOrder = lazy(() => import("./components/admin/order/Order"));
-const AdminWallet = lazy(() => import("./components/admin/wallet/WalletListing"));
+const AdminWallet = lazy(() => import("./components/admin/wallet/AdminWallet"));
 const AdminCoupons = lazy(() => import("./components/admin/coupon/CouponPage"));
+const AdminOffer = lazy(() => import("./components/admin/offer/AdminOffer"));
+const AdminSalesReport = lazy(() => import("./components/admin/salesReport/salesReportPage"));
 
 
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -89,7 +93,9 @@ function App() {
           <Route path="/coupons" element={<IsUserLogin><UserCoupons /></IsUserLogin>} />
           <Route path="/cart/:userId" element={<IsUserLogin><UserCart /></IsUserLogin>} />
           <Route path="/checkout" element={<IsUserLogin><UserCheckout /></IsUserLogin>} />
+          <Route path="/refer-and-earn" element={<IsUserLogin><UserReferAndEarn /></IsUserLogin>} />
           <Route path="/order-confirmation/:orderId" element={<IsUserLogin><UserOderConfrimation /></IsUserLogin>} />
+          <Route path="/order-failure/:orderId" element={<IsUserLogin><UserOderFailure /></IsUserLogin>} />
 
           {/* Public Admin Routes */}
           <Route path="/admin/register" element={<IsAdminLogout><AdminRegister /></IsAdminLogout>} />
@@ -105,6 +111,8 @@ function App() {
           <Route path="/admin/orders" element={<IsAdminLogin><AdminOrder /></IsAdminLogin>} />
           <Route path="/admin/wallet" element={<IsAdminLogin><AdminWallet /></IsAdminLogin>} />
           <Route path="/admin/coupons" element={<IsAdminLogin><AdminCoupons /></IsAdminLogin>} />
+          <Route path="/admin/offers" element={<IsAdminLogin><AdminOffer /></IsAdminLogin>} />
+          <Route path="/admin/sales-report" element={<IsAdminLogin><AdminSalesReport /></IsAdminLogin>} />
 
           {/* 404 Route */}
           <Route path="*" element={<NotFound />} />

@@ -14,7 +14,7 @@ const PaymentInfo = ({ order }) => (
       </div>
       <div className="flex justify-between">
         <span>Product Discount:</span>
-        <span>{order.totalDiscount}</span>
+        <span>{order.totalDiscount} </span>
       </div>
       <div className="flex justify-between">
         <span>Coupon Discount:</span>

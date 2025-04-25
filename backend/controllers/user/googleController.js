@@ -17,7 +17,6 @@ const googleAuth = async (req, res) => {
   }
 
   try {
-    // Verify the Google ID token
     const ticket = await client.verifyIdToken({
       idToken: credential,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -76,15 +75,11 @@ const googleAuth = async (req, res) => {
       name: user.name,
     };
 
-
-    // Generate tokens
     const accessToken = generateAccessToken(userData);
     const refreshToken = generateRefreshToken(userData);
 
-    // Remove old refresh tokens for security
     await RefreshToken.deleteMany({ user: user._id });
 
-    // Save refresh token in DB
     const newRefreshToken = new RefreshToken({
       token: refreshToken,
       user: user._id,
@@ -93,12 +88,9 @@ const googleAuth = async (req, res) => {
     });
     await newRefreshToken.save();
 
-    // Set tokens in cookies
     setCookie("userAccessToken", accessToken, 15 * 60 * 1000, res); 
     setCookie("userRefreshToken", refreshToken, 30 * 24 * 60 * 60 * 1000, res);
 
-
-    // Return user data
     res.status(200).json({
       success: true,
       message: "Google login successful",

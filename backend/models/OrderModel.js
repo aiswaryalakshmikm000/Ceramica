@@ -91,6 +91,11 @@ const orderSchema = new mongoose.Schema({
     default: 0,
     min: 0
   },
+  offerDiscount: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
   couponDiscount: {
     type: Number,
     default: 0,

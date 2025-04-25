@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { CheckCircle, XCircle, ChevronDown } from "lucide-react";
 import {
@@ -29,9 +30,10 @@ const OrderSummary = ({
   const totalItems = cart?.totalItems || 0;
   const totalMRP = getSafeNumber(cart?.totalMRP);
   const totalDiscount = getSafeNumber(cart?.totalDiscount);
+  const offerDiscount = getSafeNumber(cart?.offerDiscount || 0);
   const couponDiscount = getSafeNumber(appliedCoupon?.discount || 0);
   const deliveryCharge = getSafeNumber(cart?.deliveryCharge);
-  // const platformFee = getSafeNumber(cart?.platformFee);
+  const productDiscount = getSafeNumber(totalDiscount - offerDiscount);
   const subtotal = getSafeNumber(totalMRP - totalDiscount);
   const totalAmount = getSafeNumber(
     subtotal - couponDiscount + parseFloat(deliveryCharge)
@@ -62,7 +64,6 @@ const OrderSummary = ({
       setCouponCode("");
      
       setIsDropdownOpen(false);
-      // setCouponError(error?.data?.message || "Failed to apply coupon");
       toast.error(error?.data?.message || "Failed to apply coupon");
     }
   };
@@ -203,13 +204,17 @@ const OrderSummary = ({
           <span>Total Items</span>
           <span>{totalItems}</span>
         </div>
-        <div className="flex justify-between text-green-600">
-          <span>Product Discount</span>
-          <span>-₹{totalDiscount}</span>
-        </div>
         <div className="flex justify-between">
           <span>Original Price</span>
           <span>₹{totalMRP}</span>
+        </div>
+        <div className="flex justify-between text-green-600">
+          <span>Product Discount</span>
+          <span>-₹{productDiscount}</span>
+        </div>
+        <div className="flex justify-between text-green-600">
+          <span>Offer Discount</span>
+          <span>-₹{offerDiscount}</span>
         </div>
         <div className="flex justify-between">
           <span>Subtotal (After Discount)</span>
@@ -229,9 +234,9 @@ const OrderSummary = ({
           <span>Total Amount</span>
           <span>₹{totalAmount}</span>
         </div>
-        {(parseFloat(totalDiscount) > 0 || parseFloat(couponDiscount) > 0) && (
+        {(parseFloat(productDiscount) > 0 || parseFloat(offerDiscount) > 0 || parseFloat(couponDiscount) > 0) && (
           <div className="bg-green-50 text-green-600 text-sm py-2 px-3 rounded-md">
-            You have saved: ₹{getSafeNumber(parseFloat(totalDiscount) + parseFloat(couponDiscount))}
+            You have saved: ₹{getSafeNumber(parseFloat(productDiscount) + parseFloat(offerDiscount) + parseFloat(couponDiscount))}
           </div>
         )}
       </div>

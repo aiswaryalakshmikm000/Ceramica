@@ -1,4 +1,4 @@
-// src/services/api/adminCouponApiSlice.js
+
 import { adminApi } from "../../services/api/adminApi";
 
 export const adminCouponApiSlice = adminApi.injectEndpoints({

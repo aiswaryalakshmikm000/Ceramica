@@ -22,11 +22,11 @@ const ProductCard = ({ product }) => {
   );
 
   const user = useSelector(selectUser);
-  const userId = user?._id;
+  const userId = user?.id;
 
   // Get wishlist and cart data with fallback
   const { data: wishlistData = [], refetch: refetchWishlist } = useFetchWishlistQuery(userId, {
-    skip: !userId, // Skip if no userId
+    skip: !userId, 
   });
   const { data: cart, refetch: refetchCart } = useGetCartQuery(userId, {
     skip: !userId,
@@ -56,7 +56,6 @@ const ProductCard = ({ product }) => {
         productId: product.id,
         color: selectedColor
       }).unwrap();
-      // Refetch wishlist to ensure UI updates
       refetchWishlist();
       toast.success(response.message || "Item added to wishlist");
     } catch (error) {
@@ -66,7 +65,7 @@ const ProductCard = ({ product }) => {
   };
 
   const handleAddToCart = async (e) => {
-    e.preventDefault(); // Prevent navigation
+    e.preventDefault(); 
     if (!selectedColor) return;
     try {
       const response = await addToCart({
@@ -75,7 +74,6 @@ const ProductCard = ({ product }) => {
         quantity: 1,
         color: selectedColor
       }).unwrap();
-      // Refetch cart to ensure UI updates
       refetchCart();
       toast.success(response.message || "Item added to cart")
     } catch (error) {

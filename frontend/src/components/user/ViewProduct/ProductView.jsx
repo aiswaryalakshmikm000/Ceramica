@@ -18,7 +18,6 @@ const ProductView = () => {
     { label: 'Shop', href: '/shop' },
   ]);
 
-// Reset state and refetch when id changes
 useEffect(() => {
   refetch(); 
   setSelectedColor(null); 
@@ -31,12 +30,12 @@ useEffect(() => {
         { label: 'Shop', href: '/shop' },
         { label: data.product.name },
       ]);
-      // Set initial selected color if not already set
+
       if (data.product.colors.length > 0 && !selectedColor) {
         setSelectedColor(data.product.colors[0].name);
       }
     }
-  }, [data, selectedColor]); 
+  }, [data]); 
 
 
   if (isLoading) {
@@ -80,9 +79,13 @@ useEffect(() => {
     price: product.price,
     discount: product.discount,
     discountedPrice: product.discountedPrice,
-    image: product.colors?.[0]?.images?.[0] || product.images?.[0] || product.primaryImage,
+    image: product.colors?.[0]?.images?.[0] || product.images?.[0],
     inStock: product.totalStock > 0,
-    colors: product.colors,
+    colors: product.colors.map(color => ({
+      name: color.name,
+      images: color.images || [],
+      stock: color.stock || 0,
+    })),
   }));
 
   const galleryImages = selectedColor

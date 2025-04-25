@@ -16,8 +16,10 @@ import Fallback from "../../common/Fallback";
 import Breadcrumbs from "../../common/BreadCrumbs";
 
 const Cart = () => {
+  
   const user = useSelector(selectUser);
-  const userId = user?._id;
+  const userId = user?.id;
+
   const navigate = useNavigate();
 
   const {

@@ -1,4 +1,4 @@
-// adminOrderController.js
+
 const Order = require("../../models/OrderModel");
 const Product = require("../../models/productModel");
 const {
@@ -9,10 +9,8 @@ const getAllOrders = async (req, res) => {
   try {
     const { search, status, page = 1, limit = 10, sort } = req.query;
 
-    // Build the filter object
     let filter = {};
 
-    // Search by orderNumber, customerName, or email
     if (search) {
       filter.$or = [
         { orderNumber: { $regex: new RegExp(search, "i") } },
@@ -21,12 +19,10 @@ const getAllOrders = async (req, res) => {
       ];
     }
 
-    // Filter by status
     if (status !== undefined && status !== "") {
       filter.status = { $regex: new RegExp(`^${status}$`, "i") };
     }
 
-    // Pagination
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
@@ -40,7 +36,6 @@ const getAllOrders = async (req, res) => {
       sortOption.orderDate = -1;
     }
 
-    // Get total count and orders
     const totalOrders = await Order.countDocuments(filter);
     const orders = await Order.find(filter)
       .populate("items.productId", "name")
@@ -106,7 +101,6 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
-    // Validate status
     const validStatuses = [
       "Pending",
       "Confirmed",
@@ -123,14 +117,11 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
-    // Update main order status
     order.status = status;
 
-    // Update status for all items
     order.items = order.items.map((item) => {
       item.status = status;
 
-      // Reset returnRequest for each item when status is Delivered or Pending
       if (status === "Delivered" || status === "Pending") {
         item.returnRequest = {
           isRequested: false,
@@ -145,7 +136,6 @@ const updateOrderStatus = async (req, res) => {
       return item;
     });
 
-    // Reset returnRequest for the main order when status is Delivered or Pending
     if (status === "Delivered" || status === "Pending") {
       order.returnRequest = {
         isRequested: false,
@@ -156,7 +146,6 @@ const updateOrderStatus = async (req, res) => {
       };
     }
 
-    // Add to activity log
     order.activityLog.push({ status, changedAt: new Date() });
     await order.save();
 
@@ -197,13 +186,11 @@ const verifyReturnRequest = async (req, res) => {
       });
     }
 
-    // Update return request details
     order.returnRequest.isApproved = isApproved;
     order.returnRequest.approvedAt = new Date();
     order.returnRequest.adminComment = adminComment;
     order.status = isApproved ? "Returned" : "Return-Rejected";
 
-    // Update stock for all items using Promise.all
     if (isApproved) {
       await Promise.all(
         order.items.map(async (item) => {
@@ -217,7 +204,6 @@ const verifyReturnRequest = async (req, res) => {
             }
           );
           item.status = "Returned";
-          // Update item return request if exists
           if (item.returnRequest) {
             item.returnRequest.isApproved = true;
             item.returnRequest.approvedAt = order.returnRequest.approvedAt;
@@ -226,7 +212,6 @@ const verifyReturnRequest = async (req, res) => {
         })
       );
 
-      // Refund to wallet if approved, refundToWallet is true, payment method is Razorpay or Wallet, and payment status is Paid
       if (
         refundToWallet &&
         (order.paymentMethod === "Razorpay" ||
@@ -247,7 +232,6 @@ const verifyReturnRequest = async (req, res) => {
         order.paymentStatus = "Refunded";
       }
     } else {
-      // For rejected returns, update item statuses
       order.items.forEach((item) => {
         item.status = "Return-Rejected";
         if (item.returnRequest) {
@@ -257,7 +241,6 @@ const verifyReturnRequest = async (req, res) => {
       });
     }
 
-    // Log the activity
     order.activityLog.push({
       status: isApproved ? "Returned" : "Return-Rejected",
       changedAt: new Date(),
@@ -309,13 +292,11 @@ const verifyItemReturnRequest = async (req, res) => {
       });
     }
 
-    // Update item return request details
     item.returnRequest.isApproved = isApproved;
     item.returnRequest.approvedAt = new Date();
     item.returnRequest.adminComment = adminComment;
     item.status = isApproved ? "Returned" : "Return-Rejected";
 
-    // Check if all items are returned or return-rejected to update order status
     const allItemsProcessed = order.items.every(
       (i) =>
         i.status === "Returned" ||
@@ -355,7 +336,6 @@ const verifyItemReturnRequest = async (req, res) => {
       }
     }
 
-    // Log the activity
     order.activityLog.push({
       status: isApproved
         ? `Item ${item.name} Returned`

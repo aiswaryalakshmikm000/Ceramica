@@ -85,7 +85,6 @@ const ReviewForm = () => {
       localStorage.removeItem('reviewEmail');
     }
 
-    // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
       setRating(0);

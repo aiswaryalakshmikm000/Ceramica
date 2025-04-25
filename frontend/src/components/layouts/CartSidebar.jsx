@@ -9,15 +9,13 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const CartSidebar = ({ isOpen, onClose }) => {
   const user = useSelector(selectUser);
-  const userId = user?._id;
+  const userId = user?.id;
   const isAuthenticated = useSelector(selectIsUserAuthenticated);
 
-  // Fetch cart data using useGetCartQuery
   const { data: cart, isLoading, error } = useGetCartQuery(userId, {
     skip: !user, 
   });
 
-  // Calculate subtotal from cart items
   const calculateSubtotal = () => {
     if (!cart || !cart.items) return "0.00";
     return cart.items
@@ -187,7 +185,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                         </div>
                         <div className="flex-1">
                           <h3 className="text-sm font-medium text-ceramic-charcoal line-clamp-1">
-                            {item.name}
+                            {item.productId.name}
                           </h3>
                           <p className="text-xs text-gray-600 mt-1">
                             {item.color}

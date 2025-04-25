@@ -25,9 +25,6 @@ const ReviewStep = ({
     }
   };
 
-  console.log("CART ", cart)
-  console.log("COUPON ", coupon)
-
 
   if (!cart || !address || !paymentMethod) {
     toast.error("Incomplete order details");

@@ -1,18 +1,19 @@
-
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useValidateCheckoutMutation } from "../../../features/userAuth/userCartApislice";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 
-// Correct way to access environment variables in Vite
-const THRESHOLD_AMOUNT = import.meta.env.VITE_THRESHOLD_AMOUNT 
 
-const CartOrderSummary = ({ cart, subtotal, isCartEmpty, totalAmount, setProblematicItems }) => {
+const THRESHOLD_AMOUNT = import.meta.env.VITE_THRESHOLD_AMOUNT;
 
+const CartOrderSummary = ({ cart, subtotal, isCartEmpty, setProblematicItems }) => {
   const navigate = useNavigate();
   const [validateCheckout, { isLoading }] = useValidateCheckoutMutation();
+
+  const getSafeNumber = (value, defaultValue = 0) => {
+    return isNaN(parseFloat(value)) ? defaultValue : parseFloat(value).toFixed(2);
+  };
 
   const handleCheckout = async () => {
     try {
@@ -31,8 +32,17 @@ const CartOrderSummary = ({ cart, subtotal, isCartEmpty, totalAmount, setProblem
     }
   };
 
-  const hasProblems = cart.items.some(item => !item.inStock || (item.productId && !item.productId.isListed));
-  const remainingForFreeDelivery = THRESHOLD_AMOUNT - totalAmount;
+  const hasProblems = cart.items.some(
+    (item) => !item.inStock || (item.productId && !item.productId.isListed)
+  );
+  const remainingForFreeDelivery = THRESHOLD_AMOUNT - parseFloat(cart.totalAmount || 0);
+  const totalItems = cart?.totalItems || 0;
+  const totalMRP = getSafeNumber(cart?.totalMRP);
+  const totalDiscount = getSafeNumber(cart?.totalDiscount);
+  const offerDiscount = getSafeNumber(cart?.offerDiscount || 0);
+  const productDiscount = getSafeNumber(totalDiscount - offerDiscount);
+  const deliveryCharge = getSafeNumber(cart?.deliveryCharge);
+  const totalAmount = getSafeNumber(cart?.totalAmount);
 
   // Animation variants for the free delivery message
   const pulseAnimation = {
@@ -41,20 +51,18 @@ const CartOrderSummary = ({ cart, subtotal, isCartEmpty, totalAmount, setProblem
       transition: {
         duration: 2,
         repeat: Infinity,
-        ease: "easeInOut"
-      }
-    }
+        ease: "easeInOut",
+      },
+    },
   };
 
   return (
     <div className="lg:w-1/3">
       <div className="bg-white rounded-2xl sticky top-8 shadow-md p-6">
-        <h2 className="text-xl font-semibold mb-6 text-gray-800">
-          Order Summary
-        </h2>
+        <h2 className="text-xl font-semibold mb-6 text-gray-800">Order Summary</h2>
         {remainingForFreeDelivery > 0 && !isCartEmpty && (
-          <motion.p 
-            className="text-m font-medium font:semibold text-red-500 text-center mt-3 bg-orange-50 py-2 px-3 rounded-md"
+          <motion.p
+            className="text-m font-medium  text-red-500 text-center mt-3 bg-orange-50 py-2 px-3 rounded-md"
             variants={pulseAnimation}
             animate="animate"
           >
@@ -64,39 +72,41 @@ const CartOrderSummary = ({ cart, subtotal, isCartEmpty, totalAmount, setProblem
         <div className="space-y-4 text-gray-700 border-t py-6">
           <div className="flex justify-between">
             <span>Total Items</span>
-            <span>{cart.totalItems}</span>
+            <span>{totalItems}</span>
           </div>
           <div className="flex justify-between">
             <span>Original Price</span>
-            <span>₹{cart.totalMRP.toFixed(2)}</span>
+            <span>₹{totalMRP}</span>
           </div>
           <div className="flex justify-between text-green-600">
-            <span>Total Discount</span>
-            <span>-₹{cart.totalDiscount.toFixed(2)}</span>
+            <span>Product Discount</span>
+            <span>-₹{productDiscount}</span>
+          </div>
+          <div className="flex justify-between text-green-600">
+            <span>Offer Discount</span>
+            <span>-₹{offerDiscount}</span>
           </div>
           <div className="flex justify-between">
             <span>Subtotal</span>
-            <span>₹{subtotal}</span>
+            <span>₹{getSafeNumber(totalMRP - totalDiscount)}</span>
           </div>
           {!isCartEmpty && (
             <>
               <div className="flex justify-between">
                 <span>Delivery Charges</span>
-                <span>₹{cart.deliveryCharge.toFixed(2)}</span>
+                <span>₹{deliveryCharge}</span>
               </div>
-              {/* <div className="flex justify-between">
-                <span>Platform Fee</span>
-                <span>₹{cart.platformFee.toFixed(2)}</span>
-              </div> */}
             </>
           )}
           <div className="pt-4 border-t border-gray-200 flex justify-between font-semibold text-lg text-gray-800">
             <span>Total Amount</span>
             <span>₹{totalAmount}</span>
           </div>
-          <div className="bg-green-50 text-green-700 text-sm py-2 px-3 rounded-md">
-            You save: ₹{cart.totalDiscount.toFixed(2)}
-          </div>
+          {(parseFloat(productDiscount) > 0 || parseFloat(offerDiscount) > 0) && (
+            <div className="bg-green-50 text-green-700 text-sm py-2 px-3 rounded-md">
+              You save: ₹{getSafeNumber(parseFloat(productDiscount) + parseFloat(offerDiscount))}
+            </div>
+          )}
         </div>
 
         <button
@@ -110,7 +120,6 @@ const CartOrderSummary = ({ cart, subtotal, isCartEmpty, totalAmount, setProblem
         >
           {isLoading ? "Checking..." : "Proceed to Checkout"}
         </button>
-        
       </div>
     </div>
   );

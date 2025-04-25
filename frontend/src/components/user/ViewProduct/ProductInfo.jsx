@@ -24,7 +24,7 @@ const ProductInfo = ({ product, onColorSelect, selectedColor }) => {
   const navigate = useNavigate();
   const user = useSelector(selectUser);
   const isAuthenticated = !!user;
-  const userId = user?._id;
+  const userId = user?.id;
 
   const {
     data: wishlistData = [],

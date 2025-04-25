@@ -1,4 +1,4 @@
-// backend/models/couponModel.js
+
 const mongoose = require("mongoose");
 
 const couponSchema = new mongoose.Schema(
@@ -94,18 +94,6 @@ const couponSchema = new mongoose.Schema(
       default: 0,
       min: [0, "Total applied count cannot be negative"],
     },
-    applicableCategories: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Category",
-      },
-    ],
-    applicableProducts: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
-      },
-    ],
     customerType: {
       type: String,
       enum: {
@@ -123,6 +111,11 @@ const couponSchema = new mongoose.Schema(
       default: "active",
       required: [true, "Status is required"],
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    }
   },
   {
     timestamps: true,

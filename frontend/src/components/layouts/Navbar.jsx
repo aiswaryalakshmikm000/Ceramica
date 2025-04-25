@@ -10,6 +10,7 @@ import { useLogoutMutation } from "../../features/userAuth/userApiSlice";
 import { googleLogout } from "@react-oauth/google";
 import { toast } from "react-toastify";
 
+
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -24,10 +25,6 @@ const Navbar = () => {
   const user = useSelector(selectUser);
   const isAuthenticated = useSelector(selectIsUserAuthenticated);
   const [logout, { isLoading }] = useLogoutMutation();
-
-  // Debug user data
-  // console.log("User from Redux:", user);
-  // console.log("Is Authenticated:", isAuthenticated);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -44,12 +41,10 @@ const Navbar = () => {
   }, [location.pathname]);
 
   useEffect(() => {
-    console.log("Navbar user updated:", user);
   }, [user]);
 
   const handleLogoutClick = (e) => {
     e.preventDefault();
-    console.log("Logout clicked");
     setIsLogoutModalOpen(true);
   };
 
@@ -167,7 +162,7 @@ const Navbar = () => {
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           console.log("Image failed to load, using fallback");
-                          e.target.src = "";
+                          e.target.src = "https://via.placeholder.com/150?text=User";
                         }}
                       />
                     </div>
@@ -263,7 +258,7 @@ const Navbar = () => {
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             console.log("Mobile image failed to load, using fallback");
-                            e.target.src = "";
+                            e.target.src = "https://via.placeholder.com/150?text=User";
                           }}
                         />
                       </div>

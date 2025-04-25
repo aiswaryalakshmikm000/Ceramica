@@ -4,6 +4,7 @@ const User = require("../../models/userModel");
 
 const addAddress = async (req, res) => {
   const { user } = req.body;
+  console.log("UUUUUUSEr", user)
   try {
     const userExist = await User.findById(user);
     if (!userExist) {
@@ -74,7 +75,6 @@ const showAddresses = async (req, res) => {
 const editAddress = async (req, res) => {
   const { userId, addressId } = req.params; 
   try {
-    // Validate the incoming data
     const { error } = addressSchema.validate(req.body);
     if (error) {
       const errorMessages = error.details.map((err) => err.message);
@@ -87,7 +87,6 @@ const editAddress = async (req, res) => {
 
     const data = req.body;
 
-    // Ensure the address belongs to the user (optional security check)
     const existingAddress = await Address.findOne({ _id: addressId, user: userId });
     if (!existingAddress) {
       return res.status(404).json({
@@ -95,19 +94,16 @@ const editAddress = async (req, res) => {
         message: "Address not found or does not belong to this user",
       });
     }
-    // If the updated address is set as default, reset all other addresses
     if (data.isDefault === true) {
       await Address.updateMany(
-        { user: userId, _id: { $ne: addressId } }, // Exclude the current address
+        { user: userId, _id: { $ne: addressId } }, 
         { isDefault: false }
       );
     }
     
-
-    // Update the address
     const updatedAddress = await Address.findByIdAndUpdate(
       addressId,
-      { ...data, user: userId }, // Ensure user field is preserved
+      { ...data, user: userId }, 
       { new: true }
     ).select("-createdAt -updatedAt -__v");
 
@@ -144,13 +140,11 @@ const deleteAddress =async(req,res)=>{
 const setDefaultAddress = async (req, res) => {
   const { addressId } = req.params;
   try {
-    // Set all addresses for the user to non-default
     await Address.updateMany(
       { user: req.user._id }, 
       { isDefault: false }
     );
     
-    // Set the specified address as default
     const updatedAddress = await Address.findByIdAndUpdate(
       addressId,
       { isDefault: true },

@@ -33,14 +33,12 @@ const ResetPasswordModal = ({
   };
 
   const handleSubmit = async (values, { setSubmitting }) => {
-    console.log("handle submit from reset password modal");
     try {
       const response = await resetPasswordMutation({
         email,
         password: values.password,
       }).unwrap();
       onResetSuccess(response);
-      console.log("reset password from reset modal");
       setTimeout(() => {
         closeModal();
         navigate("/login");

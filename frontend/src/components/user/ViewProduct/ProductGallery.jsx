@@ -46,7 +46,7 @@ const ProductGallery = ({ images, isNew, discount }) => {
 
   const handleMouseLeave = () => {
     setZoomed(false);
-    setZoomPosition({ x: '50%', y: '50%' }); // Reset position when leaving
+    setZoomPosition({ x: '50%', y: '50%' }); 
   };
   
   const nextImage = () => {
@@ -68,7 +68,7 @@ const ProductGallery = ({ images, isNew, discount }) => {
     <div className="w-full lg:w-1/2 animate-fade-in">
       <div 
         className="relative rounded-lg overflow-hidden mb-4 product-zoom-container h-[400px] md:h-[500px]"
-        onMouseMove={handleZoom} // Always update position while hovering
+        onMouseMove={handleZoom} 
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         ref={mainImageRef}
@@ -80,7 +80,7 @@ const ProductGallery = ({ images, isNew, discount }) => {
           className={`w-full h-full object-cover transition-transform duration-100 ${zoomed ? 'zoomed' : ''} ${imagesLoaded[activeIndex] ? 'image-loaded' : 'image-loading'}`}
           style={{ 
             transformOrigin: `${zoomPosition.x} ${zoomPosition.y}`,
-            transform: zoomed ? 'scale(2)' : 'scale(1)', // Apply transform directly
+            transform: zoomed ? 'scale(2)' : 'scale(1)',
           }}
         />
 

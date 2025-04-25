@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ProductCard from "../../common/ProductCard";
 
-const RelatedProducts = ({ products }) => {
+const RelatedProducts = ({ products , refetch}) => {
 
   const scrollContainerRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);

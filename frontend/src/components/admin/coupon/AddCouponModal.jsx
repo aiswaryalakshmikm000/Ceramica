@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+
+import React, { useState } from "react";
 import { useCreateCouponMutation } from "../../../features/adminAuth/adminCouponApiSlice";
-import { useGetCategoriesQuery } from "../../../features/adminAuth/AdminCategoryApiSlice";
-import { useShowProductsQuery } from "../../../features/adminAuth/adminProductApiSlice";
 import { toast } from "react-toastify";
-import { X, ChevronDown } from "lucide-react";
+import { X } from "lucide-react";
 
 const AddCouponModal = ({ closeModal }) => {
   const [formData, setFormData] = useState({
@@ -19,47 +18,15 @@ const AddCouponModal = ({ closeModal }) => {
     expiryDate: "",
     maxUsagePerUser: 1,
     usageLimit: "",
-    applicableCategories: [],
-    applicableProducts: [],
   });
 
   const [error, setError] = useState("");
-  const { data: categoriesData, isLoading: categoriesLoading } = useGetCategoriesQuery();
-  const { data: productsData, refetch: refetchProducts } = useShowProductsQuery({
-    categoryIds: formData.applicableCategories.join(",") || undefined,
-  });
   const [createCoupon, { isLoading: isCreating }] = useCreateCouponMutation();
 
-  useEffect(() => {
-    if (formData.applicableCategories.length > 0) {
-      refetchProducts();
-    }
-  }, [formData.applicableCategories, refetchProducts]);
-
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    if (type === "checkbox" && name === "applicableCategories") {
-      setFormData((prev) => {
-        const updatedCategories = checked
-          ? [...prev.applicableCategories, value]
-          : prev.applicableCategories.filter((id) => id !== value);
-        return {
-          ...prev,
-          applicableCategories: updatedCategories,
-          applicableProducts: [],
-        };
-      });
-    } else if (type === "checkbox" && name === "applicableProducts") {
-      setFormData((prev) => ({
-        ...prev,
-        applicableProducts: checked
-          ? [...prev.applicableProducts, value]
-          : prev.applicableProducts.filter((id) => id !== value),
-      }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
-    setError(""); 
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setError("");
   };
 
   const validateForm = () => {
@@ -77,15 +44,12 @@ const AddCouponModal = ({ closeModal }) => {
       maxUsagePerUser,
     } = formData;
 
-    // Coupon code validation
     if (!code) return "Coupon code is required";
     if (code.length < 3 || code.length > 20) return "Coupon code must be between 3 and 20 characters";
 
-    // Description validation
     if (!description) return "Description is required";
     if (description.length > 500) return "Description cannot exceed 500 characters";
 
-    // Discount type and related fields
     if (!discountType) return "Discount type is required";
     if (discountType === "flat") {
       if (!discountValue || discountValue < 1) return "Discount value must be at least 1 for flat discount";
@@ -98,19 +62,16 @@ const AddCouponModal = ({ closeModal }) => {
       }
     }
 
-    // Minimum purchase amount
     if (!minPurchaseAmount || minPurchaseAmount < 0) {
       return "Minimum purchase amount is required and cannot be negative";
     }
 
-    // Dates
     if (!validFrom) return "Valid from date is required";
     if (!expiryDate) return "Expiry date is required";
     if (new Date(expiryDate) <= new Date(validFrom)) {
       return "Expiry date must be after valid from date";
     }
 
-    // Usage limits
     if (!usageLimit || usageLimit < 1) return "Usage limit must be at least 1";
     if (!maxUsagePerUser || maxUsagePerUser < 1) return "Max usage per user must be at least 1";
 
@@ -136,11 +97,6 @@ const AddCouponModal = ({ closeModal }) => {
       toast.error(err?.data?.message || "Failed to create coupon");
     }
   };
-
-  const categories = Array.isArray(categoriesData)
-    ? categoriesData
-    : categoriesData?.categories || [];
-  const products = productsData?.products || [];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -347,70 +303,6 @@ const AddCouponModal = ({ closeModal }) => {
                 className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3c73a8]"
                 required
               />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Applicable Categories
-            </label>
-            <div className="mt-2 max-h-40 overflow-y-auto border border-gray-300 rounded-md p-2">
-              {categoriesLoading ? (
-                <p>Loading categories...</p>
-              ) : categories.length > 0 ? (
-                categories.map((category) => (
-                  <label
-                    key={category._id}
-                    className="flex items-center gap-2 py-1"
-                  >
-                    <input
-                      type="checkbox"
-                      name="applicableCategories"
-                      value={category._id}
-                      checked={formData.applicableCategories.includes(
-                        category._id
-                      )}
-                      onChange={handleChange}
-                      className="h-4 w-4 text-[#3c73a8] focus:ring-[#3c73a8]"
-                    />
-                    {category.name}
-                  </label>
-                ))
-              ) : (
-                <p>No categories available</p>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Applicable Products
-            </label>
-            <div className="mt-2 max-h-40 overflow-y-auto border border-gray-300 rounded-md p-2">
-              {formData.applicableCategories.length === 0 ? (
-                <p>Please select at least one category to view products</p>
-              ) : products.length > 0 ? (
-                products.map((product) => (
-                  <label
-                    key={product._id}
-                    className="flex items-center gap-2 py-1"
-                  >
-                    <input
-                      type="checkbox"
-                      name="applicableProducts"
-                      value={product._id}
-                      checked={formData.applicableProducts.includes(
-                        product._id
-                      )}
-                      onChange={handleChange}
-                      className="h-4 w-4 text-[#3c73a8] focus:ring-[#3c73a8]"
-                    />
-                    {product.name}
-                  </label>
-                ))
-              ) : (
-                <p>No products available for selected categories</p>
-              )}
             </div>
           </div>
 

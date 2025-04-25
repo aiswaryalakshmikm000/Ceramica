@@ -3,6 +3,7 @@ import { userApi } from '../../services/api/userApi';
 
 export const userOrderApiSlice = userApi.injectEndpoints({
   endpoints: (builder) => ({
+
     createRazorpayOrder: builder.mutation({
       query: (orderData) => ({
         url: '/orders/create-razorpay-order',
@@ -11,6 +12,7 @@ export const userOrderApiSlice = userApi.injectEndpoints({
       }),
       invalidatesTags: ['Cart'],
     }),
+
     verifyRazorpayPayment: builder.mutation({
       query: (paymentData) => ({
         url: '/orders/verify-razorpay-payment',
@@ -19,6 +21,15 @@ export const userOrderApiSlice = userApi.injectEndpoints({
       }),
       invalidatesTags: ['Order', 'Cart'],
     }),
+
+    retryRazorpayPayment: builder.mutation({
+      query: ({orderNumber, userId}) => ({
+        url: `orders/retry-razorpay-payment`,
+        method: 'POST',
+        body: {orderNumber, userId}
+      }),
+    }),
+
     placeCODOrder: builder.mutation({
       query: (orderData) => ({
         url: '/orders/cod',
@@ -27,6 +38,7 @@ export const userOrderApiSlice = userApi.injectEndpoints({
       }),
       invalidatesTags: ['Cart', 'Order'],
     }),
+
     placeWalletOrder: builder.mutation({
       query: (orderData) => ({
         url: '/orders/wallet',
@@ -35,10 +47,14 @@ export const userOrderApiSlice = userApi.injectEndpoints({
       }),
       invalidatesTags: ['Cart', 'Order'],
     }),
+
     getUserOrders: builder.query({
-      query: () => '/orders',
+      query: ({page =1, limit =10}) => ({
+        url : `/orders?page=${page}&limit=${limit}`
+      }),
       providesTags: ['Order'],
     }),
+
     getOrderById: builder.query({
       query: (orderId) => `/orders/${orderId}`,
       providesTags: ['Order'],
@@ -51,6 +67,7 @@ export const userOrderApiSlice = userApi.injectEndpoints({
       }),
       invalidatesTags: ['Order', 'Product'],
     }),
+
     cancelOrderItem: builder.mutation({
       query: ({ orderId, itemId, cancelProductReason }) => ({
         url: '/orders/cancel-item',
@@ -58,6 +75,7 @@ export const userOrderApiSlice = userApi.injectEndpoints({
         body: { orderId, itemId, cancelProductReason },
       }),
     }),
+
     requestReturn: builder.mutation({
       query: ({ orderId, reason, comment }) => ({
         url: `/orders/${orderId}/return`,
@@ -73,6 +91,7 @@ export const userOrderApiSlice = userApi.injectEndpoints({
         body: { orderId, itemId, reason },
       }),
     }),
+    
     downloadInvoice: builder.mutation({
       query: (orderId) => ({
         url: `/orders/${orderId}/invoice`,
@@ -86,6 +105,7 @@ export const userOrderApiSlice = userApi.injectEndpoints({
 export const {
   useCreateRazorpayOrderMutation,
   useVerifyRazorpayPaymentMutation,
+  useRetryRazorpayPaymentMutation,
   usePlaceCODOrderMutation,
   usePlaceWalletOrderMutation,
   useGetUserOrdersQuery,

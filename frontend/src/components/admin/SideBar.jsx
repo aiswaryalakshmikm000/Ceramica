@@ -7,7 +7,7 @@ import {
   Package, 
   Tag, 
   Star, 
-  Settings, 
+  BarChart, 
   Percent, 
   Gift,
   ChevronLeft,
@@ -36,7 +36,7 @@ const SideBar = () => {
     { label: 'Categories', icon: <Tag size={20} />, path: '/admin/categories' },
     { label: 'Wallet', icon: <Wallet size={20} />, path: '/admin/wallet' },
     { label: 'Product Reviews', icon: <Star size={20} />, path: '/admin/reviews' },
-    { label: 'Settings', icon: <Settings size={20} />, path: '/admin/settings' },
+    { label: 'Sales Report', icon: <BarChart size={20} />, path: '/admin/sales-report' },
     { label: 'Offers', icon: <Gift size={20} />, path: '/admin/offers' },
     { label: 'Coupons', icon: <Percent size={20} />, path: '/admin/coupons' },
     { 

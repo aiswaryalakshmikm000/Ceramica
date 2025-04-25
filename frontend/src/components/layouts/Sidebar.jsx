@@ -11,6 +11,7 @@ import {
   Ticket,
   ChevronRight,
   ShoppingCart,
+  Share2,
   X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion"; 
@@ -18,7 +19,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
   const user = useSelector(selectUser);
-  const userId = user?._id;
+  const userId = user?.id;
 
   const menuItems = [
     {
@@ -55,6 +56,11 @@ const Sidebar = ({ isOpen, onClose }) => {
       title: "Coupons",
       icon: <Ticket size={20} />,
       path: userId ? "/coupons" : "/login"
+    },
+    {
+      title: "Refer & Earn",
+      icon: <Share2 size={20} />,
+      path: userId ? "/refer-and-earn" : "/login"
     },
   ];
 
@@ -162,7 +168,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                       <Link 
                         to={item.path} 
                         onClick={onClose}
-                        className={`flex items-center justify-between w-full p-4 rounded-lg transition-all duration-300 group
+                        className={`flex items-center justify-between w-full p-3 rounded-lg transition-all duration-300 group
                           ${location.pathname === item.path 
                             ? 'bg-orange-800/90 text-white' 
                             : 'hover:bg-orange-800/10'}`}

@@ -6,7 +6,7 @@ import { Download, ExternalLink } from "lucide-react";
 import { toast } from "react-toastify";
 import Breadcrumbs from "../../common/BreadCrumbs";
 import Fallback from "../../common/Fallback";
-import OrderItems from "./OrderItems"; 
+import OrderItems from "./OrderItems";
 import OrderInfo from "./OrderInfo";
 import ShippingInfo from "./ShippingInfo";
 import PaymentInfo from "./PaymentInfo";
@@ -29,7 +29,13 @@ const OrderDetailPage = () => {
   const [itemReturnReasons, setItemReturnReasons] = useState({});
   const [selectedItemId, setSelectedItemId] = useState(null);
 
-  const { data: orderData, isLoading, isError, error, refetch } = useGetOrderByIdQuery(orderId);
+  const {
+    data: orderData,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetOrderByIdQuery(orderId);
   const order = orderData?.data;
 
   const [cancelOrder] = useCancelOrderMutation();
@@ -43,7 +49,9 @@ const OrderDetailPage = () => {
       <Fallback
         isLoading={isLoading}
         error={isError ? error : null}
-        emptyMessage={!order && !isError && !isLoading ? "Order not found" : null}
+        emptyMessage={
+          !order && !isError && !isLoading ? "Order not found" : null
+        }
         emptyActionText="Back to Orders"
         emptyActionPath="/orders"
       />
@@ -78,7 +86,11 @@ const OrderDetailPage = () => {
       toast.success(`Return request for order ${order.orderNumber} submitted`);
       setReturnReason("");
     } catch (err) {
-      toast.error(`Failed to submit return request: ${err.data?.message || "Unknown error"}`);
+      toast.error(
+        `Failed to submit return request: ${
+          err.data?.message || "Unknown error"
+        }`
+      );
     }
   };
 
@@ -95,24 +107,31 @@ const OrderDetailPage = () => {
       toast.success(`Order ${order.orderNumber} cancelled successfully`);
       setCancelReason("");
     } catch (err) {
-      toast.error(`Failed to cancel order: ${err.data?.message || "Unknown error"}`);
+      toast.error(
+        `Failed to cancel order: ${err.data?.message || "Unknown error"}`
+      );
     }
   };
 
   const handleDownloadInvoice = async () => {
     try {
-      // Trigger the download manually using the RTK Query endpoint
-      const response = await downloadInvoice(orderId).unwrap(); // Pass orderId directly
-      const url = window.URL.createObjectURL(new Blob([response], { type: 'application/pdf' }));
-      const link = document.createElement('a');
+      const response = await downloadInvoice(orderId).unwrap();
+      const url = window.URL.createObjectURL(
+        new Blob([response], { type: "application/pdf" })
+      );
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', `invoice-${order.orderNumber}.pdf`);
+      link.setAttribute("download", `invoice-${order.orderNumber}.pdf`);
       document.body.appendChild(link);
       link.click();
       link.remove();
-      toast.success(`Invoice for order ${order.orderNumber} has been downloaded`);
+      toast.success(
+        `Invoice for order ${order.orderNumber} has been downloaded`
+      );
     } catch (err) {
-      toast.error(`Failed to download invoice: ${err.data?.message || 'Unknown error'}`);
+      toast.error(
+        `Failed to download invoice: ${err.data?.message || "Unknown error"}`
+      );
     }
   };
 
@@ -130,7 +149,9 @@ const OrderDetailPage = () => {
           <div className="mb-6 border-b border-gray-100 pb-4">
             <div className="flex justify-between items-start">
               <div>
-                <h2 className="text-2xl font-semibold text-gray-800">Order #{order.orderNumber}</h2>
+                <h2 className="text-2xl font-semibold text-gray-800">
+                  Order #{order.orderNumber}
+                </h2>
                 <Breadcrumbs items={breadcrumbItems} />
               </div>
               <div className="text-right space-y-2">
@@ -143,8 +164,7 @@ const OrderDetailPage = () => {
                   <Download size={14} className="mr-2" />
                   Download Invoice
                 </Button>
-                <div className="text-sm text-gray-500">
-                </div>
+                <div className="text-sm text-gray-500"></div>
               </div>
             </div>
           </div>
@@ -165,22 +185,23 @@ const OrderDetailPage = () => {
             />
             <div className="lg:col-span-1 py-11">
               <div className="sticky top-6 space-y-6">
-              <OrderInfo order={order} />
-              <PaymentInfo order={order} />
+                <OrderInfo order={order} />
+                <PaymentInfo order={order} />
                 <ShippingInfo order={order} />
-               
               </div>
             </div>
           </div>
 
-{/* Return Summary */}
-<ReturnSummary order={order} formatDate={formatDate} />
+          {/* Return Summary */}
+          <ReturnSummary order={order} formatDate={formatDate} />
 
           {/* Full Order Actions */}
           <div className="space-y-6 py-4">
             {canReturn && (
               <div className="bg-gray-50 rounded-lg p-4 shadow-sm">
-                <h3 className="text-lg font-medium text-gray-700 mb-2">Return Order</h3>
+                <h3 className="text-lg font-medium text-gray-700 mb-2">
+                  Return Order
+                </h3>
                 <Textarea
                   placeholder="Reason for return..."
                   value={returnReason}
@@ -198,7 +219,9 @@ const OrderDetailPage = () => {
             )}
             {canCancel && (
               <div className="bg-gray-50 rounded-lg p-4 shadow-sm">
-                <h3 className="text-lg font-medium text-gray-700 mb-2">Cancel Order</h3>
+                <h3 className="text-lg font-medium text-gray-700 mb-2">
+                  Cancel Order
+                </h3>
                 <Textarea
                   placeholder="Reason for cancellation..."
                   value={cancelReason}

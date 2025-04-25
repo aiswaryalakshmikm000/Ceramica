@@ -3,17 +3,18 @@ const upload =require('../config/multerConfig')
 
 const authenticateToken =require('../middlewares/user/authMiddleware')
 
-const { sendOTP, checkAuth, register, verifyOTP,logout, login, forgetPassword, refreshUserToken, verifyResetOtp, resetPassword, verifyPassword, changePassword} = require('../controllers/user/authController')
+const { sendOTP, checkAuth, register, verifyOTP,logout, login, forgetPassword, refreshUserToken, verifyResetOtp, resetPassword, verifyPassword, changePassword } = require('../controllers/user/authController')
 const { googleAuth } = require("../controllers/user/googleController")
-const {showCategories} =require("../controllers/user/categoryController")
+const { showCategories } =require("../controllers/user/categoryController")
 const { fetchBestProducts, fetchFeaturedProducts, viewProduct,fetchProducts} =require('../controllers/user/productController')
-const {showProfile, editProfile} =require('../controllers/user/userController')
-const {addAddress, showAddresses, editAddress, deleteAddress, setDefaultAddress} = require('../controllers/user/addressController')
-const {checkoutValidation, addToCart, showCart, updateCart, removeItemFromCart} = require('../controllers/user/cartController')
-const {updateWishlistItem, removeWishlistItem, getWishlist, toggleWishlistItem} = require("../controllers/user/wishlistController");
-const {createRazorpayOrder, verifyRazorpayPayment, placeCODOrder, placeWalletOrder, getUserOrders, getOrderById, cancelOrder, cancelOrderItem, returnOrder, returnOrderItem, downloadInvoice} = require("../controllers/user/orderController");
-const { getUserCoupons, applyCoupon} = require("../controllers/user/userCouponController");
-const {fetchWallet, addFunds} = require ('../controllers/user/walletController')
+const { showProfile, editProfile } =require('../controllers/user/userController')
+const { addAddress, showAddresses, editAddress, deleteAddress, setDefaultAddress } = require('../controllers/user/addressController')
+const { checkoutValidation, addToCart, showCart, updateCart, removeItemFromCart } = require('../controllers/user/cartController')
+const { updateWishlistItem, removeWishlistItem, getWishlist, toggleWishlistItem } = require("../controllers/user/wishlistController");
+const { createRazorpayOrder, verifyRazorpayPayment, retryRazorpayPayment, placeCODOrder, placeWalletOrder, getUserOrders, getOrderById, cancelOrder, cancelOrderItem, returnOrder, returnOrderItem, downloadInvoice } = require("../controllers/user/orderController");
+const { getUserCoupons, applyCoupon } = require("../controllers/user/userCouponController");
+const { fetchWallet, addFunds } = require ('../controllers/user/walletController')
+const { getReferralInfo, applyReferralCode } = require('../controllers/user/referralController')
 
 const userRoute = express()
 
@@ -79,6 +80,7 @@ userRoute.post('/orders/cod', authenticateToken, placeCODOrder);
 userRoute.post('/orders/wallet', authenticateToken, placeWalletOrder);
 userRoute.post('/orders/create-razorpay-order', authenticateToken, createRazorpayOrder);
 userRoute.post('/orders/verify-razorpay-payment', authenticateToken, verifyRazorpayPayment);
+userRoute.post('/orders/retry-razorpay-payment', authenticateToken, retryRazorpayPayment);
 
 userRoute.put('/orders/:orderId/cancel', authenticateToken, cancelOrder);
 userRoute.put('/orders/:orderId/return', authenticateToken, returnOrder);
@@ -94,6 +96,8 @@ userRoute.post("/coupons/apply", authenticateToken, applyCoupon);
 userRoute.get('/wallet', authenticateToken, fetchWallet);
 userRoute.post('/wallet/add', authenticateToken, addFunds);
 
-
+//referral
+userRoute.get('/:userId/referral', authenticateToken, getReferralInfo)
+userRoute.post('/referrals/apply', authenticateToken, applyReferralCode)
 
 module.exports = userRoute

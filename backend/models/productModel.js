@@ -38,7 +38,7 @@ const productSchema = new mongoose.Schema(
           required: true,
           min: [0, "Stock cannot be negative"],
         },
-        images: [{ type: String, required: true }], // All images go here
+        images: [{ type: String, required: true }], 
       },
     ],
     sku: {

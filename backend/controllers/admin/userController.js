@@ -35,8 +35,6 @@ const editCustomerStatus = async (req, res) => {
 
 
   try {
-
-    // Check if userId is valid
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res
         .status(400)

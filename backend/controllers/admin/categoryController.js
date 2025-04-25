@@ -73,7 +73,6 @@ const listCategory = async (req, res) => {
 
   try {
 
-    // Validate MongoDB ObjectId
    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
     return res.status(400).json({ success: false, message: "Invalid category ID" });
   }
@@ -85,7 +84,6 @@ const listCategory = async (req, res) => {
         .json({ success: false, message: "Category not found" });
     }
 
-    // Toggle isListed status
     category.isListed = !category.isListed;
     await category.save();
 
@@ -148,12 +146,10 @@ const showCategory = async (req, res) => {
   const { catId } = req.params;
   try {
 
-    // Validate MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(catId)) {
         return res.status(400).json({ success: false, message: "Invalid category ID" });
     }
 
-    // Fetch category from the database
     const category = await Category.findById(catId);
     if (!category) {
       return res
@@ -161,7 +157,6 @@ const showCategory = async (req, res) => {
         .json({ success: false, message: "Category not found" });
     }
 
-    // Send response
     res
       .status(200)
       .json({ success: true, message: "Fetched category details", category });

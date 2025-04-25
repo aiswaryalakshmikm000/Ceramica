@@ -7,7 +7,7 @@ import ChangePasswordRequestModal from "./ChangePasswordRequestModal";
 import OTPEnterModal from "../OTPEnterModal";
 import ResetPasswordModal from "../ResetPasswordModal";
 import { useForgetPasswordMutation, useResetPasswordMutation } from "../../../features/userAuth/userApiSlice";
-import Breadcrumbs from "../../common/BreadCrumbs.jsx"; // Import the Breadcrumbs component
+import Breadcrumbs from "../../common/BreadCrumbs.jsx"; 
 
 const Profile = () => {
   const { id } = useParams();
@@ -102,7 +102,7 @@ const Profile = () => {
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold text-gray-800">My Profile</h2>
           </div>
-          <Breadcrumbs items={breadcrumbItems} /> {/* Add Breadcrumbs here */}
+          <Breadcrumbs items={breadcrumbItems} /> 
 
           <div className="flex flex-col md:flex-row">
             <div className="flex-1 pr-0 md:pr-6 mb-8 md:mb-0">

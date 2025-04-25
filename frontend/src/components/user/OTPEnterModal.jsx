@@ -18,13 +18,12 @@ const OTPEnterModal = ({ isOpen, closeModal, email, onVerifySuccess, flow }) => 
   const [resendOTP, { isLoading: isSendingReset }] = useResendOTPMutation();
   const [verifyResetOTP, { isLoading: isVerifyingReset }] = useVerifyResetOTPMutation();
 
-  // Determine flow dynamically
+
   const isRegisterFlow = location.pathname.includes("/register");
   const isResetFlow = location.pathname.includes("/forgot-password");
   const isEmailChangeFlow = flow === "emailChange";
   const isPasswordChangeFlow = flow === "passwordChange";
 
-  // Select appropriate mutation based on flow
   const verifyMutation = (isRegisterFlow || isEmailChangeFlow) ? verifyOTP : verifyResetOTP;
   const isVerifying = (isRegisterFlow || isEmailChangeFlow) ? isVerifyingRegister : isVerifyingReset;
 

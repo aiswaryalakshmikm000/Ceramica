@@ -20,9 +20,7 @@ export const adminProductApiSlice = adminApi.injectEndpoints({
     
     addProduct: builder.mutation({
       query: (productData) => {
-        console.log("FormData being sent:", productData); 
         for (let [key, value] of productData.entries()) {
-          console.log(`FormData entry - ${key}:`, value instanceof File ? `[File: ${value.name}]` : value);
         }
         return {
           url: "/products",
@@ -45,9 +43,7 @@ export const adminProductApiSlice = adminApi.injectEndpoints({
     }),
     editProduct: builder.mutation({
       query: ({ _id, productData }) => {
-        console.log("FormData being sent:", productData);
         for (let [key, value] of productData.entries()) {
-          console.log(`FormData entry - ${key}:`, value instanceof File ? `[File: ${value.name}]` : value);
         }
         return {
           url: `/products/${_id}`,

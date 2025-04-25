@@ -16,7 +16,7 @@ import Breadcrumbs from "../../common/BreadCrumbs";
 
 const Wishlist = () => {
   const user = useSelector(selectUser);
-  const userId = user?._id;
+  const userId = user?.id;
   const navigate = useNavigate();
 
   const { data, isLoading, error, refetch } = useFetchWishlistQuery(userId, {

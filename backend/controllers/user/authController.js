@@ -16,14 +16,17 @@ const { generateAccessToken, generateRefreshToken } = require("../../utils/jwt/g
 const generateOTP = require("../../utils/otp/generateOTP");
 const sendVerificationEmail = require("../../utils/nodemailer/sendVarificationEmail");
 const sendResetPasswordMail = require("../../utils/nodemailer/forgetPassword");
+const generateReferralCode = require('../../utils/services/genrateReferralCode')
 
-
-//signup function
 const register = async (req, res) => {
   const { name, email, phone, password } = req.body;
   const file = req.file;
+  console.log("$############# req.file",  req.file)
+  console.log("$############# req.body", req.body)
 
   if (!name || !email || !phone || !password) {
+    console.log("All fields are required")
+
     return res.status(400).json({
       success: false,
       message: "All fields are required",
@@ -35,6 +38,7 @@ const register = async (req, res) => {
       $or: [{ email }, { phone }],
     });
     if (existingUser) {
+      console.log("Email or phone number already exists")
       return res.status(409).json({
         success: false,
         message: "Email or phone number already exists",
@@ -46,7 +50,11 @@ const register = async (req, res) => {
       imageUrl = await cloudinaryImageUploadMethod(file.buffer);
     }
 
+    console.log("imageUrl 3333333333333333333333", imageUrl)
+
     const securePassword = await hashPassword(password);
+
+    console.log("securePassword", securePassword)
 
     const newUser = await User.create({
       name,
@@ -56,6 +64,13 @@ const register = async (req, res) => {
       images: imageUrl || "",
       isVerified: false,
     });
+
+    console.log("newUser", newUser)
+
+    const referralCode = await generateReferralCode(newUser._id);
+    newUser.referralCode = referralCode;
+    await newUser.save();
+    console.log("newUser", newUser)
 
     res.json({
       success: true,
@@ -67,16 +82,17 @@ const register = async (req, res) => {
         phone: newUser.phone,
         role: newUser.role,
         images: newUser.images,
+        referralCode: newUser.referralCode,
       },
     });
   } catch (error) {
+    console.log('ewdeeeeeeeeeeee',error)
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 
 
 
-//login function
 const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -90,6 +106,7 @@ const login = async (req, res) => {
   try {
 
     const userExist = await User.findOne({ email });
+    console.log("$$$$$$$$$$$$$$$$$$$4  userExist", userExist)
 
     if (!userExist) {
       return res.status(404).json({
@@ -135,6 +152,7 @@ const login = async (req, res) => {
       id: userExist._id,
       email: userExist.email,
       role: userExist.role,
+      referredBy: userExist.referredBy || null,
     };
     const accessToken = generateAccessToken(userData);
     const refreshToken = generateRefreshToken(userData);
@@ -152,19 +170,20 @@ const login = async (req, res) => {
     await newRefreshToken.save();
 
     // Use setCookie function to store tokens
-    setCookie("userAccessToken", accessToken, 15 * 60 * 1000, res); 
+    setCookie("userAccessToken", accessToken, 1 * 60 * 1000, res); 
     setCookie("userRefreshToken", refreshToken, 7 * 24 * 60 * 60 * 1000, res); 
 
     return res.status(200).json({
       success: true,
       message: "Login successful",
       user: {
-        _id: userExist._id,
+        id: userExist._id,
         name: userExist.name,
         email: userExist.email,
         phone: userExist.phone,
         role: userExist.role,
         images: userExist.images,
+        referredBy: userExist.referredBy,
       },
     });
   } catch (error) {
@@ -232,28 +251,31 @@ const refreshUserToken = async (req, res) => {
       expiresAt: { $gt: new Date() },
     });
 
+
     if (!storedToken) {
       return res.status(403).json({ success: false, error: "Invalid refresh token" });
     }
 
     // Fetch user from the database
-    const userDoc = await User.findById(userId).select("email role name");
+    const userDoc = await User.findById(userId).select("email role name phone images isBlocked");
     if (!userDoc) {
       return res.status(404).json({ success: false, error: "User not found" });
     }
 
     const user = {
-      id: userId,
+      id: userDoc._id,
+      name: userDoc.name,
       email: userDoc.email,
+      phone: userDoc.phone,
       role: userDoc.role,
-      name: userDoc.name 
+      images: userDoc.images,
+      isBlocked: userDoc.isBlocked,
+      referredBy: userDoc.referredBy || null,
     };
-
-    // Generate new access token
+    
     const newAccessToken = generateAccessToken(user);
 
-    // Set new access token in a cookie
-    setCookie("userAccessToken", newAccessToken, 15 * 60 * 1000, res); 
+    setCookie("userAccessToken", newAccessToken, 1 * 60 * 1000, res); 
 
     res.status(200).json({ success: true, message: "Access token refreshed", user: user });
 
@@ -263,7 +285,6 @@ const refreshUserToken = async (req, res) => {
 };
 
 
-//generate-otp
 const sendOTP = async (req, res) => {
   const { email } = req.body;
   if (!validator.isEmail(email)) {
@@ -289,7 +310,6 @@ const verifyOTP = async (req, res) => {
   const { otp, email } = req.body;
   try {
     const otpData = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1);
-    //verifying otp
     if (!otpData.length || otp !== otpData[0].otp) {
       const errorMessage = otpData.length ? "OTP is not valid" : "OTP expired";
       return res.status(400).json({ success: false, message: errorMessage });
@@ -318,7 +338,6 @@ const forgetPassword=async(req,res)=>{
     if(!email){
       return res.status(400).json({success:false,error:"Invalid credentials"})
     }
-    //find user exist
    const user= await User.findOne({email})
    if(!user){
     return res.status(404).json({success:false, message:'User doesnot exist'})
@@ -332,12 +351,11 @@ const forgetPassword=async(req,res)=>{
   }
 
   const otp=generateOTP();
-  //generate otp
   await OTP.create({
     email,
     otp
    })
-    //send mail with to email
+
     sendResetPasswordMail(email,otp)
     res.status(201).json({ success: true, message: "OTP sent to email successfully" });
   } catch (error) {
@@ -348,7 +366,6 @@ const forgetPassword=async(req,res)=>{
 const verifyResetOtp=async(req,res)=>{
   const {email,otp}=req.body;
   try {
-    //check otp with email and otp and newest otp
    const otpData= await OTP.findOne({  email}).sort({createdAt:-1}).limit(1)
    
    if(otp!=otpData.otp || !otpData?.otp.length){
@@ -389,9 +406,6 @@ const resetPassword=async(req,res)=>{
   }
 }
 
-
-
-
 const verifyPassword=async(req,res)=>{
   const{userId}=req.params
   const{currentPassword}=req.body;
@@ -426,6 +440,8 @@ if(currentPassword===newPassword){
 }
   try {
     const user=await User.findById(userId)
+    console.log("UUUUUUUUUUUUUUUUUserr", user)
+
     if(!user){
       return res.status(404).json({success:false, message:"User not found"})
     }
@@ -441,7 +457,7 @@ if(currentPassword===newPassword){
 const checkAuth = async (req, res) => {
   try {
     const userId = req.user.id; 
-    const user = await User.findById(userId).select('name email role phone images isBlocked');
+    const user = await User.findById(userId).select('name email role phone images isBlocked referredBy');
 
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
@@ -454,13 +470,14 @@ const checkAuth = async (req, res) => {
     return res.status(200).json({
       success: true,
       user: {
-        _id: user._id,
+        id: user._id,
         name: user.name,
         email: user.email,
         phone: user.phone,
         role: user.role,
         images: user.images,
-        isBlocked: user.isBlocked
+        isBlocked: user.isBlocked,
+        referredBy: user.referredBy || null,
       },
     });
   } catch (error) {

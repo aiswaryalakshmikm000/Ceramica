@@ -3,7 +3,6 @@ const Admin = require("../../models/adminModel");
 const RefreshToken = require("../../models/refreshTokenModel");
 const jwt = require("jsonwebtoken");
 
-//utils
 const hashPassword = require("../../utils/hashPassword");
 const {
   generateAccessToken,
@@ -14,7 +13,7 @@ const setCookie = require("../../utils/jwt/setCookie");
 const register = async (req, res) => {
   const { name, email, password, phone } = req.body;
 
-  // Validate required fields
+
   if (!name || !email || !phone || !password) {
     return res.status(400).json({
       success: false,
@@ -36,7 +35,6 @@ const register = async (req, res) => {
 
     const securePassword = await hashPassword(password);
 
-    // Create a new admin
     const newAdmin = await Admin.create({
       name,
       email,
@@ -45,7 +43,6 @@ const register = async (req, res) => {
       role: "admin",
     });
 
-    // Send response with admin details (without tokens)
     res.status(201).json({
       success: true,
       message: "Admin registered successfully",
@@ -54,7 +51,7 @@ const register = async (req, res) => {
         name: newAdmin.name,
         email: newAdmin.email,
         phone: newAdmin.phone,
-        role: newAdmin.role, // Always "admin"
+        role: newAdmin.role, 
       },
     });
   } catch (error) {
@@ -146,10 +143,8 @@ const logout = async (req, res) => {
       return res.status(400).json({ message: "No refresh token found" });
     }
 
-    // Remove the refresh token from the database
     await RefreshToken.deleteOne({ token: adminRefreshToken });
 
-    // Clear access and refresh tokens from cookies
     res.clearCookie("adminAccessToken", {
       httpOnly: true,
       secure: true,
@@ -181,16 +176,15 @@ const refreshAccessToken = async (req, res) => {
   }
 
   try {
-    // Verify the refresh token
     const decoded = jwt.verify(refreshToken, process.env.ADMIN_REFRESH_TOKEN_KEY);
     const admin_id = decoded.user.id;
 
-    // Check if the refresh token exists in the database and is valid
+
     const storedToken = await RefreshToken.findOne({
       token: refreshToken,
       user: admin_id,
       role: "admin",
-      expiresAt: { $gt: new Date() }, // Fix newDate() -> new Date()
+      expiresAt: { $gt: new Date() }, 
     });
 
     if (!storedToken) {
@@ -199,13 +193,11 @@ const refreshAccessToken = async (req, res) => {
         .json({ success: false, error: "Invalid refresh token" });
     }
 
-    // Fetch admin from the database
-    const adminDoc = await Admin.findById(admin_id).select("email role name"); // Error: Admin model not defined?
+    const adminDoc = await Admin.findById(admin_id).select("email role name"); 
     if (!adminDoc) {
       return res.status(404).json({ success: false, error: "Admin not found" });
     }
 
-    // Construct the admin object
     const admin = {
       id: admin_id,
       email: adminDoc.email,
@@ -213,10 +205,8 @@ const refreshAccessToken = async (req, res) => {
       name: adminDoc.name,
     };
 
-    // Generate a new access token
     const newAccessToken = await generateAccessToken(admin);
 
-    // Use setCookie function to store the new access token
     setCookie("adminAccessToken", newAccessToken, 30 * 60 * 1000, res);
 
     res.status(200).json({ success: true, message: "Access token refreshed", admin });
@@ -231,7 +221,7 @@ const refreshAccessToken = async (req, res) => {
 
 const checkAuth = async (req, res) => {
   try {
-    const adminId = req.user.id; // From authenticateAdminToken middleware
+    const adminId = req.user.id; 
     const admin = await Admin.findById(adminId).select('name email role');
 
     if (!admin) {

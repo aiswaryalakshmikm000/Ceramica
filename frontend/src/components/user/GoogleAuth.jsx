@@ -5,7 +5,6 @@ import { useDispatch } from "react-redux";
 import { setUserCredentials } from "../../features/userAuth/userAuthSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import GoogleIcon from "../../assets/google-icon.png";
 
 const GoogleAuth = () => {
   const [googleAuth, { isLoading }] = useGoogleAuthMutation();
@@ -42,7 +41,7 @@ const GoogleAuth = () => {
             disabled={renderProps.disabled || isLoading}
             className="group relative w-full flex justify-center py-3 px-4 border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 bg-white/80 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-all duration-300 shadow-md hover:shadow-lg"
           >
-            <img src={GoogleIcon} alt="Google" className="w-5 h-5 mr-2" />
+            <img src="https://www.google.con/favicon.ico" alt="Google" className="w-5 h-5 mr-2" />
             {isLoading ? "Signing in..." : "Sign in with Google"}
           </button>
         )}

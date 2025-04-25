@@ -24,7 +24,7 @@ const authenticateToken = (req, res, next) => {
         }
         console.log('User Middleware - Token decoded:', decoded);
         req.user = decoded.user; 
-        console.log(req.user);
+        // console.log(req.user);
         next(); 
     });
 };

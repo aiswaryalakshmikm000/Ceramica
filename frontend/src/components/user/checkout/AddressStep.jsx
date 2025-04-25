@@ -12,7 +12,7 @@ import AddressForm from "../address/AddressForm";
 import { toast } from "react-toastify";
 import Modal from "../../common/Modal";
 
-const AddressStep = ({ addresses, selectedAddress, setSelectedAddress, onNext }) => {
+const AddressStep = ({ addresses, selectedAddress, setSelectedAddress, onNext, userId }) => {
   const user = useSelector(selectUser);
   const [isAddingAddress, setIsAddingAddress] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
@@ -43,22 +43,21 @@ const AddressStep = ({ addresses, selectedAddress, setSelectedAddress, onNext })
 
   const handleDeleteClick = (addressId) => {
     setAddressToDelete(addressId);
-    setShowDeleteModal(true); // Show the modal
+    setShowDeleteModal(true); 
   };
 
   const handleDeleteAddress = async () => {
     try {
-      const result = await deleteAddress({ userId: user._id, addressId: addressToDelete }).unwrap();
+      const result = await deleteAddress({ userId: user.id, addressId: addressToDelete }).unwrap();
       toast.success(result.message || "Address deleted successfully");
-      setShowDeleteModal(false); // Close the modal
-      setAddressToDelete(null); // Clear the address to delete
-      // If the deleted address was selected, clear the selection
+      setShowDeleteModal(false); 
+      setAddressToDelete(null);
       if (selectedAddress && selectedAddress._id === addressToDelete) {
         setSelectedAddress(null);
       }
     } catch (err) {
       toast.error(err?.data?.message || "Failed to delete address");
-      setShowDeleteModal(false); // Close the modal even on error
+      setShowDeleteModal(false); 
       setAddressToDelete(null);
     }
   };
@@ -78,7 +77,7 @@ const AddressStep = ({ addresses, selectedAddress, setSelectedAddress, onNext })
           setFormData={setFormData}
           handleCloseForm={handleCloseForm}
           editingAddress={editingAddress}
-          userId={user._id}
+          userId={user.id}
           addAddress={addAddress}
           updateAddress={updateAddress}
         />
@@ -129,7 +128,7 @@ const AddressStep = ({ addresses, selectedAddress, setSelectedAddress, onNext })
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDeleteClick(address._id); // Trigger modal instead of direct delete
+                          handleDeleteClick(address._id); 
                         }}
                         className="text-red-500 hover:text-red-600"
                       >

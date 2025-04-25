@@ -42,7 +42,6 @@ const editProfile=async(req,res)=>{
    
    let imageUrl = user.images;
    if (file) {
-     // Delete old image if it exists
      if (user.images) {
        await cloudinaryDeleteImages([user.images]);
      }
@@ -64,8 +63,6 @@ const editProfile=async(req,res)=>{
     res.status(500).json({message:"Internal servere error",error})
   }
 }
-
-
 
 module.exports= {
     showProfile,

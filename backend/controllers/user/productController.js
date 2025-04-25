@@ -12,11 +12,13 @@ const viewProduct = async (req, res) => {
 
   try {
     if (!id) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid product id." });
+      return res.status(400).json({ success: false, message: "Invalid product id." });
     }
-    let product = await Product.findOne({ _id: id, isListed: true }).populate({
+    let product = await Product.findOne({ _id: id, isListed: true })
+    .select(
+      "_id name price discount discountedPrice colors primaryImage totalStock createdAt categoryId description"
+    )
+    .populate({
       path: "categoryId",
       select: "name isListed",
       match: { isListed: true }, 
@@ -28,15 +30,21 @@ const viewProduct = async (req, res) => {
         message: "Product not found or not listed, or category not listed.",
       });
     }
+
     const relatedProducts = await Product.find({
-      categoryId: product.categoryId,
+      categoryId: product.categoryId._id,
       _id: { $ne: id },
       isListed: true,
-    }).populate({
+    })
+    .select(
+      "_id name price discount discountedPrice colors primaryImage totalStock description"
+    )
+    .populate({
       path: "categoryId",
-      select: "name isListed",
+      select: "name isListed ",
       match: { isListed: true },
-    });
+    })
+    .limit(6);
 
     res.status(200).json({
       success: true,
@@ -56,8 +64,6 @@ const viewProduct = async (req, res) => {
 const fetchProducts = async (req, res) => {
   try {
     let { search, categoryIds, minPrice, maxPrice, colors, sort, page = 1, limit, reset } = req.query;
-
-    console.log("$$$$$$$$$$$$$$",req.query)
 
     if (reset === "true") {
       search = categoryIds = minPrice = maxPrice = sort = null;
@@ -109,7 +115,6 @@ const fetchProducts = async (req, res) => {
     limit = parseInt(limit);
     const skip = (page - 1) * limit;
 
-    // Aggregation pipeline to count and fetch products
     const aggregatePipeline = [
       { $match: filter }, 
       {
