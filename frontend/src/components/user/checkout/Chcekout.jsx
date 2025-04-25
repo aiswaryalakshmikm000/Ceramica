@@ -306,9 +306,9 @@ const Checkout = () => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [appliedCoupon, setAppliedCoupon] = useState(null);
-  const [isFailureModalOpen, setIsFailureModalOpen] = useState(false); // Modal state
-  const [failedOrderId, setFailedOrderId] = useState(null); // Store failed order ID
-
+  const [isFailureModalOpen, setIsFailureModalOpen] = useState(false); 
+  const [failedOrderId, setFailedOrderId] = useState(null); 
+  
   const { data: cart, isLoading: isCartLoading, error: cartError } = useGetCartQuery(userId, {
     skip: !userId,
   });
@@ -342,8 +342,6 @@ const Checkout = () => {
       window.scrollTo(0, 0);
     }
   };
-
-  console.log("#@@@@ASSSSSSSSSSSSSS", selectedAddress)
 
   const handlePreviousStep = () => {
     if (activeStep > 0) {

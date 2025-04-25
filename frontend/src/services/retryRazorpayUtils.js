@@ -76,7 +76,7 @@ export const handleRetryPayment = async (
   verifyRazorpayPayment,
   retryRazorpayPayment,
   navigate,
-  onFailure // New optional callback
+  onFailure 
 ) => {
   try {
     const razorpayOrder = await retryRazorpayPayment({
@@ -103,7 +103,7 @@ export const handleRetryPayment = async (
         } catch (error) {
           toast.error(error?.data?.message || "Payment verification failed");
           if (onFailure) {
-            onFailure(razorpayOrder.data.orderNumber); // Call onFailure with orderNumber
+            onFailure(razorpayOrder.data.orderNumber); 
           } else {
             navigate(`/order-failure/${razorpayOrder.data.orderNumber}`);
           }

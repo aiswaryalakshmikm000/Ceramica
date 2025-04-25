@@ -1,4 +1,3 @@
-// src/components/common/PaymentFailureModal.jsx
 import React from "react";
 import { X, Eye, RefreshCw } from "lucide-react";
 

@@ -21,11 +21,8 @@ const generateReferralCode = require('../../utils/services/genrateReferralCode')
 const register = async (req, res) => {
   const { name, email, phone, password } = req.body;
   const file = req.file;
-  console.log("$############# req.file",  req.file)
-  console.log("$############# req.body", req.body)
 
   if (!name || !email || !phone || !password) {
-    console.log("All fields are required")
 
     return res.status(400).json({
       success: false,
@@ -38,7 +35,6 @@ const register = async (req, res) => {
       $or: [{ email }, { phone }],
     });
     if (existingUser) {
-      console.log("Email or phone number already exists")
       return res.status(409).json({
         success: false,
         message: "Email or phone number already exists",
@@ -50,11 +46,7 @@ const register = async (req, res) => {
       imageUrl = await cloudinaryImageUploadMethod(file.buffer);
     }
 
-    console.log("imageUrl 3333333333333333333333", imageUrl)
-
     const securePassword = await hashPassword(password);
-
-    console.log("securePassword", securePassword)
 
     const newUser = await User.create({
       name,
@@ -65,12 +57,9 @@ const register = async (req, res) => {
       isVerified: false,
     });
 
-    console.log("newUser", newUser)
-
     const referralCode = await generateReferralCode(newUser._id);
     newUser.referralCode = referralCode;
     await newUser.save();
-    console.log("newUser", newUser)
 
     res.json({
       success: true,
@@ -86,7 +75,6 @@ const register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log('ewdeeeeeeeeeeee',error)
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
@@ -106,7 +94,6 @@ const login = async (req, res) => {
   try {
 
     const userExist = await User.findOne({ email });
-    console.log("$$$$$$$$$$$$$$$$$$$4  userExist", userExist)
 
     if (!userExist) {
       return res.status(404).json({

@@ -95,7 +95,7 @@ const OrderItems = ({
                 <div className="flex-grow flex justify-between items-center">
                   <div>
                     <h4 className="text-sm font-medium text-gray-800">
-                      {item.name} <span className="text-gray-500">({item.color})</span>
+                      {item.name} <span className="text-gray-500">({item.color}) {item.discount}% OFF</span>
                     </h4>
                     <p className="text-sm py-2 font-semibold text-gray-900">₹{item.productId.price}</p>
                     <p className="text-xs text-gray-500">Qty: {item.quantity}</p>

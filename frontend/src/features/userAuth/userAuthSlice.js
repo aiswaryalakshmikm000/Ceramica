@@ -14,8 +14,6 @@ const userAuthSlice = createSlice({
     setUserCredentials: (state, action) => {
       state.user = action.payload.user;
       state.isAuthenticated = true;
-      // state.referredBy = action.payload.user.referredBy;
-      // console.log(" action.payload.user.referredBy",  action.payload.user.referredBy)
     },
     logoutUser: (state) => {
       state.user = null;
@@ -33,4 +31,3 @@ export default userAuthSlice.reducer;
 export const selectUser = (state) => state.userAuth.user;
 export const selectIsUserAuthenticated = (state) => state.userAuth.isAuthenticated;
 export const selectUserRole = (state) => state.userAuth.user?.role || null;
-// export const selectIsReferred = (state) => state.userAuth.user?.referredBy;

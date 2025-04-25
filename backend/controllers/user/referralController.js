@@ -67,8 +67,6 @@ const getReferralInfo = async (req, res) => {
       referralHistory: referralHistory || [],
     };
 
-    console.log("#@@@@@@@@@@@@@@@@@@ referralInfo ", referralInfo)
-
     res.json({
       success: true,
       data: referralInfo,
@@ -84,16 +82,13 @@ const getReferralInfo = async (req, res) => {
 const applyReferralCode = async (req, res) => {
   const { userId, referralCode } = req.body;
 
-  console.log("$###########     req.body", req.body )
   try {
     const user = await User.findById(userId);
-    console.log("$###########     user", user )
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
     if (user.referredBy) {
-      console.log("$3333333333333333You have already used a referral code" )
       return res.status(400).json({
         success: false,
         message: "You have already used a referral code",
@@ -102,7 +97,6 @@ const applyReferralCode = async (req, res) => {
     
 
     const referrer = await User.findOne({referralCode})
-    console.log("$###########     referrer", referrer )
     if (!referrer) {
       return res.status(400).json({
         success: false,
@@ -111,7 +105,6 @@ const applyReferralCode = async (req, res) => {
     }
 
     if (referrer._id.toString() === userId) {
-      console.log("Yyyyyyyyyyyyyyyou cannot use your own referral code" )
       return res.status(400).json({
         success: false,
         message: "You cannot use your own referral code",
@@ -132,7 +125,6 @@ const applyReferralCode = async (req, res) => {
       customerType: "new",
       userId: user._id,
     });
-    console.log("$###########     newUserCoupon", newUserCoupon )
 
     // Create coupon for the referrer (₹100 flat)
     const referrerCoupon = await Coupon.create({
@@ -149,20 +141,16 @@ const applyReferralCode = async (req, res) => {
       userId: referrer._id,
     });
 
-    console.log("$###########     referrerCoupon", referrerCoupon )
-
     // Update user and referrer records
     user.referredBy = referralCode;
     user.referralRewards += 50
     await user.save();
-    console.log("$###########     user", user )
 
     referrer.totalReferrals += 1;
     referrer.referralRewards += 100;
     referrer.isReferralRewarded = true;
 
     await referrer.save();
-    console.log("$###########     referrer", referrer )
 
     res.json({
       success: true,
@@ -171,7 +159,6 @@ const applyReferralCode = async (req, res) => {
       referrerCoupon,
     });
   } catch (error) {
-    console.error("EEEEEeeeerrorrrrrr",error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };

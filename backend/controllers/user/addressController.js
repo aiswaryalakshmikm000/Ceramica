@@ -4,7 +4,6 @@ const User = require("../../models/userModel");
 
 const addAddress = async (req, res) => {
   const { user } = req.body;
-  console.log("UUUUUUSEr", user)
   try {
     const userExist = await User.findById(user);
     if (!userExist) {

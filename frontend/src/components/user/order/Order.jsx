@@ -275,8 +275,8 @@ const Order = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const { Razorpay } = useRazorpay();
-  const [isFailureModalOpen, setIsFailureModalOpen] = useState(false); // Modal state
-  const [failedOrderId, setFailedOrderId] = useState(null); // Store failed order ID
+  const [isFailureModalOpen, setIsFailureModalOpen] = useState(false);
+  const [failedOrderId, setFailedOrderId] = useState(null); 
 
   const {
     data: ordersData,

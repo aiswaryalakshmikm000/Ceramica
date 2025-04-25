@@ -108,7 +108,7 @@ const OrderDetailPage = () => {
       setCancelReason("");
     } catch (err) {
       toast.error(
-        `Failed to cancel order: ${err.data?.message || "Unknown error"}`
+        `${err.data?.message || "Unknown error"}`
       );
     }
   };

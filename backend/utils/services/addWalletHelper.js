@@ -1,6 +1,5 @@
 const Wallet = require("../../models/walletModel");
 
-// Helper function to add wallet transaction
 const addWalletTransaction = async (
     userId,
     amount,

@@ -15,6 +15,7 @@ const {
 } = require("../../utils/services/addWalletHelper");
 const { resourceLimits } = require("worker_threads");
 
+
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
@@ -31,8 +32,6 @@ const createRazorpayOrder = async (req, res) => {
       shippingAddress,
       coupon,
     } = req.body;
-
-    console.log("req.bodyreq.bodyreq.bodyreq.bodyreq.bodyreq.body", req.body)
 
     if (!amount || typeof amount !== "number" || amount <= 0) {
       return res.status(400).json({
@@ -738,6 +737,7 @@ const placeWalletOrder = async (req, res) => {
 };
 
 const getUserOrders = async (req, res) => {
+  console.log("#@@@@@@@@@@@@@@@")
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -748,9 +748,9 @@ const getUserOrders = async (req, res) => {
       .skip(skip)
       .limit(limit)
       .select("orderNumber status orderDate totalAmount paymentStatus shippingAddress");
-
+      console.log("orders", orders)
     const totalOrders = await Order.countDocuments({userId: req.user.id})
-
+console.log("totalOrders", totalOrders)
     res.status(200).json({
       success: true,
       message: orders.length
@@ -765,6 +765,7 @@ const getUserOrders = async (req, res) => {
       },
     });
   } catch (error) {
+    console.log("errorrrrrrrrrrrrrrrrrrrrrrr",error)
     res.status(500).json({
       success: false,
       message: "Failed to retrieve orders",
@@ -809,7 +810,7 @@ const cancelOrder = async (req, res) => {
     const order = await Order.findOne({
       orderNumber: req.params.orderId,
       userId: req.user.id,
-    });
+    }).populate("items.productId");
 
     if (!order) {
       return res.status(404).json({
@@ -833,20 +834,45 @@ const cancelOrder = async (req, res) => {
     order.status = "Cancelled";
     order.cancelReason = cancelReason;
 
-    let refundAmount = 0; 
+    let refundAmount = 0;
 
-    order.items.forEach((item) => {
-      if (item.status !== "Cancelled") {
-        item.status = "Cancelled";
-        refundAmount += item.totalPrice; 
-      }
-    });
+    // Calculate refund for each item
+    await Promise.all(
+      order.items.map(async (item) => {
+        if (item.status !== "Cancelled") {
+          item.status = "Cancelled";
+          const product = item.productId;
+          if (!product) {
+            throw new Error(`Product not found for item ${item._id}`);
+          }
+
+          // Get base price (after product discount)
+          const basePrice = product.discount > 0 ? product.discountedPrice : product.price;
+
+          // Apply offers to get final discounted price
+          const { discountedPrice } = await cartService.applyOffers(product._id, basePrice);
+
+          // Calculate refund for this item
+          refundAmount += discountedPrice * item.quantity;
+        }
+      })
+    );
+
+    console.log("order", order)
+
+    // Add delivery charge to refund if applicable
+    const deliveryCharge = order.shippingFee || 0;
+    const couponCharge = order.couponDiscount || 0
+    
+    refundAmount += deliveryCharge;
+    refundAmount -+  couponCharge
 
     order.activityLog.push({
       status: "Cancelled",
       timestamp: new Date(),
     });
 
+    // Update product stock
     await Promise.all(
       order.items.map(async (item) => {
         if (item.status === "Cancelled" && !item.cancelProductReason) {
@@ -863,13 +889,13 @@ const cancelOrder = async (req, res) => {
       })
     );
 
+    // Process refund to wallet if applicable
     if (
       (order.paymentMethod === "Razorpay" ||
         order.paymentMethod === "Wallet") &&
       order.paymentStatus === "Paid" &&
       refundAmount > 0
     ) {
-      
       const walletResult = await addWalletTransaction(
         req.user.id,
         refundAmount,
@@ -890,7 +916,7 @@ const cancelOrder = async (req, res) => {
       data: {
         orderNumber: order.orderNumber,
         cancelledAt: new Date(),
-        refundedAmount: refundAmount, 
+        refundedAmount: refundAmount,
       },
     });
   } catch (error) {
@@ -911,7 +937,7 @@ const cancelOrderItem = async (req, res) => {
     const order = await Order.findOne({
       orderNumber: orderId,
       userId: req.user.id,
-    });
+    }).populate("items.productId");
 
     if (!order) {
       return res.status(404).json({
@@ -941,28 +967,58 @@ const cancelOrderItem = async (req, res) => {
       });
     }
 
+    // Check if this is the last active item
+    const activeItems = order.items.filter(
+      (i) => i.status !== "Cancelled" && i._id.toString() !== itemId
+    );
+    if (activeItems.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "This is the last item in the order. Please use full order cancellation to include delivery charge refund.",
+        data: null,
+      });
+    }
+
     item.status = "Cancelled";
     item.cancelProductReason = cancelProductReason;
+
+    // Calculate refund for the item
+    const product = item.productId;
+    if (!product) {
+      throw new Error(`Product not found for item ${item._id}`);
+    }
+
+    // Get base price (after product discount)
+    const basePrice = product.discount > 0 ? product.discountedPrice : product.price;
+
+    // Apply offers to get final discounted price
+    const { discountedPrice } = await cartService.applyOffers(product._id, basePrice);
+
+    // Calculate refund for this item
+    const refundAmount = discountedPrice * item.quantity;
 
     order.activityLog.push({
       status: `Item ${item.name} Cancelled`,
       timestamp: new Date(),
     });
 
+    // Update product stock
     await Product.updateOne(
       { _id: item.productId, "colors.name": item.color },
       { $inc: { "colors.$.stock": item.quantity, totalStock: item.quantity } }
     );
 
+    // Process refund to wallet if applicable
     if (
       (order.paymentMethod === "Razorpay" ||
         order.paymentMethod === "Wallet") &&
-      order.paymentStatus === "Paid"
+      order.paymentStatus === "Paid" &&
+      refundAmount > 0
     ) {
-      const refundAmount = item.totalPrice;
       const walletResult = await addWalletTransaction(
         req.user.id,
-        refundAmount,
+        (refundAmount),
         "credit",
         `Refund for cancelled item ${item.name} in order ${order.orderNumber}`,
         order._id
@@ -972,9 +1028,11 @@ const cancelOrderItem = async (req, res) => {
       }
     }
 
-    const activeItems = order.items.filter((i) => i.status !== "Cancelled");
-
-    if (activeItems.length === 0) {
+    // Update order status if all items are cancelled
+    const remainingActiveItems = order.items.filter(
+      (i) => i.status !== "Cancelled"
+    );
+    if (remainingActiveItems.length === 0) {
       order.status = "Cancelled";
     }
 
@@ -987,6 +1045,7 @@ const cancelOrderItem = async (req, res) => {
         orderNumber: order.orderNumber,
         itemId: item._id,
         cancelledAt: new Date(),
+        refundedAmount: (refundAmount),
       },
     });
   } catch (error) {
@@ -998,7 +1057,6 @@ const cancelOrderItem = async (req, res) => {
     });
   }
 };
-
 
 const returnOrder = async (req, res) => {
   try {
