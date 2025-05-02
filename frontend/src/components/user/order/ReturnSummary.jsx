@@ -25,8 +25,8 @@ const ReturnSummary = ({ order, formatDate }) => {
             </p>
             <p>
               <span className="font-medium">Status:</span>{" "}
-              {order.returnRequest.isApproved === null ? (
-                "Pending"
+              {!order.returnRequest.isApproved ? (
+                "Return Requested"
               ) : order.returnRequest.isApproved ? (
                 <span className="flex items-center">
                   <CheckCircle size={14} className="text-green-600 mr-1" /> Approved

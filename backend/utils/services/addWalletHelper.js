@@ -10,6 +10,7 @@ const addWalletTransaction = async (
   ) => {
     try {
       let wallet = await Wallet.findOne({ user: userId });
+
       if (!wallet) {
         wallet = new Wallet({ user: userId, balance: 0, transactions: [] });
       }
@@ -32,6 +33,7 @@ const addWalletTransaction = async (
       }
   
       await wallet.save();
+      console.log("UUupdated wallet", wallet)
       return { success: true, wallet };
     } catch (error) {
       console.error("Error adding wallet transaction:", error);

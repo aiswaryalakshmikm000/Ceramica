@@ -242,7 +242,7 @@ const EditProfile = () => {
                     type="submit"
                     disabled={isLoading || (emailChanged && !otpVerified && !isGoogleUser)}
                     className={`flex-1 text-white py-3 rounded-lg ${
-                      isLoading || (emailChanged && !otpVerified && !isGoogleUser) ? "bg-orange-700 cursor-not-allowed" : "bg-orange-800/90 hover:bg-gray-400"
+                      isLoading || (emailChanged && !otpVerified && !isGoogleUser) ? "bg-orange-800/90 cursor-not-allowed" : "bg-orange-800/90 hover:bg-orange-700"
                     }`}
                   >
                     {isLoading ? "Saving..." : "Save Changes"}

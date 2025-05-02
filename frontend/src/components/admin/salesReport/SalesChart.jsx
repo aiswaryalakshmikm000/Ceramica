@@ -1,85 +1,77 @@
-"use client"
 
-import { useEffect, useRef } from "react"
-import Chart from "chart.js/auto"
+
+
+import { useEffect, useRef } from "react";
+import Chart from "chart.js/auto";
 
 const SalesChart = ({ data, type }) => {
-  const chartRef = useRef(null)
-  const chartInstance = useRef(null)
+  const chartRef = useRef(null);
+  const chartInstance = useRef(null);
 
   useEffect(() => {
-    // Destroy previous chart if it exists
     if (chartInstance.current) {
-      chartInstance.current.destroy()
+      chartInstance.current.destroy();
     }
 
-    // Create a deep copy of the data to avoid mutating the original
-    const chartData = JSON.parse(JSON.stringify(data))
+    const chartData = JSON.parse(JSON.stringify(data));
 
-    // Create new chart
-    const ctx = chartRef.current.getContext("2d")
+    const ctx = chartRef.current.getContext("2d");
 
-    // Configure chart based on type
     const chartConfig = {
       type: type === "pie" ? "pie" : type,
-      data: chartData, 
+      data: chartData,
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            position: "top",
-          },
+          legend: { position: "top" },
           tooltip: {
             callbacks: {
               label: (context) => {
-                let label = context.dataset.label || ""
+                let label = context.dataset.label || "";
                 if (label) {
-                  label += ": "
+                  label += ": ";
                 }
                 if (context.parsed.y !== undefined) {
-                  label += new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
-                    context.parsed.y
-                  )
+                  label += new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(context.parsed.y);
                 } else if (context.parsed !== undefined) {
-                  label += new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(context.parsed)
+                  label += new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(context.parsed);
                 }
-                return label
+                return label;
               },
             },
           },
         },
       },
-    }
+    };
 
-    // Special configuration for pie chart
     if (type === "pie") {
-      // For pie chart, transform the data to show totals
-      const totalSales = chartData.datasets[0].data.reduce((sum, val) => sum + val, 0)
-      const totalDiscounts = chartData.datasets[1].data.reduce((sum, val) => sum + val, 0)
-      const totalCoupons = chartData.datasets[2].data.reduce((sum, val) => sum + val, 0)
+      const totalSales = chartData.datasets[0].data.reduce((sum, val) => sum + val, 0);
+      const totalProductsDiscounts = chartData.datasets[1].data.reduce((sum, val) => sum + val, 0);
+      const totalOfferDiscounts = chartData.datasets[2].data.reduce((sum, val) => sum + val, 0);
+      const totalCouponDiscounts = chartData.datasets[3].data.reduce((sum, val) => sum + val, 0);
 
       chartConfig.data = {
-        labels: ["Sales", "Discounts", "Coupon Discounts"],
+        labels: ["Sales", "Products Discounts", "Offer Discounts", "Coupon Discounts"],
         datasets: [
           {
-            data: [totalSales, totalDiscounts, totalCoupons],
-            backgroundColor: ["rgba(60, 115, 168, 0.7)", "rgba(255, 99, 132, 0.7)", "rgba(255, 206, 86, 0.7)"],
-            borderColor: ["rgba(60, 115, 168, 1)", "rgba(255, 99, 132, 1)", "rgba(255, 206, 86, 1)"],
+            data: [totalSales, totalProductsDiscounts, totalOfferDiscounts, totalCouponDiscounts],
+            backgroundColor: ["rgba(60, 115, 168, 0.7)", "rgba(255, 99, 132, 0.7)", "rgba(75, 192, 192, 0.7)", "rgba(255, 206, 86, 0.7)"],
+            borderColor: ["rgba(60, 115, 168, 1)", "rgba(255, 99, 132, 1)", "rgba(75, 192, 192, 1)", "rgba(255, 206, 86, 1)"],
             borderWidth: 1,
           },
         ],
-      }
+      };
     }
 
-    chartInstance.current = new Chart(ctx, chartConfig)
+    chartInstance.current = new Chart(ctx, chartConfig);
 
     return () => {
       if (chartInstance.current) {
-        chartInstance.current.destroy()
+        chartInstance.current.destroy();
       }
-    }
-  }, [data, type])
+    };
+  }, [data, type]);
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md mb-6">
@@ -88,7 +80,7 @@ const SalesChart = ({ data, type }) => {
         <canvas ref={chartRef}></canvas>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SalesChart
+export default SalesChart;

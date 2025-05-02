@@ -159,7 +159,7 @@ const OTPEnterModal = ({ isOpen, closeModal, email, onVerifySuccess, flow }) => 
                     onClick={handleResendOtp}
                     disabled={timeLeft > 0 || isSendingReset}
                     className={`w-full inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white ${
-                      timeLeft > 0 || isSendingReset ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                      timeLeft > 0 || isSendingReset ? "bg-gray-400 cursor-not-allowed" : "bg-orange-800/90 hover:bg-orange-700"
                     }`}
                   >
                     {timeLeft > 0 ? `Resend OTP in ${timeLeft}s` : isSendingReset ? "Sending..." : "Resend OTP"}

@@ -35,7 +35,7 @@ const SideBar = () => {
     { label: 'Customers', icon: <Users size={20} />, path: '/admin/customers' },
     { label: 'Categories', icon: <Tag size={20} />, path: '/admin/categories' },
     { label: 'Wallet', icon: <Wallet size={20} />, path: '/admin/wallet' },
-    { label: 'Product Reviews', icon: <Star size={20} />, path: '/admin/reviews' },
+    // { label: 'Product Reviews', icon: <Star size={20} />, path: '/admin/reviews' },
     { label: 'Sales Report', icon: <BarChart size={20} />, path: '/admin/sales-report' },
     { label: 'Offers', icon: <Gift size={20} />, path: '/admin/offers' },
     { label: 'Coupons', icon: <Percent size={20} />, path: '/admin/coupons' },

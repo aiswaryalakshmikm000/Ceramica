@@ -8,6 +8,8 @@ import { motion } from "framer-motion";
 const THRESHOLD_AMOUNT = import.meta.env.VITE_THRESHOLD_AMOUNT;
 
 const CartOrderSummary = ({ cart, subtotal, isCartEmpty, setProblematicItems }) => {
+
+  console.log("CaRTTTTTTTTTt", cart)
   const navigate = useNavigate();
   const [validateCheckout, { isLoading }] = useValidateCheckoutMutation();
 
@@ -35,14 +37,15 @@ const CartOrderSummary = ({ cart, subtotal, isCartEmpty, setProblematicItems }) 
   const hasProblems = cart.items.some(
     (item) => !item.inStock || (item.productId && !item.productId.isListed)
   );
-  const remainingForFreeDelivery = THRESHOLD_AMOUNT - parseFloat(cart.totalAmount || 0);
+  const remainingForFreeDelivery = THRESHOLD_AMOUNT - (parseFloat(cart.totalAmount || 0)- cart.deliveryCharge);
   const totalItems = cart?.totalItems || 0;
   const totalMRP = getSafeNumber(cart?.totalMRP);
-  const totalDiscount = getSafeNumber(cart?.totalDiscount);
+  // const totalDiscount = getSafeNumber(cart?.totalDiscount);
   const offerDiscount = getSafeNumber(cart?.offerDiscount || 0);
-  const productDiscount = getSafeNumber(totalDiscount - offerDiscount);
+  const productDiscount = getSafeNumber(cart?.productsDiscount);
   const deliveryCharge = getSafeNumber(cart?.deliveryCharge);
   const totalAmount = getSafeNumber(cart?.totalAmount);
+  const subTotal = getSafeNumber(cart?.totalAmount-cart?.deliveryCharge);
 
   // Animation variants for the free delivery message
   const pulseAnimation = {
@@ -88,7 +91,7 @@ const CartOrderSummary = ({ cart, subtotal, isCartEmpty, setProblematicItems }) 
           </div>
           <div className="flex justify-between">
             <span>Subtotal</span>
-            <span>₹{getSafeNumber(totalMRP - totalDiscount)}</span>
+            <span>₹{getSafeNumber(subTotal)}</span>
           </div>
           {!isCartEmpty && (
             <>

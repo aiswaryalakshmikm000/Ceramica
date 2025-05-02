@@ -134,7 +134,7 @@ const ResetPasswordModal = ({
                             closeModal();
                             navigate("/login");
                           }}
-                          className="text-sm font-medium text-blue-600 hover:text-blue-700 focus:outline-none"
+                          className="text-sm font-medium text-orange-800 hover:text-orange-700 focus:outline-none"
                         >
                           Back to Login
                         </button>

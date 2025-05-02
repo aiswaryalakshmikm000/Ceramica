@@ -14,13 +14,15 @@ const {
   addWalletTransaction,
 } = require("../../utils/services/addWalletHelper");
 const { resourceLimits } = require("worker_threads");
-
+const {
+  creditAdminWallet,
+  debitAdminWallet,
+} = require("../../utils/services/adminWalletHelper");
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
-
 
 const createRazorpayOrder = async (req, res) => {
   try {
@@ -92,6 +94,8 @@ const createRazorpayOrder = async (req, res) => {
 
     let validatedCoupon = null;
     const couponCode = coupon ? coupon.code : null;
+    console.log("have CCCCCCCCCCCCcccoupon ", couponCode);
+
     if (couponCode) {
       const {
         valid,
@@ -104,15 +108,21 @@ const createRazorpayOrder = async (req, res) => {
       validatedCoupon = couponData;
     }
 
+    console.log(
+      "WERRRRRRRRCCCCCCCCCCCCCCCCCCCCCCCCCCCcc validatedCoupon",
+      validatedCoupon
+    );
+
     const updatedCart = await cartService.recalculateCartTotals(
       cart,
       validatedCoupon
     );
 
+    console.log("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUpdated cart", updatedCart);
     const totalAmount = updatedCart.totalAmount;
 
     const options = {
-      amount: totalAmount * 100, 
+      amount: totalAmount * 100,
       currency,
       receipt: `receipt_${Date.now()}`,
     };
@@ -120,7 +130,7 @@ const createRazorpayOrder = async (req, res) => {
     const razorpayOrder = await razorpay.orders.create(options);
 
     const totalMRP = updatedCart.totalMRP;
-    const totalDiscount = updatedCart.totalDiscount;
+    const productsDiscount = updatedCart.productsDiscount;
     const offerDiscount = updatedCart.offerDiscount;
     const couponDiscount = updatedCart.couponDiscount || 0;
     const shippingFee = updatedCart.deliveryCharge;
@@ -141,7 +151,7 @@ const createRazorpayOrder = async (req, res) => {
         totalPrice: item.totalPrice,
       })),
       totalMRP,
-      totalDiscount,
+      productsDiscount,
       offerDiscount,
       couponDiscount,
       couponCode: couponCode || null,
@@ -249,7 +259,8 @@ const verifyRazorpayPayment = async (req, res) => {
         totalAmount: 0,
         totalItems: 0,
         totalMRP: 0,
-        totalDiscount: 0,
+        productsDiscount: 0,
+        offerDiscount: 0,
         deliveryCharge: 0,
         couponDiscount: 0,
         couponId: null,
@@ -257,6 +268,18 @@ const verifyRazorpayPayment = async (req, res) => {
       },
       { new: true }
     );
+
+    // Credit admin wallet
+    const adminWalletResult = await creditAdminWallet(
+      order.totalAmount,
+      `Payment received for order ${order.orderNumber}`,
+      order._id,
+      order.userId,
+      "order"
+    );
+    if (!adminWalletResult.success) {
+      throw new Error(adminWalletResult.message);
+    }
 
     await order.save();
 
@@ -282,14 +305,12 @@ const verifyRazorpayPayment = async (req, res) => {
   }
 };
 
-
 // Retry Payment for Failed/Pending Order
 const retryRazorpayPayment = async (req, res) => {
   try {
     const { orderNumber, userId } = req.body;
 
     if (!orderNumber || !userId) {
-
       return res.status(400).json({
         success: false,
         message: "Order number and user ID are required",
@@ -313,16 +334,16 @@ const retryRazorpayPayment = async (req, res) => {
       });
     }
 
-    const fiveDaysInMs = 5 * 24 * 60 * 60 * 1000; 
+    const fiveDaysInMs = 5 * 24 * 60 * 60 * 1000;
     const timeSinceCreation = Date.now() - new Date(order.createdAt).getTime();
 
     if (timeSinceCreation > fiveDaysInMs) {
       return res.status(400).json({
         success: false,
-        message: "Retry payment is only allowed within 5 days of order creation",
+        message:
+          "Retry payment is only allowed within 5 days of order creation",
       });
     }
-
 
     for (const item of order.items) {
       const isInStock = await cartService.checkStock(
@@ -341,15 +362,15 @@ const retryRazorpayPayment = async (req, res) => {
     }
 
     const options = {
-      amount: order.totalAmount * 100, 
+      amount: order.totalAmount * 100,
       currency: "INR",
       receipt: `receipt_${orderNumber}_${Date.now()}`,
     };
 
     const razorpayOrder = await razorpay.orders.create(options);
-    
+
     order.transactionId = razorpayOrder.id;
-    order.paymentStatus = "Pending"; 
+    order.paymentStatus = "Pending";
     order.activityLog.push({
       status: "Pending",
       changedAt: new Date(),
@@ -378,7 +399,6 @@ const retryRazorpayPayment = async (req, res) => {
     });
   }
 };
-
 
 const placeCODOrder = async (req, res) => {
   try {
@@ -447,12 +467,7 @@ const placeCODOrder = async (req, res) => {
         valid,
         message,
         coupon: couponData,
-      } = await cartService.validateCoupon(
-        couponCode,
-        userCart,
-        userId,
-        true 
-      );
+      } = await cartService.validateCoupon(couponCode, userCart, userId, true);
       if (!valid) {
         return res.status(400).json({ success: false, message });
       }
@@ -465,11 +480,20 @@ const placeCODOrder = async (req, res) => {
     );
 
     const totalMRP = updatedCart.totalMRP;
-    const totalDiscount = updatedCart.totalDiscount;
+    const productsDiscount = updatedCart.productsDiscount;
     const offerDiscount = updatedCart.offerDiscount;
     const couponDiscount = updatedCart.couponDiscount || 0;
     const shippingFee = updatedCart.deliveryCharge;
     const totalAmount = updatedCart.totalAmount;
+
+    if (totalAmount > 1000) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Order above 1000, could'nt place on COD",
+        });
+    }
 
     const orderDate = new Date();
     const expectedDeliveryDate = new Date(orderDate);
@@ -481,7 +505,7 @@ const placeCODOrder = async (req, res) => {
       customerName: address.fullName,
       items: orderItems,
       totalMRP,
-      totalDiscount,
+      productsDiscount,
       offerDiscount,
       couponDiscount,
       couponCode: coupon ? coupon.code : null,
@@ -519,7 +543,7 @@ const placeCODOrder = async (req, res) => {
         totalAmount: 0,
         totalItems: 0,
         totalMRP: 0,
-        totalDiscount: 0,
+        productsDiscount: 0,
         offerDiscount: 0,
         deliveryCharge: 0,
         couponDiscount: 0,
@@ -550,11 +574,12 @@ const placeCODOrder = async (req, res) => {
   }
 };
 
-
 const placeWalletOrder = async (req, res) => {
   try {
     const { cart, address, coupon } = req.body;
     const userId = req.user.id;
+
+    console.log("req.bodyyyyyyyyyyyyyyyyy", req.body);
 
     if (!cart || !cart.items || !cart.items.length) {
       return res.status(400).json({
@@ -640,7 +665,7 @@ const placeWalletOrder = async (req, res) => {
     }
 
     const totalMRP = updatedCart.totalMRP;
-    const totalDiscount = updatedCart.totalDiscount;
+    const productsDiscount = updatedCart.productsDiscount;
     const offerDiscount = updatedCart.offerDiscount;
     const couponDiscount = updatedCart.couponDiscount || 0;
     const shippingFee = updatedCart.deliveryCharge;
@@ -655,7 +680,7 @@ const placeWalletOrder = async (req, res) => {
       customerName: address.fullName,
       items: orderItems,
       totalMRP,
-      totalDiscount,
+      productsDiscount,
       offerDiscount,
       couponDiscount,
       couponCode: coupon ? coupon.code : null,
@@ -697,6 +722,19 @@ const placeWalletOrder = async (req, res) => {
       throw new Error(walletResult.message);
     }
 
+    console.log("#@@@@@@@@@@>>>>>>>>  before hitting admin caredit amount");
+    // Credit admin wallet
+    const adminWalletResult = await creditAdminWallet(
+      totalAmount,
+      `Payment received for order ${order.orderNumber}`,
+      order._id,
+      userId,
+      "order"
+    );
+    if (!adminWalletResult.success) {
+      throw new Error(adminWalletResult.message);
+    }
+
     // Clear cart
     await Cart.findOneAndUpdate(
       { userId },
@@ -705,7 +743,7 @@ const placeWalletOrder = async (req, res) => {
         totalAmount: 0,
         totalItems: 0,
         totalMRP: 0,
-        totalDiscount: 0,
+        productsDiscount: 0,
         offerDiscount: 0,
         deliveryCharge: 0,
         couponDiscount: 0,
@@ -737,7 +775,6 @@ const placeWalletOrder = async (req, res) => {
 };
 
 const getUserOrders = async (req, res) => {
-  console.log("#@@@@@@@@@@@@@@@")
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -747,10 +784,12 @@ const getUserOrders = async (req, res) => {
       .sort({ orderDate: -1 })
       .skip(skip)
       .limit(limit)
-      .select("orderNumber status orderDate totalAmount paymentStatus shippingAddress");
-      console.log("orders", orders)
-    const totalOrders = await Order.countDocuments({userId: req.user.id})
-console.log("totalOrders", totalOrders)
+      .select(
+        "orderNumber status orderDate totalAmount paymentStatus shippingAddress"
+      );
+    console.log("orders", orders);
+    const totalOrders = await Order.countDocuments({ userId: req.user.id });
+    console.log("totalOrders", totalOrders);
     res.status(200).json({
       success: true,
       message: orders.length
@@ -760,12 +799,11 @@ console.log("totalOrders", totalOrders)
       pagination: {
         totalOrders,
         currentPage: page,
-        totalPages: Math.ceil(totalOrders/limit),
-        resourceLimits
+        totalPages: Math.ceil(totalOrders / limit),
+        resourceLimits,
       },
     });
   } catch (error) {
-    console.log("errorrrrrrrrrrrrrrrrrrrrrrr",error)
     res.status(500).json({
       success: false,
       message: "Failed to retrieve orders",
@@ -847,10 +885,14 @@ const cancelOrder = async (req, res) => {
           }
 
           // Get base price (after product discount)
-          const basePrice = product.discount > 0 ? product.discountedPrice : product.price;
+          const basePrice =
+            product.discount > 0 ? product.discountedPrice : product.price;
 
           // Apply offers to get final discounted price
-          const { discountedPrice } = await cartService.applyOffers(product._id, basePrice);
+          const { discountedPrice } = await cartService.applyOffers(
+            product._id,
+            basePrice
+          );
 
           // Calculate refund for this item
           refundAmount += discountedPrice * item.quantity;
@@ -858,18 +900,13 @@ const cancelOrder = async (req, res) => {
       })
     );
 
-    console.log("order", order)
-
-    // Add delivery charge to refund if applicable
     const deliveryCharge = order.shippingFee || 0;
-    const couponCharge = order.couponDiscount || 0
-    
-    refundAmount += deliveryCharge;
-    refundAmount -+  couponCharge
+    const couponDiscount = order.couponDiscount || 0;
+    refundAmount = refundAmount + deliveryCharge - couponDiscount;
 
     order.activityLog.push({
       status: "Cancelled",
-      timestamp: new Date(),
+      changedAt: new Date(),
     });
 
     // Update product stock
@@ -896,6 +933,18 @@ const cancelOrder = async (req, res) => {
       order.paymentStatus === "Paid" &&
       refundAmount > 0
     ) {
+      // Debit admin wallet
+      const adminWalletResult = await debitAdminWallet(
+        refundAmount,
+        `Refund for cancelled order ${order.orderNumber}`,
+        order._id,
+        req.user.id,
+        "cancel"
+      );
+      if (!adminWalletResult.success) {
+        throw new Error(adminWalletResult.message);
+      }
+
       const walletResult = await addWalletTransaction(
         req.user.id,
         refundAmount,
@@ -928,7 +977,6 @@ const cancelOrder = async (req, res) => {
     });
   }
 };
-
 
 const cancelOrderItem = async (req, res) => {
   try {
@@ -990,17 +1038,21 @@ const cancelOrderItem = async (req, res) => {
     }
 
     // Get base price (after product discount)
-    const basePrice = product.discount > 0 ? product.discountedPrice : product.price;
+    const basePrice =
+      product.discount > 0 ? product.discountedPrice : product.price;
 
     // Apply offers to get final discounted price
-    const { discountedPrice } = await cartService.applyOffers(product._id, basePrice);
+    const { discountedPrice } = await cartService.applyOffers(
+      product._id,
+      basePrice
+    );
 
     // Calculate refund for this item
     const refundAmount = discountedPrice * item.quantity;
 
     order.activityLog.push({
       status: `Item ${item.name} Cancelled`,
-      timestamp: new Date(),
+      changedAt: new Date(),
     });
 
     // Update product stock
@@ -1016,9 +1068,22 @@ const cancelOrderItem = async (req, res) => {
       order.paymentStatus === "Paid" &&
       refundAmount > 0
     ) {
+      // Debit admin wallet
+      const adminWalletResult = await debitAdminWallet(
+        refundAmount,
+        `Refund for cancelled item ${item.name} in order ${order.orderNumber}`,
+        order._id,
+        req.user.id,
+        "item-cancel"
+      );
+      if (!adminWalletResult.success) {
+        throw new Error(adminWalletResult.message);
+      }
+
+      
       const walletResult = await addWalletTransaction(
         req.user.id,
-        (refundAmount),
+        refundAmount,
         "credit",
         `Refund for cancelled item ${item.name} in order ${order.orderNumber}`,
         order._id
@@ -1045,7 +1110,7 @@ const cancelOrderItem = async (req, res) => {
         orderNumber: order.orderNumber,
         itemId: item._id,
         cancelledAt: new Date(),
-        refundedAmount: (refundAmount),
+        refundedAmount: refundAmount,
       },
     });
   } catch (error) {
@@ -1127,7 +1192,6 @@ const returnOrder = async (req, res) => {
     });
   }
 };
-
 
 const returnOrderItem = async (req, res) => {
   try {
@@ -1336,8 +1400,16 @@ const downloadInvoice = async (req, res) => {
     doc.text(`₹${order.totalMRP}`, 510, doc.y - 10);
     doc.moveDown(0.3);
 
-    doc.text(`Discount:`, 400, doc.y);
-    doc.text(`₹${order.totalDiscount}`, 510, doc.y - 10);
+    doc.text(`Product Discount:`, 400, doc.y);
+    doc.text(`₹${order.productsDiscount}`, 510, doc.y - 10);
+    doc.moveDown(0.3);
+
+    doc.text(`Offer Discount:`, 400, doc.y);
+    doc.text(`₹${order.offerDiscount}`, 510, doc.y - 10);
+    doc.moveDown(0.3);
+
+    doc.text(`Coupon Discount:`, 400, doc.y);
+    doc.text(`₹${order.couponDiscount}`, 510, doc.y - 10);
     doc.moveDown(0.3);
 
     doc.text(`Shipping Fee:`, 400, doc.y);
@@ -1360,7 +1432,6 @@ const downloadInvoice = async (req, res) => {
     });
   }
 };
-
 
 module.exports = {
   addWalletTransaction,

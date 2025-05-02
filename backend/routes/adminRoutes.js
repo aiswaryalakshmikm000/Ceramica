@@ -11,6 +11,8 @@ const {getAllOrders, updateOrderStatus, verifyReturnRequest, verifyItemReturnReq
 const { createCoupon, getCoupons, deleteCoupon, } = require("../controllers/admin/couponController");
 const {getOffers, addOffer, updateOffer, statusToggle } = require("../controllers/admin/offerController");
 const { getSalesReport, downloadExcelReport, downloadPdfReport } = require("../controllers/admin/salesReportController");
+const {getStatus, getSales, getTopProducts, getTopCategories, } = require ('../controllers/admin/dashboardController')
+const { getAdminWallet, getWalletTransactions } = require("../controllers/admin/adminWalletController");
 
 const adminRoute = express()
 
@@ -63,6 +65,18 @@ adminRoute.patch('/offers/:id', authenticateAdminToken, statusToggle);
 adminRoute.get('/sales-report', authenticateAdminToken, getSalesReport);
 adminRoute.get('/sales-report/download/excel', authenticateAdminToken, downloadExcelReport);
 adminRoute.get('/sales-report/download/pdf', authenticateAdminToken, downloadPdfReport);
+
+
+//dashboard
+adminRoute.get('/dashboard/status', authenticateAdminToken, getStatus);
+adminRoute.get('/dashboard/sales', authenticateAdminToken, getSales);
+adminRoute.get('/dashboard/top-products', authenticateAdminToken, getTopProducts);
+adminRoute.get('/dashboard/top-categories', authenticateAdminToken, getTopCategories);
+
+//wallet
+adminRoute.get("/wallet", authenticateAdminToken, getAdminWallet);
+adminRoute.get("/wallet/transactions", authenticateAdminToken, getWalletTransactions);
+
 
 module.exports = adminRoute
 

@@ -15,7 +15,7 @@ const PasswordInput = ({ id, name, label, placeholder }) => {
           name={name}
           type={showPassword ? "text" : "password"}
           autoComplete="current-password"
-          className="appearance-none block w-full px-4 py-3 bg-white/70 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 sm:text-sm transition-all duration-300 hover:border-indigo-400"
+          className="appearance-none block w-full px-4 py-3 bg-white/70 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-800/50 focus:border-orange-800 sm:text-sm transition-all duration-300 hover:border-orange-800"
           placeholder={placeholder}
         />
         <button

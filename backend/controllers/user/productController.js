@@ -174,34 +174,34 @@ const fetchProducts = async (req, res) => {
 };
 
 
-const fetchBestProducts = async (req, res) => {
-  try {
-    const { limit = 10 } = req.query; 
+// const fetchBestProducts = async (req, res) => {
+//   try {
+//     const { limit = 10 } = req.query; 
 
-    const sortOptions = {
-      isFeatured: -1, 
-      avgRating: -1,
-      totalStock: -1, 
-      createdAt: -1, 
-    };
+//     const sortOptions = {
+//       isFeatured: -1, 
+//       avgRating: -1,
+//       totalStock: -1, 
+//       createdAt: -1, 
+//     };
 
-    const bestProducts = await Product.find({ isListed: true })
-      .sort(sortOptions)
-      .limit(parseInt(limit))
-      .populate("categoryId", "name"); 
+//     const bestProducts = await Product.find({ isListed: true })
+//       .sort(sortOptions)
+//       .limit(parseInt(limit))
+//       .populate("categoryId", "name"); 
 
-    res.status(200).json({
-      success: true,
-      bestProducts,
-    });
-  } catch (error) {
-    console.error("Error fetching best products:", error);
-    res.status(500).json({
-      success: false,
-      message: "Something went wrong while fetching best products.",
-    });
-  }
-};
+//     res.status(200).json({
+//       success: true,
+//       bestProducts,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching best products:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Something went wrong while fetching best products.",
+//     });
+//   }
+// };
 
 const fetchFeaturedProducts = async (req, res) => {
   try {
@@ -239,6 +239,6 @@ const fetchFeaturedProducts = async (req, res) => {
 module.exports = {
   viewProduct,
   fetchProducts,
-  fetchBestProducts,
+  // fetchBestProducts,
   fetchFeaturedProducts,
 };

@@ -88,6 +88,7 @@ const FeaturedProducts = () => {
                     discountedPrice: product.discountedPrice, 
                     image:  product.colors?.[0]?.images?.[0] || product.images?.[0],
                     inStock: product.totalStock > 0,
+                    colors: product.colors,
                   }} 
                 />
               ))}

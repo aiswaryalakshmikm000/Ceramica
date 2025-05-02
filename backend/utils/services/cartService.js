@@ -47,7 +47,6 @@ const checkStock = async (productId, color, quantity) => {
 
 const validateCoupon = async (couponCode, cart, userId = null, incrementUsage = false) => {
   try {
-
     // Validate inputs
     if (!couponCode) {
       return { valid: false, message: 'No coupon code provided', coupon: null };
@@ -55,7 +54,6 @@ const validateCoupon = async (couponCode, cart, userId = null, incrementUsage = 
     if (!cart?.items?.length) {
       return { valid: false, message: 'Cart is empty', coupon: null };
     }
-
 
     // Validate coupon code format (must be uppercase)
     if (couponCode !== couponCode?.toUpperCase()) {
@@ -72,6 +70,7 @@ const validateCoupon = async (couponCode, cart, userId = null, incrementUsage = 
       return { valid: false, message: 'Invalid coupon code', coupon: null };
     }
 
+    // console.log("couponDoccouponDoccouponDoccouponDoc", couponDoc)
 
     // Check coupon status and dates
     const now = new Date();
@@ -89,7 +88,6 @@ const validateCoupon = async (couponCode, cart, userId = null, incrementUsage = 
     if (couponDoc.status !== 'active') {
       return { valid: false, message: `Coupon is ${couponDoc.status}`, coupon: null };
     }
-
 
     // Check usage limit
     if (couponDoc.totalAppliedCount >= couponDoc.usageLimit) {
@@ -113,8 +111,6 @@ const validateCoupon = async (couponCode, cart, userId = null, incrementUsage = 
       }
     }
 
-
-
     // Max usage per user check (if userId is provided)
     if (userId && couponDoc.maxUsagePerUser) {
       const userCouponUsage = await Order.find({
@@ -131,23 +127,27 @@ const validateCoupon = async (couponCode, cart, userId = null, incrementUsage = 
       }
     }
 
-
     // Populate cart items with product data
-    await cart.populate('items.productId');
-
-
-    // Calculate subtotal for all items
+    await cart.populate({
+      path: 'items.productId',
+      select: '_id price discount discountedPrice isListed colors',
+    });
+    
+    // Calculate subtotal after product and offer discounts
     const subtotal = roundToTwo(
-      cart.items.reduce((sum, item) => {
+      await cart.items.reduce(async (sumPromise, item) => {
+        const sum = await sumPromise; 
         const product = item.productId;
+        // console.log("YYYYYYYYY subtotal product", product);
         if (!product || !item.inStock) return sum;
-        const price = product.discountedPrice;
-        return sum + price * item.quantity;
-      }, 0)
+    
+        const { discountedPrice } = await applyOffers(product._id, product.price); 
+        // console.log("................../////////////. discountedPrice", discountedPrice);
+        return sum + discountedPrice * item.quantity;
+      }, Promise.resolve(0)) 
     );
 
-    console.log('<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.........subtotal...............', subtotal);
-
+    // console.log("subtotalsubtotalsubtotalsubtotalsubtotalsubtotalsubtotal", subtotal)
 
     // Check minimum purchase amount
     if (subtotal < couponDoc.minPurchaseAmount) {
@@ -158,27 +158,26 @@ const validateCoupon = async (couponCode, cart, userId = null, incrementUsage = 
       };
     }
 
-    console.log('sehey4g5544444444<%%%%%%%%%%%........................');
-
-
     // Calculate coupon discount
     let discount = 0;
     if (couponDoc.discountType === 'flat') {
-      discount = couponDoc.discountValue;
+      discount = couponDoc.discountValue || 0;
+      // console.log(".............discount flattttttttttttttttttttttttt", discount)
     } else if (couponDoc.discountType === 'percentage') {
       discount = (couponDoc.discountPercentage / 100) * subtotal;
       if (couponDoc.maxDiscountAmount && discount > couponDoc.maxDiscountAmount) {
-        discount = couponDoc.maxDiscountAmount;
+        discount = couponDoc.maxDiscountAmount || 0;
       }
+      // console.log("............discount percenttttttttttttttttttttt ", discount)
     }
-    discount = roundToTwo(discount);
 
+    discount = roundToTwo(discount);
+// console.log("discountdiscountdiscountdiscount", discount)
     // Increment usage if requested (e.g., for confirmed orders)
     if (incrementUsage) {
       couponDoc.totalAppliedCount += 1;
       await couponDoc.save();
     }
-
 
     // Return validated coupon data
     const validatedCoupon = {
@@ -190,8 +189,8 @@ const validateCoupon = async (couponCode, cart, userId = null, incrementUsage = 
       minPurchaseAmount: couponDoc.minPurchaseAmount,
       maxDiscountAmount: couponDoc.maxDiscountAmount || 0,
     };
-    console.log('sehey4g5544444444<%%%%%%%%%%%>>>>>>>.............');
 
+    // console.log("################ validatedCoupon",validatedCoupon)
     return {
       valid: true,
       message: 'Coupon validated successfully',
@@ -207,17 +206,21 @@ const validateCoupon = async (couponCode, cart, userId = null, incrementUsage = 
   }
 };
 
+
 // Apply offers to a product (used in cart or order calculations)
 const applyOffers = async (productId, originalPrice) => {
   try {
     const product = await Product.findById(productId).populate('categoryId');
+//  console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4 product",product)
     if (!product) {
-      return { discountedPrice: originalPrice, appliedOffer: null };
+      return { discountedPrice: originalPrice, appliedOffer: null, offerDiscount: 0 };
     }
 
     const basePrice = product.discount > 0 ? product.discountedPrice : product.price;
     let bestDiscount = 0;
     let appliedOffer = null;
+
+    // console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4 basePrice",basePrice)
 
     // Check product-specific offers
     const productOffers = await Offer.find({
@@ -232,17 +235,22 @@ const applyOffers = async (productId, originalPrice) => {
       let discount = 0;
       if (offer.discountType === 'flat') {
         discount = offer.discountValue;
+        // console.log("$#%%%%%%% product flat", discount)
       } else if (offer.discountType === 'percentage') {
         discount = Math.min(
           basePrice * (offer.discountValue / 100),
           offer.maxDiscountAmount || Infinity
         );
+        // console.log("$#%%%%%%% product percentage", discount)
       }
       if (discount > bestDiscount) {
         bestDiscount = discount;
         appliedOffer = offer._id;
       }
     }
+
+    // console.log( "bestDiscount", bestDiscount)
+    // console.log( "appliedOffer", appliedOffer)
 
     // Check category-specific offers
     const categoryOffers = await Offer.find({
@@ -257,11 +265,13 @@ const applyOffers = async (productId, originalPrice) => {
       let discount = 0;
       if (offer.discountType === 'flat') {
         discount = offer.discountValue;
+        // console.log("$#%%%%%%% category flat", discount)
       } else if (offer.discountType === 'percentage') {
         discount = Math.min(
           basePrice * (offer.discountValue / 100),
           offer.maxDiscountAmount || Infinity
         );
+        // console.log("$#%%%%%%% category percentage", discount)
       }
       if (discount > bestDiscount) {
         bestDiscount = discount;
@@ -269,13 +279,18 @@ const applyOffers = async (productId, originalPrice) => {
       }
     }
 
-    return {
+    // console.log( "after category bestDiscount", bestDiscount)
+    // console.log( "after category  appliedOffer", appliedOffer)
+    // console.log( "*****************************************discountedPrice", basePrice-bestDiscount)
+
+    return ({
       discountedPrice: basePrice - bestDiscount,
       appliedOffer,
-    };
+      offerDiscount: bestDiscount ,
+    });
   } catch (error) {
     // console.error('Error in applyOffers:', error);
-    return { discountedPrice: originalPrice, appliedOffer: null };
+    return { discountedPrice: originalPrice, appliedOffer: null, offerDiscount: 0 };
   }
 };
 
@@ -286,8 +301,8 @@ const recalculateCartTotals = async (cart, coupon = null) => {
         ...cart.toObject(),
         totalItems: 0,
         totalMRP: 0,
-        totalDiscount: 0,
-        offerDiscount: 0, 
+        productsDiscount: 0,
+        offerDiscount: 0,
         deliveryCharge: 0,
         totalAmount: 0,
         couponDiscount: 0,
@@ -305,19 +320,26 @@ const recalculateCartTotals = async (cart, coupon = null) => {
         .map(async (item) => {
           const product = item.productId;
 
-          if (!product) return { totalItems: 0, totalMRP: 0, totalDiscount: 0, offerDiscount: 0 };
+          if (!product) return { totalItems: 0, totalMRP: 0, productsDiscount: 0, offerDiscount: 0 };
 
           const originalPrice = product.price || 0;
           const basePrice = product.discount > 0 ? product.discountedPrice : product.price;
 
+          // Calculate product-level discount
+          const productDiscount = product.discount > 0 ? originalPrice - basePrice : 0;
+          // console.log("EEEEEEEEEEEEEEEEEEEEEEEEEEEE, basePrice", basePrice)
+          // console.log("EEEEEEEEEEEEEEEEEEEEEEEEEEEE, productDiscount", productDiscount)
           // Apply offers dynamically
-          const { discountedPrice, appliedOffer } = await applyOffers(product._id, basePrice);
+          const { discountedPrice, appliedOffer, offerDiscount } = await applyOffers(product._id, basePrice);
 
-          // Calculate discounts
-          const productDiscount = product.discount > 0 ? originalPrice - product.discountedPrice : 0;
-          const offerDiscount = basePrice - discountedPrice;
-          const totalDiscount = (productDiscount + offerDiscount) * item.quantity;
-          const offerDiscountTotal = offerDiscount * item.quantity;
+          // console.log(`$$$............  discountedPrice, appliedOffer, offerDiscount for ${basePrice}` ,  discountedPrice, appliedOffer, offerDiscount)
+
+          // Calculate totals
+          const totalProductDiscount = productDiscount * item.quantity;
+          const totalOfferDiscount = offerDiscount * item.quantity;
+
+          // console.log("totalProductDiscount", totalProductDiscount)
+          // console.log("totalOfferDiscount", totalOfferDiscount)
 
           if (appliedOffer) {
             product.offerId = appliedOffer;
@@ -327,8 +349,8 @@ const recalculateCartTotals = async (cart, coupon = null) => {
           return {
             totalItems: item.quantity,
             totalMRP: originalPrice * item.quantity,
-            totalDiscount: totalDiscount,
-            offerDiscount: offerDiscountTotal,
+            productsDiscount: totalProductDiscount,
+            offerDiscount: totalOfferDiscount,
           };
         })
     );
@@ -337,11 +359,13 @@ const recalculateCartTotals = async (cart, coupon = null) => {
       (acc, curr) => ({
         totalItems: acc.totalItems + curr.totalItems,
         totalMRP: acc.totalMRP + curr.totalMRP,
-        totalDiscount: acc.totalDiscount + curr.totalDiscount,
+        productsDiscount: acc.productsDiscount + curr.productsDiscount,
         offerDiscount: acc.offerDiscount + curr.offerDiscount,
       }),
-      { totalItems: 0, totalMRP: 0, totalDiscount: 0, offerDiscount: 0 }
+      { totalItems: 0, totalMRP: 0, productsDiscount: 0, offerDiscount: 0 }
     );
+
+    // console.log("AAAAaggregatedTotals", aggregatedTotals)
 
     let couponDiscount = 0;
     let couponId = null;
@@ -354,17 +378,27 @@ const recalculateCartTotals = async (cart, coupon = null) => {
       discountPercentage = coupon.discountPercentage || 0;
     }
 
-    const subtotal = Math.max(aggregatedTotals.totalMRP - aggregatedTotals.totalDiscount, 0);
+    const subtotal = roundToTwo(
+      aggregatedTotals.totalMRP - aggregatedTotals.productsDiscount - aggregatedTotals.offerDiscount
+    );
+
+    // console.log("SSSSSSSSSSSSub total", subtotal)
+
     const deliveryCharge = subtotal >= (process.env.THRESHOLD_AMOUNT || 500) ? 0 : 60;
 
-    const totalAmount = Math.max(subtotal - couponDiscount + deliveryCharge, 0);
+    
+    // console.log('deliveryCharge', deliveryCharge)
+
+    const totalAmount = roundToTwo(Math.max(subtotal - couponDiscount + deliveryCharge, 0));
+
+    // console.log('totalAmount', totalAmount)
 
     const updatedCart = {
       ...cart.toObject(),
       totalItems: aggregatedTotals.totalItems,
       totalMRP: roundToTwo(aggregatedTotals.totalMRP),
-      totalDiscount: roundToTwo(aggregatedTotals.totalDiscount),
-      offerDiscount: roundToTwo(aggregatedTotals.offerDiscount), 
+      productsDiscount: roundToTwo(aggregatedTotals.productsDiscount),
+      offerDiscount: roundToTwo(aggregatedTotals.offerDiscount),
       couponDiscount: roundToTwo(couponDiscount),
       couponId,
       couponCode,
@@ -373,12 +407,14 @@ const recalculateCartTotals = async (cart, coupon = null) => {
       totalAmount: roundToTwo(totalAmount),
     };
 
+    // console.log('updatedCart', updatedCart)
+
     return updatedCart;
   } catch (error) {
+    // console.error('Error in recalculateCartTotals:', error);
     throw error;
   }
 };
-
 
 
 // Helper function

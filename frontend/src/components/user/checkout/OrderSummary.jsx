@@ -15,6 +15,8 @@ const OrderSummary = ({
   appliedCoupon,
   setAppliedCoupon,
 }) => {
+
+  console.log("Cart", cart)
   const [couponCode, setCouponCode] = useState("");
   const [couponError, setCouponError] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -29,12 +31,12 @@ const OrderSummary = ({
   // Use cart values safely
   const totalItems = cart?.totalItems || 0;
   const totalMRP = getSafeNumber(cart?.totalMRP);
-  const totalDiscount = getSafeNumber(cart?.totalDiscount);
+  // const totalDiscount = getSafeNumber(cart?.totalDiscount);
   const offerDiscount = getSafeNumber(cart?.offerDiscount || 0);
   const couponDiscount = getSafeNumber(appliedCoupon?.discount || 0);
   const deliveryCharge = getSafeNumber(cart?.deliveryCharge);
-  const productDiscount = getSafeNumber(totalDiscount - offerDiscount);
-  const subtotal = getSafeNumber(totalMRP - totalDiscount);
+  const productDiscount = getSafeNumber(cart?.productsDiscount);
+  const subtotal = getSafeNumber(cart?.totalAmount- cart?.deliveryCharge);
   const totalAmount = getSafeNumber(
     subtotal - couponDiscount + parseFloat(deliveryCharge)
   );

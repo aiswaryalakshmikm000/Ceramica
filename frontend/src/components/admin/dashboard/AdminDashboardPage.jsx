@@ -1,7 +1,7 @@
 // AdminLayout.js
 import React from 'react';
 import SideBar from '../../admin/SideBar'; 
-import SalesReport from './SalesReport';
+import AdminDashboard from './AdminDashboard';
 
 const AdminLayout = () => {
   return (
@@ -10,7 +10,7 @@ const AdminLayout = () => {
       <SideBar />
 
       <main className="flex-1 overflow-y-auto">
-        <SalesReport />
+        <AdminDashboard />
       </main>
     </div>
   );

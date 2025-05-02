@@ -34,7 +34,7 @@ const AdminEditProductPage = lazy(() => import("./components/admin/product/Admin
 const AdminShowProductsPage = lazy(() => import("./components/admin/product/AdminShowProducts"));
 const AdminCategoryManagement = lazy(() => import("./components/admin/category/AdminCategoryManagement"));
 const AdminShowCustomers = lazy(() => import("./components/admin/customer/AdminShowCustomers"));
-const AdminDashboard = lazy(() => import("./components/admin/dashboard/AdminDashboard"));
+const AdminDashboard = lazy(() => import("./components/admin/dashboard/AdminDashboardPage"));
 const AdminOrder = lazy(() => import("./components/admin/order/Order"));
 const AdminWallet = lazy(() => import("./components/admin/wallet/AdminWallet"));
 const AdminCoupons = lazy(() => import("./components/admin/coupon/CouponPage"));

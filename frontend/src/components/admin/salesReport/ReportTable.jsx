@@ -1,48 +1,42 @@
-"use client"
 
-import { useState } from "react"
-import { ChevronDown, ChevronUp } from "lucide-react"
+
+
+import { useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 const ReportTable = ({ data }) => {
-  const [sortField, setSortField] = useState("period")
-  const [sortDirection, setSortDirection] = useState("asc")
+  const [sortField, setSortField] = useState("period");
+  const [sortDirection, setSortDirection] = useState("asc");
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
       minimumFractionDigits: 2,
-    }).format(amount)
-  }
+    }).format(amount);
+  };
 
-  // Handle sorting
   const handleSort = (field) => {
     if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
-      setSortField(field)
-      setSortDirection("asc")
+      setSortField(field);
+      setSortDirection("asc");
     }
-  }
+  };
 
-  // Sort data
   const sortedData = [...data].sort((a, b) => {
     if (sortDirection === "asc") {
-      return a[sortField] > b[sortField] ? 1 : -1
+      return a[sortField] > b[sortField] ? 1 : -1;
     } else {
-      return a[sortField] < b[sortField] ? 1 : -1
+      return a[sortField]  < b[sortField] ? 1 : -1;
     }
-  })
+  });
 
-  // Render sort icon
   const renderSortIcon = (field) => {
-    if (sortField !== field) return null
-    return sortDirection === "asc" ? (
-      <ChevronUp className="h-4 w-4 inline-block ml-1" />
-    ) : (
-      <ChevronDown className="h-4 w-4 inline-block ml-1" />
-    )
-  }
+    if (sortField !== field) return null;
+    return sortDirection === "asc" ? <ChevronUp className="h-4 w-4 inline-block ml-1" /> : <ChevronDown className="h-4 w-4 inline-block ml-1" />;
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
@@ -59,8 +53,11 @@ const ReportTable = ({ data }) => {
               <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort("sales")}>
                 Sales {renderSortIcon("sales")}
               </th>
-              <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort("discount")}>
-                Discounts {renderSortIcon("discount")}
+              <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort("productsDiscount")}>
+                Products Discounts {renderSortIcon("productsDiscount")}
+              </th>
+              <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort("offerDiscount")}>
+                Offer Discounts {renderSortIcon("offerDiscount")}
               </th>
               <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort("couponDiscount")}>
                 Coupon Discounts {renderSortIcon("couponDiscount")}
@@ -78,7 +75,8 @@ const ReportTable = ({ data }) => {
               <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                 <td className="px-4 py-3 border-t">{row.period}</td>
                 <td className="px-4 py-3 border-t">{formatCurrency(row.sales)}</td>
-                <td className="px-4 py-3 border-t">{formatCurrency(row.discount)}</td>
+                <td className="px-4 py-3 border-t">{formatCurrency(row.productsDiscount)}</td>
+                <td className="px-4 py-3 border-t">{formatCurrency(row.offerDiscount)}</td>
                 <td className="px-4 py-3 border-t">{formatCurrency(row.couponDiscount)}</td>
                 <td className="px-4 py-3 border-t">{formatCurrency(row.netSales)}</td>
                 <td className="px-4 py-3 border-t">{row.orders}</td>
@@ -88,7 +86,7 @@ const ReportTable = ({ data }) => {
         </table>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ReportTable
+export default ReportTable;

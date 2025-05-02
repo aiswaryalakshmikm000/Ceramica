@@ -98,7 +98,7 @@ const UserForgetPasswordPage = () => {
                     name="email"
                     type="email"
                     autoComplete="email"
-                    className="appearance-none block w-full px-4 py-3 bg-white/70 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 sm:text-sm transition-all duration-300 hover:border-indigo-400"
+                    className="appearance-none block w-full px-4 py-3 bg-white/70 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-800/50 focus:border-orange-800 sm:text-sm transition-all duration-300 hover:border-orange-800"
                     placeholder="e.g., user@gmail.com"
                   />
                   <ErrorMessage
@@ -114,7 +114,7 @@ const UserForgetPasswordPage = () => {
                 <div className="text-sm">
                   <Link
                     to="/login"
-                    className="font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
+                    className="font-medium text-orange-800 hover:text-orange-800 transition-colors duration-200"
                   >
                     Back to Login
                   </Link>
@@ -125,7 +125,7 @@ const UserForgetPasswordPage = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-300 shadow-md hover:shadow-lg"
+                  className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-orange-800/90 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                   {isSubmitting ? (
                     <span className="flex items-center">

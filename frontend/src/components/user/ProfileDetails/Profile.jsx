@@ -7,7 +7,7 @@ import ChangePasswordRequestModal from "./ChangePasswordRequestModal";
 import OTPEnterModal from "../OTPEnterModal";
 import ResetPasswordModal from "../ResetPasswordModal";
 import { useForgetPasswordMutation, useResetPasswordMutation } from "../../../features/userAuth/userApiSlice";
-import Breadcrumbs from "../../common/BreadCrumbs.jsx"; 
+import Breadcrumbs from "../../common/Breadcrumbs";
 
 const Profile = () => {
   const { id } = useParams();
@@ -159,13 +159,13 @@ const Profile = () => {
               <div className="mt-8 w-full flex flex-col md:flex-row gap-4">
                 <button
                   onClick={handleEditProfile}
-                  className="flex-1 bg-orange-800/90 text-white py-3 rounded-lg hover:bg-orange-800 transition-colors"
+                  className="flex-1 bg-orange-800/90 text-white py-3 rounded-lg hover:bg-orange-700 transition-colors"
                 >
                   Edit Profile
                 </button>
                 <button
                   onClick={handleChangePassword}
-                  className="flex-1 bg-orange-800/90 text-white py-3 rounded-lg hover:bg-orange-800 transition-colors"
+                  className="flex-1 bg-orange-800/90 text-white py-3 rounded-lg hover:bg-orange-700 transition-colors"
                 >
                   Change Password
                 </button>

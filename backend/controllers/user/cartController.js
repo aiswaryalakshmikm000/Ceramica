@@ -22,7 +22,7 @@ const addToCart = async (req, res) => {
 
     const product = await Product.findById(productId);
     if (!product || !product.isListed) {
-      return res.status(404).json({ success: false, message: 'Product not found or unavailable' });
+    return res.status(404).json({ success: false, message: 'Product not found or unavailable' });
     }
     
     let cart = await Cart.findOne({ userId });
@@ -74,7 +74,7 @@ const addToCart = async (req, res) => {
 const showCart = async (req, res) => {
   try {
     const { userId } = req.params;
-
+    console.log('>>>>>>>>>>>>>>>>>>>>>userId', userId)
     const cart = await Cart.findOne({ userId }).populate({
       path: 'items.productId',
       select: '_id name price discount discountedPrice isListed colors',
@@ -93,6 +93,7 @@ const showCart = async (req, res) => {
     }
 
     const originalItemCount = cart.items.length;
+    console.log("######### originalItemCount", originalItemCount)
 
     cart.items = cart.items.filter((item) => {
       const product = item.productId;
@@ -108,9 +109,20 @@ const showCart = async (req, res) => {
 
     const updatedCart = await cartService.recalculateCartTotals(cart);
 
+    console.log("######### updatedCart", updatedCart)
+
     cart.set({
       items: cart.items,
       totalAmount: updatedCart.totalAmount,
+      totalMRP: updatedCart.totalMRP,
+      productsDiscount: updatedCart.productsDiscount,
+      offerDiscount: updatedCart.offerDiscount,
+      couponDiscount: updatedCart.couponDiscount,
+      couponId: updatedCart.couponId,
+      couponCode: updatedCart.couponCode,
+      discountPercentage: updatedCart.discountPercentage,
+      deliveryCharge: updatedCart.deliveryCharge,
+      totalItems: updatedCart.totalItems,
     });
     await cart.save();
 
@@ -133,8 +145,8 @@ const showCart = async (req, res) => {
         })),
         totalItems: updatedCart.totalItems,
         totalMRP: updatedCart.totalMRP,
-        totalDiscount: updatedCart.totalDiscount,
-        offerDiscount: updatedCart.offerDiscount, 
+        productsDiscount: updatedCart.productsDiscount,
+        offerDiscount: updatedCart.offerDiscount,
         couponDiscount: updatedCart.couponDiscount,
         couponId: updatedCart.couponId,
         couponCode: updatedCart.couponCode,
@@ -208,6 +220,15 @@ const updateCart = async (req, res) => {
     cart.set({
       items: cart.items,
       totalAmount: updatedCart.totalAmount,
+      totalMRP: updatedCart.totalMRP,
+      productsDiscount: updatedCart.productsDiscount,
+      offerDiscount: updatedCart.offerDiscount,
+      couponDiscount: updatedCart.couponDiscount,
+      couponId: updatedCart.couponId,
+      couponCode: updatedCart.couponCode,
+      discountPercentage: updatedCart.discountPercentage,
+      deliveryCharge: updatedCart.deliveryCharge,
+      totalItems: updatedCart.totalItems,
     });
     await cart.save();
 
@@ -231,8 +252,8 @@ const updateCart = async (req, res) => {
         })),
         totalItems: updatedCart.totalItems,
         totalMRP: updatedCart.totalMRP,
-        totalDiscount: updatedCart.totalDiscount,
-        offerDiscount: updatedCart.offerDiscount, 
+        productsDiscount: updatedCart.productsDiscount,
+        offerDiscount: updatedCart.offerDiscount,
         couponDiscount: updatedCart.couponDiscount,
         couponId: updatedCart.couponId,
         couponCode: updatedCart.couponCode,
@@ -280,6 +301,15 @@ const removeItemFromCart = async (req, res) => {
     cart.set({
       items: cart.items,
       totalAmount: updatedCart.totalAmount,
+      totalMRP: updatedCart.totalMRP,
+      productsDiscount: updatedCart.productsDiscount,
+      offerDiscount: updatedCart.offerDiscount,
+      couponDiscount: updatedCart.couponDiscount,
+      couponId: updatedCart.couponId,
+      couponCode: updatedCart.couponCode,
+      discountPercentage: updatedCart.discountPercentage,
+      deliveryCharge: updatedCart.deliveryCharge,
+      totalItems: updatedCart.totalItems,
     });
     await cart.save();
 
@@ -303,8 +333,8 @@ const removeItemFromCart = async (req, res) => {
         })),
         totalItems: updatedCart.totalItems,
         totalMRP: updatedCart.totalMRP,
-        totalDiscount: updatedCart.totalDiscount,
-        offerDiscount: updatedCart.offerDiscount, 
+        productsDiscount: updatedCart.productsDiscount,
+        offerDiscount: updatedCart.offerDiscount,
         couponDiscount: updatedCart.couponDiscount,
         couponId: updatedCart.couponId,
         couponCode: updatedCart.couponCode,
@@ -326,7 +356,6 @@ const removeItemFromCart = async (req, res) => {
     });
   }
 };
-
 
 const checkoutValidation = async (req, res) => {
   try {

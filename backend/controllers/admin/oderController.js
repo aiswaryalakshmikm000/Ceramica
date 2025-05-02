@@ -4,6 +4,8 @@ const Product = require("../../models/productModel");
 const {
   addWalletTransaction,
 } = require("../../utils/services/addWalletHelper");
+const {applyOffers} = require('../../utils/services/cartService')
+const {debitAdminWallet} = require('../../utils/services/adminWalletHelper')
 
 const getAllOrders = async (req, res) => {
   try {
@@ -218,7 +220,22 @@ const verifyReturnRequest = async (req, res) => {
           order.paymentMethod === "Wallet") &&
         order.paymentStatus === "Paid"
       ) {
-        const refundAmount = order.totalAmount;
+
+        const refundAmount = order.totalAmount - (order.shippingFee + order.couponDiscount);
+
+        // Debit admin wallet
+        const adminWalletResult = await debitAdminWallet(
+          refundAmount,
+          `Refund for returned order ${order.orderNumber}`,
+          order._id,
+          order.userId,
+          "return"
+        );
+        if (!adminWalletResult.success) {
+          throw new Error(adminWalletResult.message);
+        }
+
+
         const walletResult = await addWalletTransaction(
           order.userId,
           refundAmount,
@@ -266,6 +283,7 @@ const verifyReturnRequest = async (req, res) => {
 
 const verifyItemReturnRequest = async (req, res) => {
   try {
+    
     const {
       isApproved,
       adminComment = "",
@@ -274,7 +292,10 @@ const verifyItemReturnRequest = async (req, res) => {
     } = req.body;
     const { orderId } = req.params;
 
+    console.log("req.bodyreq.bodyreq.body", req.body)
     const order = await Order.findById(orderId).populate("items.productId");
+
+    console.log("orderorderorder", order)
     if (!order) {
       return res.status(404).json({
         success: false,
@@ -282,7 +303,6 @@ const verifyItemReturnRequest = async (req, res) => {
         data: null,
       });
     }
-
     const item = order.items.id(itemId);
     if (!item || !item.returnRequest.isRequested) {
       return res.status(400).json({
@@ -321,7 +341,32 @@ const verifyItemReturnRequest = async (req, res) => {
           order.paymentMethod === "Wallet") &&
         order.paymentStatus === "Paid"
       ) {
-        const refundAmount = item.totalPrice;
+
+       
+        const product = item.productId
+        if (!product){
+          throw new Error (`Product not found for the item ${item._id}`)
+        }
+
+        const basePrice = product.discount > 0 ? product.discountedPrice : product.price;
+        const {discountedPrice} = await applyOffers(product._id, basePrice)
+        const totalItems = order.items.length;
+        const apportionedCouponDiscount = order.couponDiscount / totalItems;
+
+        const refundAmount = (discountedPrice * item.quantity) + apportionedCouponDiscount;
+
+         // Debit admin wallet
+         const adminWalletResult = await debitAdminWallet(
+          refundAmount,
+          `Refund for returned item ${item.name} in order ${order.orderNumber}`,
+          order._id,
+          order.userId,
+          "item-return"
+        );
+        if (!adminWalletResult.success) {
+          throw new Error(adminWalletResult.message);
+        }
+
         const walletResult = await addWalletTransaction(
           order.userId,
           refundAmount,

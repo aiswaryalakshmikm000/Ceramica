@@ -1,5 +1,3 @@
-
-
 import React from "react";
 import { CreditCard, Wallet, BanknoteIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "react-toastify";
@@ -53,6 +51,8 @@ const PaymentStep = ({
     onNext();
   };
 
+  const isCODDisabled = cart?.totalAmount > 1000 && paymentMethods.find(method => method.id === "Cash on Delivery");
+
   return (
     <div className="bg-white rounded-xl shadow-md p-6">
       <div className="flex items-center mb-6">
@@ -61,38 +61,58 @@ const PaymentStep = ({
       </div>
 
       <div className="space-y-4">
-        {paymentMethods.map((method) => (
-          <div
-            key={method.id}
-            className={`bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow p-4 cursor-pointer ${
-              selectedPaymentMethod === method.id ? "border border-gray-200" : ""
-            }`}
-            onClick={() => handleSelectPayment(method.id)}
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center h-10 w-10 rounded-full bg-orange-100">
-                {method.icon}
-              </div>
-              <div className="flex-1">
-                <h3 className="font-medium text-orange-800">{method.title}</h3>
-                <p className="text-sm text-gray-600">{method.description}</p>
-              </div>
-              <div className="ml-auto">
-                <div
-                  className={`h-5 w-5 rounded-full ${
-                    selectedPaymentMethod === method.id
-                      ? "bg-orange-800 ring-2 ring-orange-200"
-                      : "border border-gray-300"
-                  }`}
-                >
-                  {selectedPaymentMethod === method.id && (
-                    <div className="h-2.5 w-2.5 m-1.25 rounded-full"></div>
+        {paymentMethods.map((method) => {
+          const isDisabled = method.id === "Cash on Delivery" && isCODDisabled;
+          return (
+            <div
+              key={method.id}
+              className={`bg-white rounded-xl shadow-md transition-shadow p-4 ${
+                isDisabled
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:shadow-lg cursor-pointer"
+              } ${
+                selectedPaymentMethod === method.id && !isDisabled
+                  ? "border border-gray-200"
+                  : ""
+              }`}
+              onClick={() => {
+                if (!isDisabled) {
+                  handleSelectPayment(method.id);
+                } else {
+                  toast.info("Cash on Delivery is not available for orders above ₹1000");
+                }
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center h-10 w-10 rounded-full bg-orange-100">
+                  {method.icon}
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-medium text-orange-800">{method.title}</h3>
+                  <p className="text-sm text-gray-600">{method.description}</p>
+                  {isDisabled && (
+                    <p className="text-xs text-red-500 mt-1">
+                      Not available for orders above ₹1000
+                    </p>
                   )}
+                </div>
+                <div className="ml-auto">
+                  <div
+                    className={`h-5 w-5 rounded-full ${
+                      selectedPaymentMethod === method.id && !isDisabled
+                        ? "bg-orange-800 ring-2 ring-orange-200"
+                        : "border border-gray-300"
+                    }`}
+                  >
+                    {selectedPaymentMethod === method.id && !isDisabled && (
+                      <div className="h-2.5 w-2.5 m-1.25 rounded-full"></div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="mt-8 flex justify-between">

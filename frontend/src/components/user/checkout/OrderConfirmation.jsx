@@ -13,6 +13,7 @@ const OrderConfirmation = () => {
     skip: !orderId,
   });
 
+  console.log("OOOOOOOOOOrder", orderData)
   // Helper function to safely format dates
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
