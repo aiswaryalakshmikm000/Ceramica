@@ -124,12 +124,6 @@ const Navbar = () => {
               >
                 About Me
               </Link>
-              <Link
-                to="/about"
-                className="relative text-ceramic-charcoal hover:text-ceramic-earth text-lg font-semibold transition-all duration-300 hover:scale-105 after:content-[''] after:absolute after:w-full after:h-[2px] after:bg-ceramic-earth after:left-0 after:bottom-[-4px] after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100"
-              >
-                Contact Us
-              </Link>
             </div>
 
             <Link to="/" className="absolute left-1/2 transform -translate-x-1/2 flex items-center">

@@ -149,6 +149,8 @@ const createRazorpayOrder = async (req, res) => {
         latestPrice: item.latestPrice,
         discount: item.discount,
         totalPrice: item.totalPrice,
+        status: "Payment-Pending",
+        paymentStatus: "Pending",
       })),
       totalMRP,
       productsDiscount,
@@ -161,10 +163,10 @@ const createRazorpayOrder = async (req, res) => {
       paymentMethod: "Razorpay",
       paymentStatus: "Pending",
       transactionId: razorpayOrder.id,
-      status: "Pending",
+      status: "Payment-Pending",
       orderDate: new Date(),
       expectedDeliveryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      activityLog: [{ status: "Pending", changedAt: new Date() }],
+      activityLog: [{ status: "Payment-Pending", changedAt: new Date() }],
     });
 
     await order.save();
@@ -327,7 +329,7 @@ const retryRazorpayPayment = async (req, res) => {
       });
     }
 
-    if (order.paymentStatus !== "Pending") {
+    if (order.paymentStatus !== "Pending"  ) {
       return res.status(400).json({
         success: false,
         message: "Order is not eligible for retry payment",
@@ -371,8 +373,12 @@ const retryRazorpayPayment = async (req, res) => {
 
     order.transactionId = razorpayOrder.id;
     order.paymentStatus = "Pending";
+    order.items.forEach((item) => {
+      item.paymentStatus = "Pending";
+      item.status = "Payment-Pending";
+    });
     order.activityLog.push({
-      status: "Pending",
+      status: "Payment-Pending",
       changedAt: new Date(),
       description: "Retry payment initiated",
     });
@@ -858,7 +864,7 @@ const cancelOrder = async (req, res) => {
       });
     }
 
-    if (order.status !== "Pending" && order.status !== "Confirmed") {
+    if (order.status !== "Pending" && order.status !== "Confirmed" && order.status !== "Payment-Pending") {
       return res.status(400).json({
         success: false,
         message: "Cannot cancel order at this stage",

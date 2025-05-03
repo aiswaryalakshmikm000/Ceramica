@@ -122,7 +122,7 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-20 my-2 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="px-24 mx-auto">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Cart Items Section */}
           <div className="lg:w-2/3">

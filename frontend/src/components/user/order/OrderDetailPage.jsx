@@ -59,7 +59,7 @@ const OrderDetailPage = () => {
   }
 
   const status = order.status;
-  const canCancel = status === "Pending" || status === "Confirmed";
+  const canCancel = status === "Pending" || status === "Payment-Pending" || status === "Confirmed";
   const canReturn = status === "Delivered";
   const isShipped = status === "Shipped" || status === "Out for Delivery";
 

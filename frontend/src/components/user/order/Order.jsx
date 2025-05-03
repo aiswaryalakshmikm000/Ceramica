@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Eye, ShoppingBag, RefreshCw } from "lucide-react";
+import { Search, ShoppingBag, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader } from "../../ui/Card.jsx";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
@@ -98,8 +98,8 @@ const Order = () => {
       retryRazorpayPayment,
       navigate,
       (orderNumber) => {
-        setFailedOrderId(orderNumber); // Set failed order ID
-        setIsFailureModalOpen(true); // Open modal on failure
+        setFailedOrderId(orderNumber);
+        setIsFailureModalOpen(true);
       }
     );
   };
@@ -184,7 +184,8 @@ const Order = () => {
               <div className="divide-y divide-gray-100">
                 {filteredOrders.map((order) => (
                   <div key={order.orderNumber} className="transition-colors">
-                    <div className="p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between cursor-pointer hover:bg-gray-50/50">
+                    <div className="p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between cursor-pointer hover:bg-gray-50/50" 
+                    onClick={() => navigate(`/orders/${order.orderNumber}`)}>
                       <div className="flex flex-col mb-3 md:mb-0">
                         <div className="flex items-center gap-2 md:gap-4">
                           <span className="text-lg font-medium text-gray-900">
@@ -200,19 +201,6 @@ const Order = () => {
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-xs"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/orders/${order.orderNumber}`);
-                          }}
-                        >
-                          <Eye size={14} className="mr-1.5" />
-                          Details
-                        </Button>
-
                         {(order.paymentStatus === "Pending" || order.paymentStatus === "Failed") && (
                           <Button
                             variant="outline"
@@ -263,7 +251,6 @@ const Order = () => {
         </div>
       </div>
 
-      {/* Render the Payment Failure Modal */}
       <PaymentFailureModal
         isOpen={isFailureModalOpen}
         onClose={handleCloseModal}

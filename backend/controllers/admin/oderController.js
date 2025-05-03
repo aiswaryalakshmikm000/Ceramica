@@ -110,6 +110,7 @@ const updateOrderStatus = async (req, res) => {
       "Out for Delivery",
       "Delivered",
       "Cancelled",
+      "Payment-Pending",
     ];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
@@ -119,6 +120,17 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
+    if (order.status === "Payment-Pending") {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot change status while order is Payment-Pending",
+        data: {
+          currentStatus: order.status,
+          allowedAction: "Wait for payment to be completed or failed",
+        },
+      });
+    }
+    
     order.status = status;
 
     order.items = order.items.map((item) => {
