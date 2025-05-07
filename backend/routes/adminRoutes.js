@@ -9,7 +9,7 @@ const{addCategory,showCategories,editCategory,listCategory,showCategory} = requi
 const {addProduct,showProducts,updateProductStatus, showProduct, editProduct} = require('../controllers/admin/productController')
 const {getAllOrders, updateOrderStatus, verifyReturnRequest, verifyItemReturnRequest, getOrderDetails} = require('../controllers/admin/oderController');
 const { createCoupon, getCoupons, deleteCoupon, } = require("../controllers/admin/couponController");
-const {getOffers, addOffer, updateOffer, statusToggle } = require("../controllers/admin/offerController");
+const {getOffers, addOffer, statusToggle } = require("../controllers/admin/offerController");
 const { getSalesReport, downloadExcelReport, downloadPdfReport } = require("../controllers/admin/salesReportController");
 const {getStatus, getSales, getTopProducts, getTopCategories, } = require ('../controllers/admin/dashboardController')
 const { getAdminWallet, getWalletTransactions } = require("../controllers/admin/adminWalletController");
@@ -58,7 +58,7 @@ adminRoute.delete("/coupons/:couponId", authenticateAdminToken, deleteCoupon);
 //offer
 adminRoute.get('/offers', authenticateAdminToken, getOffers);
 adminRoute.post('/offers/add', authenticateAdminToken,  addOffer);
-adminRoute.put('/offers/:id', authenticateAdminToken, updateOffer);
+// adminRoute.put('/offers/:id', authenticateAdminToken, updateOffer);
 adminRoute.patch('/offers/:id', authenticateAdminToken, statusToggle);
 
 //sales report

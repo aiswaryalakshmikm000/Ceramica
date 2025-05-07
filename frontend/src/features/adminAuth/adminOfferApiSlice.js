@@ -24,14 +24,14 @@ export const adminOfferApiSlice = adminApi.injectEndpoints({
       }),
       invalidatesTags: ["Offers"],
     }),
-    updateOffer: builder.mutation({
-      query: ({ id, ...offerData }) => ({
-        url: `/offers/${id}`,
-        method: "PUT",
-        body: offerData,
-      }),
-      invalidatesTags: ["Offers"],
-    }),
+    // updateOffer: builder.mutation({
+    //   query: ({ id, ...offerData }) => ({
+    //     url: `/offers/${id}`,
+    //     method: "PUT",
+    //     body: offerData,
+    //   }),
+    //   invalidatesTags: ["Offers"],
+    // }),
   }),
 });
 
