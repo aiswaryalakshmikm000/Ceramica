@@ -115,7 +115,7 @@ const PaymentStep = ({
         })}
       </div>
 
-      <div className="mt-8 flex justify-between">
+      <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0">
         <button
           onClick={onBack}
           className="flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"

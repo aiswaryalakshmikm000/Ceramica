@@ -52,16 +52,16 @@ const ColorFilter = ({ onChange, initialColors = [], resetTrigger }) => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="px-4 py-2 bg-white border border-gray-200 rounded-lg flex items-center justify-between min-w-[130px] hover:border-gray-300 transition-colors"
+        className="px-4 py-2 bg-white border border-gray-200 rounded-lg flex items-center justify-between w-full sm:min-w-[130px] hover:border-gray-300 transition-colors"
       >
-        <span className="text-sm text-gray-700">Colors {getSelectedCount()}</span>
+        <span className="text-sm text-gray-700 truncate">Colors {getSelectedCount()}</span>
         <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="filter-dropdown absolute left-0 top-full mt-1 w-56 bg-white shadow-lg rounded-lg border border-gray-100 z-10 p-4">
+        <div className="filter-dropdown absolute left-0 top-full mt-1 w-full sm:w-56 bg-white shadow-lg rounded-lg border border-gray-100 z-10 p-4">
           <h3 className="font-medium text-sm mb-3">Select Colors</h3>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
             {colorOptions.map((color) => (
               <div
                 key={color.name}
@@ -71,8 +71,8 @@ const ColorFilter = ({ onChange, initialColors = [], resetTrigger }) => {
                 }`}
                 style={{ 
                   backgroundColor: color.hex,
-                  width: '40px',
-                  height: '40px',
+                  width: '32px',
+                  height: '32px',
                   boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
                   border: '1px solid rgba(0,0,0,0.1)'
                 }}
@@ -80,7 +80,7 @@ const ColorFilter = ({ onChange, initialColors = [], resetTrigger }) => {
               >
                 {selectedColors.includes(color.name) && (
                   <Check 
-                    size={16} 
+                    size={14} 
                     className={`${['white', 'beige', 'mint'].includes(color.name) ? 'text-black' : 'text-white'}`} 
                   />
                 )}

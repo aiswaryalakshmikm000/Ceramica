@@ -6,7 +6,6 @@ import {
   Users, 
   Package, 
   Tag, 
-  Star, 
   BarChart, 
   Percent, 
   Gift,

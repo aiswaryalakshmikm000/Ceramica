@@ -11,7 +11,23 @@ const baseQuery = fetchBaseQuery({
 // Custom query with token refresh logic
 const baseQueryWithReauth = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
-
+  if(result.error && result.error.status === 403) {
+    try {
+      const blockResult = await baseQuery(
+        { url: "/logout", method: "POST" }, 
+        api, 
+        extraOptions
+      );
+      if(blockResult.success){
+        api.dispatch(logoutUser())
+        toast.error('Your account was blocked by Admin, Contact support');
+      }
+    } catch (error) {
+      console.log('Error:', error)
+      toast.error(error);
+    }
+  }
+  
   if (result.error && result.error.status === 401) {
     console.log("Access token expired. Attempting to refresh...");
 

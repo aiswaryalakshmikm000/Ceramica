@@ -66,7 +66,7 @@ const aggregateSalesData = async (period, start, end) => {
           $gte: start,
           $lte: end,
         },
-        status: { $in: ["Confirmed", "Delivered"] },
+        status: { $in: [ "Delivered"] },
       },
     },
     {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { selectIsUserAuthenticated, selectUserRole } from '../features/userAuth/userAuthSlice';
 import { selectIsAdminAuthenticated, selectAdminRole } from '../features/adminAuth/adminAuthSlice';
 import { useCheckAuthQuery } from "../features/userAuth/userApiSlice";

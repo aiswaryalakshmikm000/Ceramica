@@ -15,6 +15,8 @@ const AdminEditProductPage = () => {
   const [editProduct, { isLoading: editLoading, error: editError }] = useEditProductMutation();
   const { data: categoriesData, isLoading: categoriesLoading, error: categoriesError } = useGetCategoriesQuery();
 
+  console.log("productData", productData)
+
   const categories = categoriesData?.categories || [];
   const product = productData?.product;
 
@@ -77,7 +79,7 @@ const AdminEditProductPage = () => {
     description: product.description || "",
     price: product.price || "",
     discount: product.discount || "0",
-    categoryId: product.categoryId || "",
+    categoryId: product.categoryId._id || "",
     tags: product.tags ? product.tags.join(", ") : "",
     isFeatured: product.isFeatured || false,
     colors: product.colors.length > 0

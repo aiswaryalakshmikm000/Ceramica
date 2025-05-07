@@ -8,11 +8,13 @@ const productSchema = Joi.object({
     .min(2)
     .max(50)
     .required()
+    .regex(/^(?!\d+$)/)
     .messages({
       "string.empty": "Product name is required.",
       "any.required": "Product name is required.",
       "string.min": "Product name should have at least 2 characters.",
       "string.max": "Product name should have at most 50 characters.",
+      "string.pattern.base": "Product name cannot be only numbers.",
     }),
 
   description: Joi.string()
@@ -50,7 +52,11 @@ const productSchema = Joi.object({
   }),
 
   tags: Joi.array()
-    .items(Joi.string().trim())
+    .items(Joi.string()
+    .trim()
+    .regex(/^(?!\d+$)/)
+        .message("Tags cannot be only numbers.")
+  )
     .messages({
       "array.base": "Tags must be an array of strings.",
     }),
@@ -73,11 +79,13 @@ const productSchema = Joi.object({
             "any.required": "Stock is required.",
           }),
         images: Joi.array()
-          .items(Joi.string()) // Removed .uri() validation to allow local paths or Cloudinary URLs
-          //.required()   give this
+          .items(Joi.string()) 
+          .min(3)
+          .required()  
           .messages({
             "array.base": "Images must be an array of strings.",
             "any.required": "Images are required.",
+            "array.min": "At least three image is required per color variant.",
           }),
       })
     )
@@ -89,26 +97,7 @@ const productSchema = Joi.object({
       "any.required": "Colors are required.",
     }),
 
-
-
-
-
-    //%^%$#$#@%$@#%$#%$#%#V Remove this#$%@#$%#@$%$#%
-
-    images: Joi.array()
-    .items(Joi.string()) // Removed .uri() validation to allow local paths or Cloudinary URLs
-    .required()
-    .messages({  // <-- This bracket is not properly closed
-      "array.base": "Images must be an array of strings.",
-      "any.required": "Images are required."}),
- //#$%@%#$%^%$^@%^$%^@#$%%@^&#%^$^^^^^^^^^^^^^^^^$@%$#%$#%#$%#@
-
-
-
-
-
-  totalStock: Joi.forbidden(), // Prevents direct input, as it will be computed in the backend.
-
+  totalStock: Joi.forbidden(),
   isFeatured: Joi.boolean()
     .default(false)
     .messages({
@@ -131,7 +120,7 @@ const productSchema = Joi.object({
           "number.max": "Rating cannot be more than 5.",
         }),
         comment: Joi.string().allow(null, ""),
-        createdAt: Joi.date(), // No default, since MongoDB sets it automatically
+        createdAt: Joi.date(), 
       })
     )
     .messages({

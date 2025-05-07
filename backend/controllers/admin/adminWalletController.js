@@ -30,7 +30,7 @@ const getAdminWallet = async (req, res) => {
 
 const getWalletTransactions = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search = "", type = "", date = "" } = req.query;
+    const { page = 1, limit = 10, search = "", type = ""} = req.query;
     const wallet = await AdminWallet.findOne({}).populate(
       "transactions.userId",
       "name email"
@@ -59,24 +59,6 @@ const getWalletTransactions = async (req, res) => {
     if (type && type !== "all") {
       filteredTransactions = filteredTransactions.filter(
         (transaction) => transaction.type === type
-      );
-    }
-
-    // Apply date filter
-    if (date && date !== "all") {
-      const now = new Date();
-      let startDate;
-
-      if (date === "today") {
-        startDate = new Date(now.setHours(0, 0, 0, 0));
-      } else if (date === "week") {
-        startDate = new Date(now.setDate(now.getDate() - 7));
-      } else if (date === "month") {
-        startDate = new Date(now.setMonth(now.getMonth() - 1));
-      }
-
-      filteredTransactions = filteredTransactions.filter(
-        (transaction) => new Date(transaction.createdAt) >= startDate
       );
     }
 

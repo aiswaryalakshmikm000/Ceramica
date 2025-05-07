@@ -3,7 +3,7 @@ import {
   useGetCustomerDetailsQuery,
   useEditCustomerStatusMutation,
 } from "../../../features/adminAuth/AdminCustomerApiSlice";
-import Breadcrumbs from "../../common/BreadCrumbs";
+import Breadcrumbs from "../../common/Breadcrumbs";
 import Pagination from "../../common/Pagination";
 import { Eye, Search } from "lucide-react";
 import Sidebar from "../SideBar";
@@ -47,10 +47,6 @@ const AdminShowCustomers = () => {
     } catch (err) {
       toast.error(err?.data?.message || "Failed to update customer status");
     }
-  };
-
-  const handleViewDetails = (userId) => {
-    navigate(`/admin/customers/${userId}`);
   };
 
   if (error) {
@@ -186,13 +182,6 @@ const AdminShowCustomers = () => {
                           }`}
                         >
                           {user.isBlocked ? "Unblock" : "Block"}
-                        </button>
-                        <button
-                          onClick={() => handleViewDetails(user._id)}
-                          className="text-[#3c73a8] hover:text-[#2c5580] flex items-center gap-1"
-                        >
-                          <Eye size={16} />
-                          <span>View</span>
                         </button>
                       </td>
                     </tr>

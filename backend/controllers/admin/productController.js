@@ -1,6 +1,6 @@
 
 const Product = require("../../models/productModel");
-const productValidationSchema = require('../../utils/validation/productValidation')
+const productSchema = require('../../utils/validation/productValidation')
 const mongoose = require("mongoose");
 
 const { cloudinaryImageUploadMethod } = require("../../utils/cloudinary/cloudinaryUpload");

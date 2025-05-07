@@ -26,6 +26,7 @@ const UserCheckout = lazy(() => import ('./pages/user/UserCheckout'))
 const UserReferAndEarn = lazy(() => import ('./pages/user/UserReferAndEarn'))
 const UserOderConfrimation = lazy(() => import ('./pages/user/UserOrderConfirmation'))
 const UserOderFailure = lazy(() => import ('./pages/user/UserOrderFailure'))
+const UserAbout = lazy(() => import ('./pages/user/UserAbout'))
 
 const AdminLogin = lazy(() => import("./components/admin/AdminLogin"));
 const AdminRegister = lazy(() => import("./components/admin/AdminRegister"));
@@ -82,7 +83,7 @@ function App() {
           <Route path="/shop" element={<UserShop />} /> {/* Made public */}
           <Route path="/shop/:id" element={<UserViewProduct />} /> {/* Made public */}
 
-          {/* Protected User Routes (Commented as in your code) */}
+          {/* Protected User Routes */}
           <Route path="/profile/:id" element={<IsUserLogin><UserProfile /></IsUserLogin>} />
           <Route path="/profile/edit/:id" element={<IsUserLogin><UserEditProfile /></IsUserLogin>} />
           <Route path="/address/:userId" element={<IsUserLogin><UserAddress /></IsUserLogin>} />
@@ -96,6 +97,7 @@ function App() {
           <Route path="/refer-and-earn" element={<IsUserLogin><UserReferAndEarn /></IsUserLogin>} />
           <Route path="/order-confirmation/:orderId" element={<IsUserLogin><UserOderConfrimation /></IsUserLogin>} />
           <Route path="/order-failure/:orderId" element={<IsUserLogin><UserOderFailure /></IsUserLogin>} />
+          <Route path="/about" element={<IsUserLogin><UserAbout /></IsUserLogin>} />
 
           {/* Public Admin Routes */}
           <Route path="/admin/register" element={<IsAdminLogout><AdminRegister /></IsAdminLogout>} />

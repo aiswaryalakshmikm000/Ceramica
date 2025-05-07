@@ -14,14 +14,6 @@ dotenv.config();
 // Round to two decimal places
 const roundToTwo = (num) => Number((Math.round(num * 100) / 100).toFixed(2));
 
-// // Calculate discount price
-// const calculateDiscountPrice = (product) => {
-//   if (!product) return 0;
-//   let totalDiscount = product.discount || 0;
-//   return Math.min(totalDiscount, 100);
-// };
-
-
 // Check stock availability
 const checkStock = async (productId, color, quantity) => {
   const product = await Product.findById(productId);

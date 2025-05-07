@@ -93,16 +93,16 @@ const Hero = () => {
         <div className="absolute inset-0 bg-ceramic-charcoal/30"></div>
       </div>
 
-      <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
-        <div className="max-w-3xl">
+      <div className="relative h-full flex flex-col items-center justify-center mx-auto px-4 sm:px-6 lg:px-14 my-10 sm:my-14 lg:my-20 max-w-7xl">
+        <div className="w-full max-w-3xl sm:max-w-4xl lg:max-w-3xl">
           <div ref={titleRef} className="mb-6">
-            <h1 className="text-white font-serif text-5xl md:text-6xl lg:text-7xl leading-tight">
+            <h1 className="text-white font-serif text-3xl sm:text-4xl md:text-5xl lg:text-7xl leading-tight sm:leading-snug">
               {banner.title}
             </h1>
           </div>
           
           <div ref={subtitleRef} className="mb-8">
-            <p className="text-white/90 text-lg md:text-xl max-w-2xl mx-auto">
+            <p className="text-white/90 text-base sm:text-lg md:text-xl max-w-full sm:max-w-xl md:max-w-2xl mx-auto">
               {banner.subtitle}
             </p>
           </div>
@@ -110,7 +110,7 @@ const Hero = () => {
           <div ref={ctaRef}>
             <a 
               href={banner.ctaLink} 
-              className="inline-block bg-ceramic-clay text-white font-medium px-8 py-3 rounded-full transition-all duration-300 hover:bg-ceramic-terracotta hover:shadow-lg"
+              className="inline-block bg-ceramic-clay text-white font-medium px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base rounded-full transition-all duration-300 hover:bg-ceramic-terracotta hover:shadow-lg"
             >
               {banner.ctaText}
             </a>

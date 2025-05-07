@@ -35,6 +35,9 @@ const register = async (req, res) => {
       $or: [{ email }, { phone }],
     });
     if (existingUser) {
+      if (!existingUser.isVerified){
+        return res.status(409).json({success: false, message: "This email or phone number is already registered but not verified. Please use the forgot password flow to verify your email with an OTP."})
+      }
       return res.status(409).json({
         success: false,
         message: "Email or phone number already exists",
@@ -119,7 +122,7 @@ const login = async (req, res) => {
     if(!userExist.isVerified){
       return res.status(403).json({
         success: false,
-        message: "Please verify your email with OTP before logging in."
+        message: "Please verify your email with OTP before logging in by using forget password flow."
       })
     }
 
@@ -189,7 +192,7 @@ const logout = async (req, res) => {
     const refreshToken = req.cookies["userRefreshToken"];
 
     if (!refreshToken) {
-      return res.status(400).json({ message: "No refresh token found" });
+      return res.status(400).json({ success: false, message: "No refresh token found" });
     }
 
     const deletedToken = await RefreshToken.findOneAndDelete({
@@ -197,7 +200,7 @@ const logout = async (req, res) => {
     });
 
     if (!deletedToken) {
-      return res.status(400).json({ message: "Token not found in database" });
+      return res.status(400).json({ success: false, message: "Token not found in database" });
     }
 
     res.clearCookie("userAccessToken", {
@@ -211,7 +214,7 @@ const logout = async (req, res) => {
       sameSite: "strict",
     });
 
-    res.status(200).json({ message: "User logged out successfully" });
+    res.status(200).json({ success:true, message: "User logged out successfully" });
 
   } catch (error) {
     console.error("Error in logout:", error);
@@ -359,6 +362,13 @@ const verifyResetOtp=async(req,res)=>{
     const errorMessage=!otpData?.otp.length?"OTP Expired.":"OTP is not valid."
   return res.status(400).json({message:errorMessage})
   }
+
+  const user = await User.findOneAndUpdate(
+    { email },
+    { isVerified: true },
+    { new: true }
+  ).select("-password");
+
   res.status(200).json({success:true,message:"OTP verfied successfully."})
   } catch (error) {
     const errorMessage=error.message||"OTP Verification failed."

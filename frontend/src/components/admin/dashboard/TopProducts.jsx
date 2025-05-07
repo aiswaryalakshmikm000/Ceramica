@@ -36,14 +36,14 @@ const TopProducts = ({ dateRange, filterType }) => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3c73a8]"></div>
+        <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-[#3c73a8]"></div>
       </div>
     )
   }
 
   if (isError) {
     return (
-      <div className="flex justify-center items-center h-64 text-red-500">
+      <div className="flex justify-center items-center h-64 text-red-500 text-sm sm:text-base">
         Error loading product data
       </div>
     )
@@ -51,7 +51,7 @@ const TopProducts = ({ dateRange, filterType }) => {
 
   if (!products || products.length === 0) {
     return (
-      <div className="flex justify-center items-center h-64 text-gray-500">
+      <div className="flex justify-center items-center h-64 text-gray-500 text-sm sm:text-base">
         No product data available for the selected period
       </div>
     )
@@ -64,13 +64,13 @@ const TopProducts = ({ dateRange, filterType }) => {
       <div className="flex justify-end mb-4">
         <div className="flex border border-gray-200 rounded-md overflow-hidden">
           <button
-            className={`px-3 py-1 text-sm ${viewMode === "table" ? "bg-[#3c73a8] text-white" : "bg-gray-100"}`}
+            className={`px-2 py-1 text-xs sm:px-3 sm:py-1 sm:text-sm ${viewMode === "table" ? "bg-[#3c73a8] text-white" : "bg-gray-100"}`}
             onClick={() => setViewMode("table")}
           >
             Table
           </button>
           <button
-            className={`px-3 py-1 text-sm ${viewMode === "chart" ? "bg-[#3c73a8] text-white" : "bg-gray-100"}`}
+            className={`px-2 py-1 text-xs sm:px-3 sm:py-1 sm:text-sm ${viewMode === "chart" ? "bg-[#3c73a8] text-white" : "bg-gray-100"}`}
             onClick={() => setViewMode("chart")}
           >
             Chart
@@ -83,19 +83,19 @@ const TopProducts = ({ dateRange, filterType }) => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-2 py-2 sm:px-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Product
                 </th>
-                <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-2 py-2 sm:px-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Category
                 </th>
-                <th className="px-2 py- mv3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-2 py-2 sm:px-2 sm:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Sales
                 </th>
-                <th className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-2 py-2 sm:px-2 sm:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Revenue
                 </th>
-                <th className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-2 py-2 sm:px-2 sm:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Stock
                 </th>
               </tr>
@@ -103,25 +103,25 @@ const TopProducts = ({ dateRange, filterType }) => {
             <tbody className="bg-white divide-y divide-gray-200">
               {products.map((product) => (
                 <tr key={product._id} className="hover:bg-gray-50">
-                  <td className="px-2 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{product.name}</td>
-                  <td className="px-2 py-3 whitespace-nowrap text-sm text-gray-500">{product.categoryName}</td>
-                  <td className="px-2 py-3 whitespace-nowrap text-sm text-gray-500 text-right">{product.sales}</td>
-                  <td className="px-2 py-3 whitespace-nowrap text-sm text-gray-500 text-right">
+                  <td className="px-2 py-2 sm:px-2 sm:py-3 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">{product.name}</td>
+                  <td className="px-2 py-2 sm:px-2 sm:py-3 whitespace-nowrap text-xs sm:text-sm text-gray-500">{product.categoryName}</td>
+                  <td className="px-2 py-2 sm:px-2 sm:py-3 whitespace-nowrap text-xs sm:text-sm text-gray-500 text-right">{product.sales}</td>
+                  <td className="px-2 py-2 sm:px-2 sm:py-3 whitespace-nowrap text-xs sm:text-sm text-gray-500 text-right">
                     ₹{product.revenue.toLocaleString()}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 text-right">{product.totalStock}</td>
+                  <td className="px-2 py-2 sm:px-4 sm:py-3 whitespace-nowrap text-xs sm:text-sm text-gray-500 text-right">{product.totalStock}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       ) : (
-        <div className="h-80">
+        <div className="h-64 sm:h-80">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart layout="vertical" data={chartData} margin={{ top: 5, right: 30, left: 100, bottom: 5 }}>
+            <BarChart layout="vertical" data={chartData} margin={{ top: 5, right: 10, left: 50, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={100} />
+              <XAxis type="number" tick={{ fontSize: 10 }} className="sm:text-xs" />
+              <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} width={50} className="sm:text-xs" />
               <Tooltip formatter={(value) => [value, "Units Sold"]} />
               <Bar dataKey="sales" fill="#3c73a8" />
             </BarChart>

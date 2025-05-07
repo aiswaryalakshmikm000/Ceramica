@@ -7,9 +7,21 @@ const User = require('../../models/userModel');
 const moment = require('moment');
 
 // Helper function to calculate date range
-const getDateRangeFilter = (startDate, endDate) => {
-  const start = moment(startDate).startOf('day').toDate();
-  const end = moment(endDate).endOf('day').toDate();
+const getDateRangeFilter = (filterType) => {
+  let start, end;
+  if (filterType === 'daily') {
+    start = moment().startOf('day').toDate();
+    end = moment().endOf('day').toDate();
+  } else if (filterType === 'weekly') {
+    start = moment().startOf('isoWeek').toDate(); // Monday
+    end = moment().endOf('isoWeek').toDate(); // Sunday
+  } else if (filterType === 'monthly') {
+    start = moment().startOf('month').toDate();
+    end = moment().endOf('month').toDate();
+  } else if (filterType === 'yearly') {
+    start = moment().startOf('year').toDate();
+    end = moment().endOf('year').toDate();
+  }
   return {
     orderDate: {
       $gte: start,
@@ -29,7 +41,7 @@ const generateLabels = (filterType, startDate, endDate) => {
       labels.push(`${i}:00`);
     }
   } else if (filterType === 'weekly') {
-    labels.push('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
+    labels.push('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
   } else if (filterType === 'monthly') {
     const daysInMonth = end.diff(start, 'days') + 1;
     for (let i = 0; i < daysInMonth; i++) {
@@ -47,13 +59,13 @@ const getGroupFormat = (filterType) => {
     case 'daily':
       return { $hour: '$orderDate' };
     case 'weekly':
-      return { $dayOfWeek: '$orderDate' };
+      return { $dayOfWeek: '$orderDate' }; // 1=Sunday, 2=Monday, ..., 7=Saturday
     case 'monthly':
       return { $dayOfMonth: '$orderDate' };
     case 'yearly':
       return { $month: '$orderDate' };
     default:
-      return { $dayOfWeek: '$orderDate' }; 
+      return { $dayOfWeek: '$orderDate' };
   }
 };
 
@@ -63,13 +75,14 @@ const mapResultsToDataArrays = (results, filterType, labels) => {
   const productsDiscountData = new Array(labels.length).fill(0);
   const offerDiscountData = new Array(labels.length).fill(0);
   const couponDiscountData = new Array(labels.length).fill(0);
+  const ordersData = new Array(labels.length).fill(0);
 
   results.forEach((result) => {
     let index;
     if (filterType === 'daily') {
       index = result._id;
     } else if (filterType === 'weekly') {
-      index = result._id - 1; // MongoDB $dayOfWeek starts from 1 (Sunday)
+      index = (result._id + 5) % 7; // Adjust: 2(Monday)=0, 1(Sunday)=6
     } else if (filterType === 'monthly') {
       index = result._id - 1;
     } else if (filterType === 'yearly') {
@@ -77,28 +90,35 @@ const mapResultsToDataArrays = (results, filterType, labels) => {
     }
 
     if (index >= 0 && index < labels.length) {
-      salesData[index] = result.sales;
-      productsDiscountData[index] = result.productsDiscount;
-      offerDiscountData[index] = result.offerDiscount;
-      couponDiscountData[index] = result.couponDiscount;
+      salesData[index] = result.sales || 0;
+      productsDiscountData[index] = result.productsDiscount || 0;
+      offerDiscountData[index] = result.offerDiscount || 0;
+      couponDiscountData[index] = result.couponDiscount || 0;
+      ordersData[index] = result.orders || 0;
     }
   });
 
-  return { salesData, productsDiscountData, offerDiscountData, couponDiscountData };
+  return { salesData, productsDiscountData, offerDiscountData, couponDiscountData, ordersData };
 };
 
 // 1. Get Dashboard Summary Stats
+
 const getStatus = async (req, res) => {
   try {
-    const { startDate, endDate, filterType } = req.query;
+    const { filterType = 'weekly' } = req.query;
 
-    const dateFilter = startDate && endDate ? getDateRangeFilter(startDate, endDate) : {};
+    if (!['daily', 'weekly', 'monthly', 'yearly'].includes(filterType)) {
+      return res.status(400).json({ message: 'Invalid filter type' });
+    }
+
+    const dateFilter = getDateRangeFilter(filterType);
+    console.log('getStatus Date Filter:', dateFilter);
 
     const orderStats = await Order.aggregate([
       {
         $match: {
           ...dateFilter,
-          status: 'Delivered', 
+          status: 'Delivered',
         },
       },
       {
@@ -108,13 +128,13 @@ const getStatus = async (req, res) => {
           totalOrders: { $sum: 1 },
         },
       },
-      {
-        $project: {
-          netSales: 1,
-          totalOrders: 1,
-        },
-      },
     ]);
+
+    const orders = await Order.find({
+      ...dateFilter,
+      status: 'Delivered',
+    }).select('orderNumber totalAmount orderDate status');
+    console.log('getStatus Orders:', orders);
 
     const activeUsers = await User.countDocuments({
       isBlocked: false,
@@ -134,25 +154,23 @@ const getStatus = async (req, res) => {
 // 2. Get Sales Data
 const getSales = async (req, res) => {
   try {
-    const { startDate, endDate, filterType = 'weekly' } = req.query;
-
-    if (!startDate || !endDate) {
-      return res.status(400).json({ message: 'Start date and end date are required' });
-    }
+    const { filterType = 'weekly' } = req.query;
 
     if (!['daily', 'weekly', 'monthly', 'yearly'].includes(filterType)) {
       return res.status(400).json({ message: 'Invalid filter type' });
     }
 
-    const dateFilter = getDateRangeFilter(startDate, endDate);
-    const labels = generateLabels(filterType, startDate, endDate);
+    const dateFilter = getDateRangeFilter(filterType);
+    const labels = generateLabels(filterType, dateFilter.orderDate.$gte, dateFilter.orderDate.$lte);
     const groupFormat = getGroupFormat(filterType);
+
+    console.log('getSales Date Filter:', dateFilter);
 
     const salesData = await Order.aggregate([
       {
         $match: {
           ...dateFilter,
-          status: 'Delivered', 
+          status: 'Delivered',
         },
       },
       {
@@ -162,6 +180,7 @@ const getSales = async (req, res) => {
           productsDiscount: { $sum: '$productsDiscount' },
           offerDiscount: { $sum: '$offerDiscount' },
           couponDiscount: { $sum: '$couponDiscount' },
+          orders: { $sum: 1 },
         },
       },
       {
@@ -169,7 +188,9 @@ const getSales = async (req, res) => {
       },
     ]);
 
-    const { salesData: salesArray, productsDiscountData, offerDiscountData, couponDiscountData } = mapResultsToDataArrays(
+    console.log('getSales Aggregation Results:', salesData);
+
+    const { salesData: salesArray, productsDiscountData, offerDiscountData, couponDiscountData, ordersData } = mapResultsToDataArrays(
       salesData,
       filterType,
       labels
@@ -206,6 +227,13 @@ const getSales = async (req, res) => {
           borderColor: 'rgba(255, 206, 86, 1)',
           borderWidth: 1,
         },
+        {
+          label: 'Orders',
+          data: ordersData,
+          backgroundColor: 'rgba(153, 102, 255, 0.7)',
+          borderColor: 'rgba(153, 102, 255, 1)',
+          borderWidth: 1,
+        },
       ],
     };
 
@@ -219,26 +247,20 @@ const getSales = async (req, res) => {
 // 3. Get Top Products
 const getTopProducts = async (req, res) => {
   try {
-    const { startDate, endDate, limit = 10, filterType = 'weekly' } = req.query;
-
-    console.log('getTopProducts .......................................query:', req.query);
-
-    if (!startDate || !endDate) {
-      return res.status(400).json({ message: 'Start date and end date are required' });
-    }
+    const { filterType = 'weekly', limit = 10 } = req.query;
 
     if (!['daily', 'weekly', 'monthly', 'yearly'].includes(filterType)) {
       return res.status(400).json({ message: 'Invalid filter type' });
     }
 
-    const dateFilter = getDateRangeFilter(startDate, endDate);
-    const labels = generateLabels(filterType, startDate, endDate);
+    const dateFilter = getDateRangeFilter(filterType);
+    const labels = generateLabels(filterType, dateFilter.orderDate.$gte, dateFilter.orderDate.$lte);
 
     const topProducts = await Order.aggregate([
       {
         $match: {
           ...dateFilter,
-          status: 'Delivered', 
+          status: 'Delivered',
         },
       },
       {
@@ -294,12 +316,7 @@ const getTopProducts = async (req, res) => {
       },
     ]);
 
-    const response = {
-      labels,
-      products: topProducts,
-    };
-
-    res.status(200).json(response);
+    res.status(200).json({ labels, products: topProducts });
   } catch (error) {
     console.error('Error fetching top products:', error);
     res.status(500).json({ message: 'Server error while fetching top products' });
@@ -309,26 +326,20 @@ const getTopProducts = async (req, res) => {
 // 4. Get Top Categories
 const getTopCategories = async (req, res) => {
   try {
-    const { startDate, endDate, limit = 10, filterType = 'weekly' } = req.query;
-
-    console.log('getTopCategories ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;query:', req.query);
-
-    if (!startDate || !endDate) {
-      return res.status(400).json({ message: 'Start date and end date are required' });
-    }
+    const { filterType = 'weekly', limit = 10 } = req.query;
 
     if (!['daily', 'weekly', 'monthly', 'yearly'].includes(filterType)) {
       return res.status(400).json({ message: 'Invalid filter type' });
     }
 
-    const dateFilter = getDateRangeFilter(startDate, endDate);
-    const labels = generateLabels(filterType, startDate, endDate);
+    const dateFilter = getDateRangeFilter(filterType);
+    const labels = generateLabels(filterType, dateFilter.orderDate.$gte, dateFilter.orderDate.$lte);
 
     const topCategories = await Order.aggregate([
       {
         $match: {
           ...dateFilter,
-          status: 'Delivered', // Changed to only include Delivered
+          status: 'Delivered',
         },
       },
       {
@@ -378,12 +389,7 @@ const getTopCategories = async (req, res) => {
       },
     ]);
 
-    const response = {
-      labels,
-      categories: topCategories,
-    };
-
-    res.status(200).json(response);
+    res.status(200).json({ labels, categories: topCategories });
   } catch (error) {
     console.error('Error fetching top categories:', error);
     res.status(500).json({ message: 'Server error while fetching top categories' });

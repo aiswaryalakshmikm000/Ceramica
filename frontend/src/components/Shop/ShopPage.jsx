@@ -25,7 +25,7 @@ const Shop = () => {
     priceRange: { min: 0, max: 5000 },
     colors: [],
     categoryIds: [],
-    sort: 'featured',
+    sort: 'all',
     page: 1,
     limit: 8,
   };
@@ -39,6 +39,7 @@ const Shop = () => {
     const searchParams = new URLSearchParams(location.search);
     const categoryIdsFromUrl = searchParams.get('categoryIds')?.split(',').filter(Boolean) || [];
     const searchTermFromUrl = searchParams.get('search') || '';
+    const sortFromUrl = searchParams.get('sort') || 'all';
 
     setFilters(prev => ({
       ...prev,
@@ -52,7 +53,7 @@ const Shop = () => {
     search: filters.search || undefined,
     minPrice: filters.priceRange.min,
     maxPrice: filters.priceRange.max,
-    sort: filters.sort,
+    sort: filters.sort === 'all' ? undefined : filters.sort,
     page: filters.page,
     limit: filters.limit,
     ...(filters.categoryIds.length > 0 && { categoryIds: filters.categoryIds.join(',') }),
@@ -116,13 +117,13 @@ const Shop = () => {
   ];
 
   return (
-    <div className="py-16 md:py-12 bg-ceramic-gray-light">
-      <div className="container mx-auto px-4 md:px-8">
+    <div className="bg-ceramic-gray-light">
+      <div className="mx-auto px-4 sm:px-6 lg:px-14 my-10 sm:my-14 lg:my-20 max-w-7xl">
         <Breadcrumbs items={breadcrumbItems} />
         <ShopHeader productCount={data?.totalProductsCount} />
 
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div className="flex flex-wrap gap-3 items-center">
+        <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-wrap items-center gap-3 sm:flex-nowrap">
             <PriceRangeFilter
               onChange={handlePriceRangeChange}
               initialRange={filters.priceRange}
@@ -146,13 +147,13 @@ const Shop = () => {
               Reset Filters
             </button>
           </div>
-          <div className="flex items-center justify-between md:justify-end gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 sm:justify-end">
             <SortFilter
               onChange={handleSortChange}
               initialSort={filters.sort}
               resetTrigger={resetTrigger}
             />
-            <div className="flex items-center gap-2">
+            <div className="flex items-center">
               <select
                 id="limit"
                 value={filters.limit}

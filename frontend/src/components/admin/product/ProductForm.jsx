@@ -10,7 +10,8 @@ import Breadcrumbs from "../../common/BreadCrumbs";
 const productValidationSchema = Yup.object({
   name: Yup.string()
     .required("Product name is required")
-    .min(2, "Product name must be at least 2 characters"),
+    .min(2, "Product name must be at least 2 characters")
+    .matches(/^(?!\d+$)/, "Product name cannot be only numbers"),
   description: Yup.string()
     .required("Product description is required")
     .min(10, "Description must be at least 10 characters"),
@@ -28,19 +29,29 @@ const productValidationSchema = Yup.object({
     .nullable()
     .default(0),
   categoryId: Yup.string().required("Category is required"),
-  tags: Yup.string(),
+  tags: Yup.string().test(
+    "not-only-numbers",
+    "Tags cannot be only numbers",
+    (value) => {
+      if (!value) return true; 
+      const tagsArray = value.split(",").map((tag) => tag.trim());
+      return tagsArray.every((tag) => !/^\d+$/.test(tag));
+    }
+  ),
   isFeatured: Yup.boolean().default(false),
   colors: Yup.array()
     .of(
       Yup.object({
-        name: Yup.string().required("Color name is required"),
+        name: Yup.string()
+          .required("Color name is required")
+          .matches(/^(?!\d+$)/, "Color name cannot be only numbers"),
         stock: Yup.number()
           .required("Stock is required")
           .min(0, "Stock cannot be negative")
           .integer("Stock must be a whole number"),
         images: Yup.array()
           .of(Yup.mixed())
-          .min(1, "At least one image is required per color variant")
+          .min(3, "At least three image is required per color variant")
       })
     )
     .min(1, "At least one color variant is required")
@@ -65,7 +76,7 @@ const ProductForm = ({
     price: "",
     discount: "",
     categoryId: "",
-    tags: "",
+    tags: [],
     isFeatured: false,
     colors: [{ name: "", stock: "", images: [] }],
   },
@@ -74,7 +85,7 @@ const ProductForm = ({
   isLoading = false,
   error = null,
   isEditMode = false,
-  breadcrumbItems = [], // Added for breadcrumbs
+  breadcrumbItems = [], 
 }) => {
   const [deletedImages, setDeletedImages] = useState([]);
 
@@ -240,9 +251,10 @@ const ProductForm = ({
                       as="select"
                       id="categoryId"
                       name="categoryId"
+                      value={values.categoryId}
                       className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3c73a8] focus:border-transparent"
                     >
-                      <option value="">Select a category</option>
+                      <option value="" disabled>Select a category</option>
                       {categories.map((category) => (
                         <option key={category._id} value={category._id}>
                           {category.name}
@@ -438,3 +450,4 @@ const ProductForm = ({
 };
 
 export default ProductForm;
+

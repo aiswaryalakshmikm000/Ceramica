@@ -4,9 +4,10 @@ export const adminDashboardApiSlice = adminApi.injectEndpoints({
   endpoints: (builder) => ({
     // Get dashboard summary stats
     getDashboardStats: builder.query({
-      query: () => ({
+      query: ({ startDate, endDate, filterType }) => ({
         url: "/dashboard/status",
         method: "GET",
+        params: { startDate, endDate, filterType },
       }),
       providesTags: ["Dashboard"],
     }),

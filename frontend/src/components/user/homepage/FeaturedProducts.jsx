@@ -36,7 +36,7 @@ const FeaturedProducts = () => {
   const featuredProducts = response.filteredFeaturedProducts || [];
 
   return (
-    <div className="py-16 md:py-12">
+    <div className="py-2 md:py-2">
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
           <div>
@@ -58,7 +58,7 @@ const FeaturedProducts = () => {
         
         {featuredProducts.length > 0 ? (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-12">
               {featuredProducts.slice(0, 4).map((product) => (
                 <ProductCard 
                   key={product._id} 
@@ -76,7 +76,7 @@ const FeaturedProducts = () => {
               ))}
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
               {featuredProducts.slice(4, 8).map((product) => (
                 <ProductCard 
                   key={product._id} 

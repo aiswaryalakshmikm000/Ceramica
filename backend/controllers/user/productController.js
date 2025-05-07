@@ -12,17 +12,19 @@ const viewProduct = async (req, res) => {
 
   try {
     if (!id) {
-      return res.status(400).json({ success: false, message: "Invalid product id." });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid product id." });
     }
     let product = await Product.findOne({ _id: id, isListed: true })
-    .select(
-      "_id name price discount discountedPrice colors primaryImage totalStock createdAt categoryId description"
-    )
-    .populate({
-      path: "categoryId",
-      select: "name isListed",
-      match: { isListed: true }, 
-    });
+      .select(
+        "_id name price discount discountedPrice colors primaryImage totalStock createdAt categoryId description"
+      )
+      .populate({
+        path: "categoryId",
+        select: "name isListed",
+        match: { isListed: true },
+      });
 
     if (!product || !product.categoryId) {
       return res.status(404).json({
@@ -36,15 +38,15 @@ const viewProduct = async (req, res) => {
       _id: { $ne: id },
       isListed: true,
     })
-    .select(
-      "_id name price discount discountedPrice colors primaryImage totalStock description"
-    )
-    .populate({
-      path: "categoryId",
-      select: "name isListed ",
-      match: { isListed: true },
-    })
-    .limit(6);
+      .select(
+        "_id name price discount discountedPrice colors primaryImage totalStock description"
+      )
+      .populate({
+        path: "categoryId",
+        select: "name isListed ",
+        match: { isListed: true },
+      })
+      .limit(6);
 
     res.status(200).json({
       success: true,
@@ -63,13 +65,27 @@ const viewProduct = async (req, res) => {
 
 const fetchProducts = async (req, res) => {
   try {
-    let { search, categoryIds, minPrice, maxPrice, colors, sort, page = 1, limit, reset } = req.query;
+    let {
+      search,
+      categoryIds,
+      minPrice,
+      maxPrice,
+      colors,
+      sort,
+      page = 1,
+      limit,
+      reset,
+    } = req.query;
 
     if (reset === "true") {
       search = categoryIds = minPrice = maxPrice = sort = null;
     }
 
     let filter = { isListed: true };
+
+    if (sort === "featured") {
+      filter.isFeatured = true;
+    }
 
     if (search) {
       filter.$or = [
@@ -79,15 +95,15 @@ const fetchProducts = async (req, res) => {
       ];
     }
 
-    if(categoryIds){
-      const categoryArray = categoryIds.split(",").map(id => {
-        try{
-          return new mongoose.Types.ObjectId(id.trim())
-        }catch{
-          throw new Error (`invalid categoryId: ${id}`)
+    if (categoryIds) {
+      const categoryArray = categoryIds.split(",").map((id) => {
+        try {
+          return new mongoose.Types.ObjectId(id.trim());
+        } catch {
+          throw new Error(`invalid categoryId: ${id}`);
         }
-      })
-      filter.categoryId = {$in: categoryArray}
+      });
+      filter.categoryId = { $in: categoryArray };
     }
 
     if (minPrice || maxPrice) {
@@ -103,20 +119,28 @@ const fetchProducts = async (req, res) => {
 
     let sortOptions = {};
     if (sort === "priceLowHigh") sortOptions.discountedPrice = 1;
-    if (sort === "priceHighLow") sortOptions.discountedPrice = -1;
-    if (sort === "nameAZ") sortOptions.name = 1;
-    if (sort === "nameZA") sortOptions.name = -1;
-    if (sort === "popularity") sortOptions.totalStock = -1;
-    if (sort === "averageRating") sortOptions["avgRating"] = -1;
-    if (sort === "newArrivals") sortOptions.createdAt = -1;
-    if (sort === "featured") sortOptions.isFeatured = -1;
+    else if (sort === "priceHighLow") sortOptions.discountedPrice = -1;
+    else if (sort === "nameAZ") sortOptions.name = 1;
+    else if (sort === "nameZA") sortOptions.name = -1;
+    else if (sort === "popularity") sortOptions.totalStock = -1;
+    else if (sort === "averageRating") sortOptions.avgRating = -1;
+    else if (sort === "newArrivals") sortOptions.createdAt = -1;
+    else if (sort === "featured") {
+      sortOptions.createdAt = -1;
+    } else {
+      sortOptions.createdAt = -1;
+    }
+    const collation = (sort === "nameAZ" || sort === "nameZA") 
+    ? { locale: "en", strength: 2 } 
+    : undefined;
+
 
     page = parseInt(page);
     limit = parseInt(limit);
     const skip = (page - 1) * limit;
 
     const aggregatePipeline = [
-      { $match: filter }, 
+      { $match: filter },
       {
         $lookup: {
           from: "categories",
@@ -126,7 +150,7 @@ const fetchProducts = async (req, res) => {
         },
       },
       { $unwind: "$category" },
-      { $match: { "category.isListed": true } }, 
+      { $match: { "category.isListed": true } },
     ];
 
     const totalResult = await Product.aggregate([
@@ -152,10 +176,10 @@ const fetchProducts = async (req, res) => {
           categoryName: "$category.name",
           categoryIsListed: "$category.isListed",
           isFeatured: 1,
+          createdAt: 1,
         },
       },
-    ]);
-
+    ]).collation(collation);
 
     res.status(200).json({
       success: true,
@@ -173,39 +197,9 @@ const fetchProducts = async (req, res) => {
   }
 };
 
-
-// const fetchBestProducts = async (req, res) => {
-//   try {
-//     const { limit = 10 } = req.query; 
-
-//     const sortOptions = {
-//       isFeatured: -1, 
-//       avgRating: -1,
-//       totalStock: -1, 
-//       createdAt: -1, 
-//     };
-
-//     const bestProducts = await Product.find({ isListed: true })
-//       .sort(sortOptions)
-//       .limit(parseInt(limit))
-//       .populate("categoryId", "name"); 
-
-//     res.status(200).json({
-//       success: true,
-//       bestProducts,
-//     });
-//   } catch (error) {
-//     console.error("Error fetching best products:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Something went wrong while fetching best products.",
-//     });
-//   }
-// };
-
 const fetchFeaturedProducts = async (req, res) => {
   try {
-    const { limit = 10 } = req.query; 
+    const { limit = 10 } = req.query;
 
     const featuredProducts = await Product.find({
       isFeatured: true,
@@ -215,8 +209,8 @@ const fetchFeaturedProducts = async (req, res) => {
       .limit(parseInt(limit))
       .populate({
         path: "categoryId",
-        select: "name isListed", 
-        match: { isListed: true }, 
+        select: "name isListed",
+        match: { isListed: true },
       });
 
     const filteredFeaturedProducts = featuredProducts.filter(

@@ -86,7 +86,7 @@ const AdminRegister = () => {
                     type="text"
                     autoComplete="name"
                     placeholder="Enter your full name"
-                    className={`appearance-none block w-full px-4 py-3 border rounded-lg shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 sm:text-sm ${
+                    className={`appearance-none block w-full px-4 py-3 border rounded-lg shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition duration-200 sm:text-sm ${
                       errors.name && touched.name ? "border-red-500" : "border-gray-300"
                     }`}
                   />
@@ -107,7 +107,7 @@ const AdminRegister = () => {
                     type="email"
                     autoComplete="email"
                     placeholder="Enter your Gmail address (e.g., example@gmail.com)"
-                    className={`appearance-none block w-full px-4 py-3 border rounded-lg shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 sm:text-sm ${
+                    className={`appearance-none block w-full px-4 py-3 border rounded-lg shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition duration-200 sm:text-sm ${
                       errors.email && touched.email ? "border-red-500" : "border-gray-300"
                     }`}
                   />
@@ -128,7 +128,7 @@ const AdminRegister = () => {
                     type="password"
                     autoComplete="new-password"
                     placeholder="Enter your password"
-                    className={`appearance-none block w-full px-4 py-3 border rounded-lg shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 sm:text-sm ${
+                    className={`appearance-none block w-full px-4 py-3 border rounded-lg shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition duration-200 sm:text-sm ${
                       errors.password && touched.password ? "border-red-500" : "border-gray-300"
                     }`}
                   />
@@ -149,7 +149,7 @@ const AdminRegister = () => {
                     type="tel"
                     autoComplete="tel"
                     placeholder="Enter your 10-digit phone number"
-                    className={`appearance-none block w-full px-4 py-3 border rounded-lg shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 sm:text-sm ${
+                    className={`appearance-none block w-full px-4 py-3 border rounded-lg shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition duration-200 sm:text-sm ${
                       errors.phone && touched.phone ? "border-red-500" : "border-gray-300"
                     }`}
                   />
@@ -165,7 +165,7 @@ const AdminRegister = () => {
                 <div className="text-sm">
                   <a
                     href="/admin/login"
-                    className="font-medium text-indigo-600 hover:text-indigo-500 transition duration-200"
+                    className="font-medium text-orange-600 hover:text-orange-500 transition duration-200"
                   >
                     Already have an account? Sign in
                   </a>
@@ -178,9 +178,9 @@ const AdminRegister = () => {
                   disabled={isLoading || isSubmitting}
                   className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white ${
                     isLoading || isSubmitting
-                      ? "bg-indigo-400 cursor-not-allowed"
-                      : "bg-indigo-600 hover:bg-indigo-700"
-                  } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-md`}
+                      ? "bg-orange-400 cursor-not-allowed"
+                      : "bg-orange-600 hover:bg-orange-700"
+                  } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-md`}
                 >
                   {isLoading || isSubmitting ? (
                     <span className="flex items-center">

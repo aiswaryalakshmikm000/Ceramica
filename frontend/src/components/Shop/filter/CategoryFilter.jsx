@@ -40,14 +40,14 @@ const CategoryFilter = ({ onChange, initialCategories = [], resetTrigger, catego
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="px-4 py-2 bg-white border border-gray-200 rounded-lg flex items-center justify-between min-w-[160px] hover:border-gray-300 transition-colors"
+        className="px-4 py-2 bg-white border border-gray-200 rounded-lg flex items-center justify-between w-full sm:min-w-[160px] hover:border-gray-300 transition-colors"
       >
         <span className="text-sm text-gray-700">Categories {getSelectedCount()}</span>
         <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="filter-dropdown absolute left-0 top-full mt-1 w-56 bg-white shadow-lg rounded-lg border border-gray-100 z-10 p-4">
+        <div className="filter-dropdown absolute left-0 top-full mt-1 w-full sm:w-56 bg-white shadow-lg rounded-lg border border-gray-100 z-10 p-4">
           <h3 className="font-medium text-sm mb-3">Select Categories</h3>
           <div className="space-y-2 max-h-60 overflow-y-auto">
             {categories?.map((category) => (

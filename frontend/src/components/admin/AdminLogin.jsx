@@ -71,7 +71,7 @@ const AdminLogin = () => {
                     name="email"
                     type="email"
                     placeholder="yourname@gmail.com"
-                    className={`appearance-none block w-full px-4 py-3 border rounded-lg shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 sm:text-sm ${
+                    className={`appearance-none block w-full px-4 py-3 border rounded-lg shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-800 focus:border-orange-800 transition duration-200 sm:text-sm ${
                       errors.email && touched.email
                         ? "border-red-500"
                         : "border-gray-300"
@@ -93,7 +93,7 @@ const AdminLogin = () => {
                     name="password"
                     type="password"
                     placeholder="Enter your password"
-                    className={`appearance-none block w-full px-4 py-3 border rounded-lg shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 sm:text-sm ${
+                    className={`appearance-none block w-full px-4 py-3 border rounded-lg shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-800 focus:border-orange-800 transition duration-200 sm:text-sm ${
                       errors.password && touched.password
                         ? "border-red-500"
                         : "border-gray-300"
@@ -113,9 +113,9 @@ const AdminLogin = () => {
                   disabled={isLoading || isSubmitting}
                   className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white ${
                     isLoading || isSubmitting
-                      ? "bg-indigo-400 cursor-not-allowed"
-                      : "bg-indigo-600 hover:bg-indigo-700"
-                  } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-md`}
+                      ? "bg-orange-700 cursor-not-allowed"
+                      : "bg-orange-800/90 hover:bg-orange-700"
+                  } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-800 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-md`}
                 >
                   {isLoading || isSubmitting ? (
                     <span className="flex items-center">

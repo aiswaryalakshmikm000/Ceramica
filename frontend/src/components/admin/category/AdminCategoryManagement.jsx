@@ -6,7 +6,7 @@ import {
   useListCategoryMutation,
 } from "../../../features/adminAuth/AdminCategoryApiSlice";
 import { toast } from "react-toastify";
-import Breadcrumbs from "../../common/Breadcrumbs";
+import Breadcrumbs from "../../common/BreadCrumbs";
 import Pagination from "../../common/Pagination"; 
 import { Pencil, ToggleLeft, ToggleRight, Image } from "lucide-react";
 import Sidebar from "../SideBar";

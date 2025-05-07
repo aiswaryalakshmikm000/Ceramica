@@ -61,7 +61,7 @@ const ChangePasswordRequestModal = ({ isOpen, closeModal, email, onSendOTP }) =>
                       id="email"
                       value={emailInput}
                       onChange={(e) => setEmailInput(e.target.value)}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-800 focus:border-orange-800 sm:text-sm"
                       placeholder="e.g., user@gmail.com"
                     />
                   </div>
@@ -75,7 +75,7 @@ const ChangePasswordRequestModal = ({ isOpen, closeModal, email, onSendOTP }) =>
                     </button>
                     <button
                       type="submit"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-orange-800/90 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 focus:outline-none"
                     >
                       Send OTP
                     </button>

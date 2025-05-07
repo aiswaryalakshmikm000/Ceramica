@@ -10,9 +10,10 @@ export const adminWalletApiSlice = adminApi.injectEndpoints({
       providesTags: ["Wallet"],
     }),
     getWalletTransactions: builder.query({
-      query: ({ page = 1, limit = 10, search = "", type = "", date = "" }) => ({
-        url: `/wallet/transactions?page=${page}&limit=${limit}&search=${search}&type=${type}&date=${date}`,
+      query: (params) => ({
+        url: "/wallet/transactions",
         method: "GET",
+        params, 
       }),
       providesTags: ["Transactions"],
     }),

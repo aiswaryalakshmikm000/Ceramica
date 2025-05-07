@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { ArrowUp, ArrowDown, Eye } from "lucide-react";
 import OrderDetailModal from "./OrderDetailModal";
-import Breadcrumbs from "../../common/BreadCrumbs";
+import Breadcrumbs from "../../common/Breadcrumbs";
 import Pagination from "../../common/Pagination";
 import FilterSearchBar from "./FilterSearchBar";
 import StatusBadge from "../../common/StatusBadge";
@@ -75,7 +75,7 @@ const OrderManagement = () => {
   };
 
   const handleViewOrder = (order) => {
-    setSelectedOrderId(order._id); // Store only the ID
+    setSelectedOrderId(order._id);
     setIsModalOpen(true);
   };
 
@@ -303,15 +303,36 @@ const OrderManagement = () => {
           </table>
         </div>
 
-        <div className="px-6 py-3 border-t border-gray-200">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalItems={totalOrdersCount}
-            itemsPerPage={itemsPerPage}
-            onPageChange={setCurrentPage}
-          />
-        </div>
+        {/* Pagination Section with Showing X to Y of Z */}
+        {totalPages > 0 && (
+          <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
+            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm text-gray-700">
+                  Showing{" "}
+                  <span className="font-medium">
+                    {(currentPage - 1) * itemsPerPage + 1}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-medium">
+                    {Math.min(currentPage * itemsPerPage, totalOrdersCount)}
+                  </span>{" "}
+                  of <span className="font-medium">{totalOrdersCount}</span>{" "}
+                  results
+                </p>
+              </div>
+              <div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={totalOrdersCount}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {selectedOrderId && (

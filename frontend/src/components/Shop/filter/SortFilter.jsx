@@ -24,6 +24,7 @@ const SortFilter = ({ onChange, initialSort = 'featured', resetTrigger }) => {
   }, []);
 
   const sortOptions = [
+    { value: 'all', label: 'All' },
     { value: 'featured', label: 'Featured' },
     { value: 'priceLowHigh', label: 'Price: Low to High' },
     { value: 'priceHighLow', label: 'Price: High to Low' },
@@ -49,14 +50,14 @@ const SortFilter = ({ onChange, initialSort = 'featured', resetTrigger }) => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="px-4 py-2 bg-white border border-gray-200 rounded-lg flex items-center justify-between min-w-[160px] hover:border-gray-300 transition-colors"
+        className="px-4 py-2 bg-white border border-gray-200 rounded-lg flex items-center justify-between w-full sm:min-w-[160px] hover:border-gray-300 transition-colors"
       >
-        <span className="text-sm text-gray-700">{getSelectedLabel()}</span>
+        <span className="text-sm text-gray-700 truncate">{getSelectedLabel()}</span>
         <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="filter-dropdown absolute right-0 top-full mt-1 w-48 bg-white shadow-lg rounded-lg border border-gray-100 z-10">
+        <div className="filter-dropdown absolute right-0 top-full mt-1 w-full sm:w-48 bg-white shadow-lg rounded-lg border border-gray-100 z-10">
           <div className="py-1">
             {sortOptions.map((option) => (
               <button

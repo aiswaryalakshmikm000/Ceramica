@@ -94,7 +94,7 @@ const VideoSection = () => {
   };
 
   return (
-    <div className="py-16 md:py-2 pb-16 md:pb-20 bg-ceramic-light/30">
+    <div className="py-16 md:py-16 pb-16 md:pb-20 bg-ceramic-light/30">
       <div className="container mx-auto px-4 md:px-8">
         <div className="mb-12">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif font-medium text-ceramic-dark mb-4 text-left">

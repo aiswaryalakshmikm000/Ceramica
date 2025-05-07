@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 
 const showCategories = async (req, res) => {
     try {
-      const categories = await Category.find({});
+      const categories = await Category.find({}).sort({createdAt:-1});
       
       if (categories.length === 0) {
         return res
@@ -30,9 +30,14 @@ const showCategories = async (req, res) => {
   
 const addCategory = async (req, res) => {
   try {
+    const { error } = categoryValidationSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
     const { name, description } = req.body;
     const file = req.file;
-
+    
     if (!name || !description) {
       return res.status(400).json({ success: false, message: "Name and description are required" });
     }
@@ -101,6 +106,12 @@ const listCategory = async (req, res) => {
 const editCategory = async (req, res) => {
   try {
     const { catId } = req.params;
+    
+    const { error } = categoryValidationSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
     const { name, description } = req.body;
     const file = req.file;
 
@@ -117,6 +128,14 @@ const editCategory = async (req, res) => {
         await cloudinaryDeleteImages([category.images]);
       }
       imageUrl = await cloudinaryImageUploadMethod(file.buffer);
+    }
+
+    const categoryExist = await Category.findOne({
+      name: { $regex: new RegExp(`^${name}$`, "i") },
+      _id: {$ne: catId},
+    });
+    if (categoryExist) {
+      return res.status(409).json({ success: false, message: "Category already exists with this name!" });
     }
 
     const updatedCategory = await Category.findByIdAndUpdate(
