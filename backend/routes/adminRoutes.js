@@ -58,7 +58,6 @@ adminRoute.delete("/coupons/:couponId", authenticateAdminToken, deleteCoupon);
 //offer
 adminRoute.get('/offers', authenticateAdminToken, getOffers);
 adminRoute.post('/offers/add', authenticateAdminToken,  addOffer);
-// adminRoute.put('/offers/:id', authenticateAdminToken, updateOffer);
 adminRoute.patch('/offers/:id', authenticateAdminToken, statusToggle);
 
 //sales report

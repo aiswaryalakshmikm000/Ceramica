@@ -252,7 +252,7 @@ const addOffer = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    const { name, targetType, targetId } = req.body;
+    const { name, targetType, targetId,discountValue } = req.body;
     
     console.log("$$$$$444  req.body req.body req.body req.body",  req.body )
 
@@ -291,6 +291,11 @@ const addOffer = async (req, res) => {
     const offer = new Offer({ ...req.body, discountType: 'percentage' });
     await offer.save();
 
+    const product = await Product.findById(targetId);
+    product.discount += Number(discountValue);
+
+    product.save();
+
     if (targetType === "Product") {
       await Product.findByIdAndUpdate(targetId, { offerId: offer._id });
     }
@@ -300,46 +305,6 @@ const addOffer = async (req, res) => {
     res.status(500).json({ message: "Failed to create offer", error });
   }
 };
-
-// const updateOffer = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const { error } = offerValidation.validate(req.body);
-//     if (error) {
-//       return res.status(400).json({ message: error.details[0].message });
-//     }
-
-//     const offer = await Offer.findById(id);
-//     if (!offer) {
-//       return res.status(404).json({ message: "Offer not found" });
-//     }
-
-//     const { targetType, targetId } = req.body;
-
-//     if (targetType === "Product") {
-//       const product = await Product.findById(targetId);
-//       if (!product) {
-//         return res.status(404).json({ message: "Product not found" });
-//       }
-//     } else if (targetType === "Category") {
-//       const category = await Category.findById(targetId);
-//       if (!category) {
-//         return res.status(404).json({ message: "Category not found" });
-//       }
-//     }
-
-//     Object.assign(offer, { ...req.body, discountType: 'percentage' });
-//     await offer.save();
-
-//     if (targetType === "Product") {
-//       await Product.findByIdAndUpdate(targetId, { offerId: offer._id });
-//     }
-
-//     res.status(200).json({ message: "Offer updated successfully", offer });
-//   } catch (error) {
-//     res.status(500).json({ message: "Failed to update offer", error });
-//   }
-// };
 
 const statusToggle = async (req, res) => {
   try {
@@ -378,7 +343,6 @@ const statusToggle = async (req, res) => {
 
 module.exports = {
   statusToggle,
-  // updateOffer,
   addOffer,
   getOffers,
 };
