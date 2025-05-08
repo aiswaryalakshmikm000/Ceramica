@@ -1,13 +1,8 @@
-
 const AdminWallet = require("../../models/adminWalletModel");
 
-
-// Helper function to credit admin wallet
 const creditAdminWallet = async (amount, description, orderId, userId, transactionType = "order") => {
-  console.log("@@@@@@@@@$4444444444444444444444444444444 amount, description, orderId, userId, transactionType", amount, description, orderId, userId, transactionType);
   try {
     let adminWallet = await AdminWallet.findOne();
-    console.log("Admin wallet found", adminWallet);
 
     if (!adminWallet) {
       adminWallet = new AdminWallet();
@@ -29,11 +24,8 @@ const creditAdminWallet = async (amount, description, orderId, userId, transacti
     adminWallet.transactions.push(transaction);
     await adminWallet.save();
 
-    console.log("Admin wallet updated after credit ", adminWallet);
-
     return { success: true, message: "Admin wallet credited successfully" };
   } catch (error) {
-    console.error("Error crediting admin wallet:", error);
     return { success: false, message: "Failed to credit admin wallet", error: error.message };
   }
 };
@@ -69,7 +61,6 @@ const creditAdminWallet = async (amount, description, orderId, userId, transacti
   
       return { success: true, message: "Admin wallet debited successfully" };
     } catch (error) {
-      console.error("Error debiting admin wallet:", error);
       return { success: false, message: "Failed to debit admin wallet", error: error.message };
     }
   };

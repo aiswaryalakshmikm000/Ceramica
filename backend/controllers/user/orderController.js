@@ -94,7 +94,6 @@ const createRazorpayOrder = async (req, res) => {
 
     let validatedCoupon = null;
     const couponCode = coupon ? coupon.code : null;
-    console.log("have CCCCCCCCCCCCcccoupon ", couponCode);
 
     if (couponCode) {
       const {
@@ -108,17 +107,11 @@ const createRazorpayOrder = async (req, res) => {
       validatedCoupon = couponData;
     }
 
-    console.log(
-      "WERRRRRRRRCCCCCCCCCCCCCCCCCCCCCCCCCCCcc validatedCoupon",
-      validatedCoupon
-    );
-
     const updatedCart = await cartService.recalculateCartTotals(
       cart,
       validatedCoupon
     );
 
-    console.log("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUpdated cart", updatedCart);
     const totalAmount = updatedCart.totalAmount;
 
     const options = {
@@ -183,7 +176,6 @@ const createRazorpayOrder = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error creating Razorpay order:", error);
     res.status(500).json({
       success: false,
       message: "Failed to create Razorpay order",
@@ -298,7 +290,6 @@ const verifyRazorpayPayment = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error verifying Razorpay payment:", error);
     res.status(500).json({
       success: false,
       message: "Failed to verify payment or update order",
@@ -307,7 +298,7 @@ const verifyRazorpayPayment = async (req, res) => {
   }
 };
 
-// Retry Payment for Failed/Pending Order
+
 const retryRazorpayPayment = async (req, res) => {
   try {
     const { orderNumber, userId } = req.body;
@@ -319,7 +310,6 @@ const retryRazorpayPayment = async (req, res) => {
       });
     }
 
-    // Find the order
     const order = await Order.findOne({ orderNumber, userId });
 
     if (!order) {
@@ -397,7 +387,6 @@ const retryRazorpayPayment = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error retrying payment:", error);
     res.status(500).json({
       success: false,
       message: "Failed to initiate retry payment",
@@ -541,7 +530,6 @@ const placeCODOrder = async (req, res) => {
       );
     }
 
-    // Clear cart
     await Cart.findOneAndUpdate(
       { userId },
       {
@@ -571,7 +559,6 @@ const placeCODOrder = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error placing COD order:", error);
     res.status(500).json({
       success: false,
       message: "Failed to place COD order",
@@ -584,8 +571,6 @@ const placeWalletOrder = async (req, res) => {
   try {
     const { cart, address, coupon } = req.body;
     const userId = req.user.id;
-
-    console.log("req.bodyyyyyyyyyyyyyyyyy", req.body);
 
     if (!cart || !cart.items || !cart.items.length) {
       return res.status(400).json({
@@ -728,7 +713,6 @@ const placeWalletOrder = async (req, res) => {
       throw new Error(walletResult.message);
     }
 
-    console.log("#@@@@@@@@@@>>>>>>>>  before hitting admin caredit amount");
     // Credit admin wallet
     const adminWalletResult = await creditAdminWallet(
       totalAmount,
@@ -771,7 +755,6 @@ const placeWalletOrder = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error placing Wallet order:", error);
     res.status(500).json({
       success: false,
       message: "Failed to place Wallet order",
@@ -779,6 +762,7 @@ const placeWalletOrder = async (req, res) => {
     });
   }
 };
+
 
 const getUserOrders = async (req, res) => {
   try {
@@ -793,9 +777,9 @@ const getUserOrders = async (req, res) => {
       .select(
         "orderNumber status orderDate totalAmount paymentStatus shippingAddress"
       );
-    console.log("orders", orders);
+      
     const totalOrders = await Order.countDocuments({ userId: req.user.id });
-    console.log("totalOrders", totalOrders);
+
     res.status(200).json({
       success: true,
       message: orders.length
@@ -975,7 +959,6 @@ const cancelOrder = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error cancelling order:", error);
     res.status(500).json({
       success: false,
       message: "Failed to cancel order",
@@ -1043,17 +1026,14 @@ const cancelOrderItem = async (req, res) => {
       throw new Error(`Product not found for item ${item._id}`);
     }
 
-    // Get base price (after product discount)
     const basePrice =
       product.discount > 0 ? product.discountedPrice : product.price;
 
-    // Apply offers to get final discounted price
     const { discountedPrice } = await cartService.applyOffers(
       product._id,
       basePrice
     );
 
-    // Calculate refund for this item
     const refundAmount = discountedPrice * item.quantity;
 
     order.activityLog.push({
@@ -1099,7 +1079,6 @@ const cancelOrderItem = async (req, res) => {
       }
     }
 
-    // Update order status if all items are cancelled
     const remainingActiveItems = order.items.filter(
       (i) => i.status !== "Cancelled"
     );
@@ -1120,7 +1099,6 @@ const cancelOrderItem = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error cancelling item:", error);
     res.status(500).json({
       success: false,
       message: "Failed to cancel item",
@@ -1274,7 +1252,6 @@ const returnOrderItem = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error requesting item return:", error);
     res.status(500).json({
       success: false,
       message: "Failed to process item return request",
@@ -1430,7 +1407,6 @@ const downloadInvoice = async (req, res) => {
     doc.text(`₹${order.totalAmount}`, 510, doc.y - 10);
     doc.end();
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       success: false,
       message: "Failed to generate invoice",

@@ -1,4 +1,3 @@
-// AdminLayout.js
 import React from 'react';
 import SideBar from '../../admin/SideBar'; 
 import AdminOffersPage from './AdminOfferPage';

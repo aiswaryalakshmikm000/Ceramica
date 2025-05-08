@@ -20,7 +20,6 @@ const GoogleAuth = () => {
       toast.success(result.message || "Google login successful");
       navigate("/");
     } catch (err) {
-        console.error("Google login error:", err);
         toast.error(err?.data?.message || "Google login failed. Please try again.");
     }
   };

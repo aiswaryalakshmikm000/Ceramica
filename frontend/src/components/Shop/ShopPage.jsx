@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { useFetchProductsQuery } from '../../features/userAuth/userProductApislice';
 import { useShowCategoriesQuery } from '../../features/userAuth/userCategoryApiSlice';

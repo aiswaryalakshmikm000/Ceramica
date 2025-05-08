@@ -5,33 +5,6 @@ const User = require('../../models/userModel');
 
 const tokenKey = process.env.TOKEN_KEY;
 
-// const authenticateToken = (req, res, next) => {
-//     console.log('User Middleware - Received Cookies:', req.cookies);
-
-//     let token = req.cookies?.userAccessToken; 
-//     console.log('User Middleware - Extracted Token:', token);
-
-//     console.log("Extracted Token:", token); 
-
-//     if (!token) {
-//         console.log('User Middleware - No user access token in cookies');
-//         return res.status(401).json({ success: false, message: 'Access token is required' });
-//     }
-
-//     jwt.verify(token, tokenKey, (error, decoded) => {
-//         if (error) {
-//             console.log('User Middleware - Invalid or expired access token:', error);
-//             return res.status(401).json({ message: 'Invalid or expired access token' });
-//         }
-//         console.log('User Middleware - Token decoded:', decoded);
-
-//         const user = User.findOne({_id:decoded.user.id})
-//         console.log("UUUUUUser", user)
-//         req.user = decoded.user; 
-//         next(); 
-//     });
-// };
-
 const authenticateToken = async (req, res, next) => {
     console.log('User Middleware - Received Cookies:', req.cookies);
   

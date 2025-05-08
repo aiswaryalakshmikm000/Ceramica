@@ -1,4 +1,3 @@
-
 const Coupon = require("../../models/couponModel");
 const UserCoupon = require("../../models/userCouponModel");
 const mongoose = require("mongoose");
@@ -89,15 +88,12 @@ const getUserCoupons = async (req, res) => {
       (coupon) =>
         coupon.status !== "inactive" && new Date(coupon.validFrom) <= now && (!coupon.userId || coupon.userId.toString() === userId)
     );
-
-    console.log("####################3 eligibleCoupons", eligibleCoupons )
     
     res.status(200).json({
       success: true,
       coupons: eligibleCoupons,
     });
   } catch (error) {
-    console.error("Error fetching user coupons:", error);
     res.status(500).json({
       success: false,
       message: "Something went wrong while fetching coupons.",
@@ -221,7 +217,6 @@ const applyCoupon = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error in applyCouponController:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",

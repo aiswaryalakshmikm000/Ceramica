@@ -18,8 +18,6 @@ const UserHome = () => {
   const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
   const isAuthenticated = useSelector(selectIsUserAuthenticated);
   const user = useSelector(selectUser)
-console.log("$######### user", user)
-
 
   const setLoginModalTimer = () => {
     return setTimeout(() => {

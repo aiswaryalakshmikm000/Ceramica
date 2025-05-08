@@ -1,5 +1,4 @@
 const Product = require("../../models/productModel");
-
 const mongoose = require("mongoose");
 
 const viewProduct = async (req, res) => {
@@ -37,8 +36,7 @@ const viewProduct = async (req, res) => {
       categoryId: product.categoryId._id,
       _id: { $ne: id },
       isListed: true,
-    })
-      .select(
+    }).select(
         "_id name price discount discountedPrice colors primaryImage totalStock description"
       )
       .populate({
@@ -189,7 +187,6 @@ const fetchProducts = async (req, res) => {
       filteredProducts: products,
     });
   } catch (error) {
-    console.error("Error fetching products:", error);
     res.status(500).json({
       success: false,
       message: "Something went wrong while fetching products.",
@@ -222,7 +219,6 @@ const fetchFeaturedProducts = async (req, res) => {
       filteredFeaturedProducts,
     });
   } catch (error) {
-    console.error("Error fetching featured products:", error);
     res.status(500).json({
       success: false,
       message: "Something went wrong while fetching featured products.",
@@ -233,6 +229,5 @@ const fetchFeaturedProducts = async (req, res) => {
 module.exports = {
   viewProduct,
   fetchProducts,
-  // fetchBestProducts,
   fetchFeaturedProducts,
 };

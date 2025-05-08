@@ -16,7 +16,6 @@ const OrderSummary = ({
   setAppliedCoupon,
 }) => {
 
-  console.log("Cart", cart)
   const [couponCode, setCouponCode] = useState("");
   const [couponError, setCouponError] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -61,7 +60,6 @@ const OrderSummary = ({
       setIsDropdownOpen(false);
       toast.success(response.message || "Coupon applied successfully");
     } catch (error) {
-      console.error("Coupon Mutation Error:", error);
       setAppliedCoupon(null);
       setCouponCode("");
      
@@ -82,7 +80,6 @@ const OrderSummary = ({
       setCouponError("");
       toast.success("Coupon removed successfully");
     } catch (error) {
-      console.error("Remove Coupon Error:", error);
       toast.error(error?.data?.message || "Failed to remove coupon");
     }
   };

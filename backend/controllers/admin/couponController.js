@@ -1,4 +1,3 @@
-
 const Coupon = require("../../models/couponModel");
 const mongoose = require("mongoose");
 
@@ -47,7 +46,6 @@ const createCoupon = async (req, res) => {
     await coupon.save();
     res.status(201).json({ success: true, message: "Coupon created successfully", coupon });
   } catch (error) {
-    console.error("Error adding coupon:", error);
     res.status(500).json({
       success: false,
       message: "Something went wrong while adding the coupon.",
@@ -119,7 +117,6 @@ const getCoupons = async (req, res) => {
       coupons: updatedCoupons,
     });
   } catch (error) {
-    console.error("Error fetching coupons:", error);
     res.status(500).json({
       success: false,
       message: "Something went wrong while fetching coupons.",
@@ -127,6 +124,7 @@ const getCoupons = async (req, res) => {
     });
   }
 };
+
 
 const deleteCoupon = async (req, res) => {
   const { couponId } = req.params;
@@ -146,7 +144,6 @@ const deleteCoupon = async (req, res) => {
     await coupon.save();
     res.status(200).json({ success: true, message: "Coupon deactivated successfully", coupon });
   } catch (error) {
-    console.error("Error deactivating coupon:", error);
     res.status(500).json({
       success: false,
       message: "Something went wrong while deactivating the coupon.",

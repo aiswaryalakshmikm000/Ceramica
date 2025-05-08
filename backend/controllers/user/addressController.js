@@ -46,6 +46,7 @@ const addAddress = async (req, res) => {
   }
 };
 
+
 const showAddresses = async (req, res) => {
   const { userId } = req.params;
   try {
@@ -70,6 +71,7 @@ const showAddresses = async (req, res) => {
       .json({ success: false, message: "Internal server error", error });
   }
 };
+
 
 const editAddress = async (req, res) => {
   const { userId, addressId } = req.params; 
@@ -112,7 +114,6 @@ const editAddress = async (req, res) => {
       updatedAddress,
     });
   } catch (error) {
-    console.error("Error editing address:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -120,6 +121,7 @@ const editAddress = async (req, res) => {
     });
   }
 };
+
 
 const deleteAddress =async(req,res)=>{
   const {userId, addressId}=req.params
@@ -135,6 +137,7 @@ const deleteAddress =async(req,res)=>{
     res.status(500).json({success:false ,message:"Internal server error",error})
   }
 }
+
 
 const setDefaultAddress = async (req, res) => {
   const { addressId } = req.params;

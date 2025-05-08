@@ -1,4 +1,3 @@
-
 const Order = require("../../models/OrderModel");
 const Product = require("../../models/productModel");
 const {
@@ -247,7 +246,6 @@ const verifyReturnRequest = async (req, res) => {
           throw new Error(adminWalletResult.message);
         }
 
-
         const walletResult = await addWalletTransaction(
           order.userId,
           refundAmount,
@@ -293,6 +291,7 @@ const verifyReturnRequest = async (req, res) => {
   }
 };
 
+
 const verifyItemReturnRequest = async (req, res) => {
   try {
     
@@ -304,10 +303,8 @@ const verifyItemReturnRequest = async (req, res) => {
     } = req.body;
     const { orderId } = req.params;
 
-    console.log("req.bodyreq.bodyreq.body", req.body)
     const order = await Order.findById(orderId).populate("items.productId");
 
-    console.log("orderorderorder", order)
     if (!order) {
       return res.status(404).json({
         success: false,
@@ -354,7 +351,6 @@ const verifyItemReturnRequest = async (req, res) => {
         order.paymentStatus === "Paid"
       ) {
 
-       
         const product = item.productId
         if (!product){
           throw new Error (`Product not found for the item ${item._id}`)

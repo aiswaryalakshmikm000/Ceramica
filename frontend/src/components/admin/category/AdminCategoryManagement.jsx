@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   useGetCategoriesQuery,
@@ -36,7 +35,6 @@ const AdminCategoryManagement = () => {
       toast.success("Category status changed.");
     } catch (err) {
       toast.error(err?.data?.message || "Failed to toggle category status");
-      console.error("Failed to toggle category status:", err);
     }
   };
 

@@ -33,10 +33,8 @@ const addWalletTransaction = async (
       }
   
       await wallet.save();
-      console.log("UUupdated wallet", wallet)
       return { success: true, wallet };
     } catch (error) {
-      console.error("Error adding wallet transaction:", error);
       return {
         success: false,
         message: "Failed to add wallet transaction",

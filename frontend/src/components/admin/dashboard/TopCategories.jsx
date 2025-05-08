@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -22,11 +21,9 @@ const TopCategories = ({ dateRange, filterType }) => {
     "#f97316",
   ]
 
-  // Format dates for API query
   const formattedStartDate = dateRange.startDate.toISOString().split("T")[0]
   const formattedEndDate = dateRange.endDate.toISOString().split("T")[0]
 
-  // Fetch top categories data
   const {
     data: categoriesData,
     isLoading,
@@ -39,7 +36,6 @@ const TopCategories = ({ dateRange, filterType }) => {
   })
 
   useEffect(() => {
-    console.log('TopCategories data:', categoriesData);
     if (categoriesData?.categories) {
       setCategories(categoriesData.categories)
     }

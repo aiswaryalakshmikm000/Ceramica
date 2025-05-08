@@ -55,7 +55,6 @@ const register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error in admin registration:", error);
     res.status(500).json({
       success: false,
       message: "Registration failed",
@@ -125,7 +124,6 @@ const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error in admin login:", error);
     res.status(500).json({
       success: false,
       message: "Login failed due to an internal error",
@@ -160,7 +158,6 @@ const logout = async (req, res) => {
     res.status(200).json({ message: "Admin logout successful" });
 
   } catch (error) {
-    console.error("Error in logout:", error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
@@ -238,7 +235,6 @@ const checkAuth = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error in admin checkAuth:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };

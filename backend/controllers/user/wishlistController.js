@@ -11,27 +11,20 @@ const toggleWishlistItem = async (req, res) => {
     const { userId } = req.params;
     const { productId, color } = req.body;
 
-    console.log("WWW req.params.req.params", req.params)
-    console.log("WWW req.body", req.body)
-
     const user = await User.findById(userId);
-    console.log("WWUUUUUUUUUUUUUUUUUUUW user", user)
+
     if (!user || user.isBlocked) {
       return res.status(403).json({ message: "User is blocked or not found" });
     }
 
     const product = await Product.findById(productId);
-    console.log("product product", product)
     if (!product || !product.isListed) {
-      console.log("NOoooooooooooooooooooooooooooo product product or not listed", product)
       return res.status(404).json({ message: "Product not found or not listed" });
     }
 
     let wishlist = await Wishlist.findOne({ userId });
-    console.log("wishlist wishlist", wishlist)
 
     if (!wishlist) {
-      console.log("NNNNNNNOOOOOOOOOOOOOOOOOOOOOOwishlist wishlist", wishlist)
       wishlist = new Wishlist({ userId, items: [] });
     }
 
@@ -40,7 +33,6 @@ const toggleWishlistItem = async (req, res) => {
     );
 
     const isInStock = await checkStock(productId, color, 1);
-    console.log("isInStock isInStock", isInStock)
     if (!isInStock && itemIndex === -1) {
       return res.status(400).json({ message: "Selected color variant is out of stock" });
     }
@@ -72,7 +64,6 @@ const toggleWishlistItem = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("EEEEEEEErrroer", error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -156,21 +147,16 @@ const updateWishlistItem = async (req, res) => {
 const getWishlist = async (req, res) => {
   try {
     const { userId } = req.params;
-    console.log("WWW req.params",req.params)
     const wishlist = await Wishlist.findOne({ userId }).populate({
       path: "items.productId",
       select: "name price discount color image discountedPrice",
     });
 
-    console.log("WWW wishlist.wishlist", wishlist)
-
     if (!wishlist) {
-      console.log("Noooooooooo wishlist.wishlist", wishlist)
       return res.status(200).json({ items: [] });
     }
 
     for (let item of wishlist.items) {
-      console.log("WEWERERERWDVSVd", item)
       item.inStock = await checkStock(item.productId._id, item.color, 1);
     }
 
@@ -182,7 +168,6 @@ const getWishlist = async (req, res) => {
       items: wishlist.items, 
     });
   } catch (error) {
-    console.log("error,", error)
     return res.status(500).json({ success: false, message: error.message });
   }
 };

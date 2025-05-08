@@ -83,7 +83,6 @@ const register = async (req, res) => {
 };
 
 
-
 const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -95,7 +94,6 @@ const login = async (req, res) => {
   }
 
   try {
-
     const userExist = await User.findOne({ email });
 
     if (!userExist) {
@@ -177,7 +175,6 @@ const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error in login:", error);
     res.status(500).json({
       success: false,
       message: "Something went wrong! Please try again.",
@@ -217,7 +214,6 @@ const logout = async (req, res) => {
     res.status(200).json({ success:true, message: "User logged out successfully" });
 
   } catch (error) {
-    console.error("Error in logout:", error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
@@ -437,7 +433,6 @@ if(currentPassword===newPassword){
 }
   try {
     const user=await User.findById(userId)
-    console.log("UUUUUUUUUUUUUUUUUserr", user)
 
     if(!user){
       return res.status(404).json({success:false, message:"User not found"})
@@ -478,7 +473,6 @@ const checkAuth = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error in checkAuth:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };

@@ -15,8 +15,6 @@ const AdminEditProductPage = () => {
   const [editProduct, { isLoading: editLoading, error: editError }] = useEditProductMutation();
   const { data: categoriesData, isLoading: categoriesLoading, error: categoriesError } = useGetCategoriesQuery();
 
-  console.log("productData", productData)
-
   const categories = categoriesData?.categories || [];
   const product = productData?.product;
 
@@ -26,7 +24,6 @@ const AdminEditProductPage = () => {
       toast.success(response.message || "Product updated successfully");
       navigate("/admin/products");
     } catch (err) {
-      console.error("RTK Query error:", err);
       const errorMessage = err?.data?.message || "Something went wrong while editing the product.";
       toast.error(errorMessage);
     }

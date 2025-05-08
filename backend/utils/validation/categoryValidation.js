@@ -1,6 +1,5 @@
 const Joi = require('joi');
 
-// Joi return the object of details of error and value (validated data) ==> {error : {details: [ { message: ""}]}}
 const categoryValidationSchema = Joi.object({
   name: Joi.string()
     .trim()

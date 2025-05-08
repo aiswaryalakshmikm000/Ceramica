@@ -2,7 +2,7 @@
 const Joi = require('joi');
 
 const addressSchema = Joi.object({
-  user: Joi.string().trim().optional(), // Use string for ObjectId
+  user: Joi.string().trim().optional(), 
   fullname: Joi.string().required().trim(),
   phone: Joi.string()
     .required()

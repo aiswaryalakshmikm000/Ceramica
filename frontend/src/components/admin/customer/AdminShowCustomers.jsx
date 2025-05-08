@@ -3,7 +3,7 @@ import {
   useGetCustomerDetailsQuery,
   useEditCustomerStatusMutation,
 } from "../../../features/adminAuth/AdminCustomerApiSlice";
-import Breadcrumbs from "../../common/Breadcrumbs";
+import Breadcrumbs from "../../common/BreadCrumbs";
 import Pagination from "../../common/Pagination";
 import { Eye, Search } from "lucide-react";
 import Sidebar from "../SideBar";

@@ -72,7 +72,6 @@ const getReferralInfo = async (req, res) => {
       data: referralInfo,
     });
   } catch (error) {
-    console.error("Error in getReferralInfo:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
@@ -95,7 +94,6 @@ const applyReferralCode = async (req, res) => {
       });
     }
     
-
     const referrer = await User.findOne({referralCode})
     if (!referrer) {
       return res.status(400).json({

@@ -12,11 +12,6 @@ export const IsUserLogin = ({ children }) => {
   // Fetch auth state directly
   const { data: authData, isLoading, isFetching } = useCheckAuthQuery();
 
-  // console.log("--- IsUserLogin ---");
-  // console.log("Redux - isAuthenticated:", isAuthenticated);
-  // console.log("Redux - userRole:", userRole);
-  // console.log("checkAuth - Data:", authData, "isLoading:", isLoading, "isFetching:", isFetching);
-
   // Wait for checkAuth to resolve
   if (isLoading || isFetching) {
     return (
@@ -31,11 +26,9 @@ export const IsUserLogin = ({ children }) => {
   const effectiveRole = authData?.role || userRole;
 
   if (!effectiveAuthenticated || effectiveRole !== "user") {
-    // console.log("User not authenticated or wrong role, redirecting to /login");
     return <Navigate to="/login" replace />;
   }
 
-  // console.log("User access granted");
   return children;
 };
 
@@ -44,14 +37,9 @@ export const IsUserLogout = ({ children }) => {
   const isAuthenticated = useSelector(selectIsUserAuthenticated);
   const userRole = useSelector(selectUserRole);
 
-  // console.log('IsUserLogout - isAuthenticated:', isAuthenticated);
-  // console.log('IsUserLogout - userRole:', userRole);
-
   if (isAuthenticated && userRole === 'user') {
-    // console.log('IsUserLogout - Redirecting to /');
     return <Navigate to="/" />;
   }
-  // console.log('IsUserLogout - Access granted');
   return children;
 };
 
@@ -60,11 +48,6 @@ export const IsAdminLogin = ({ children }) => {
   const isAdminAuthenticated = useSelector(selectIsAdminAuthenticated);
   const adminRole = useSelector(selectAdminRole);
   const isUserAuthenticated = useSelector(selectIsUserAuthenticated);
-
-  // console.log('--- IsAdminLogin ---');
-  // console.log('isAdminAuthenticated:', isAdminAuthenticated);
-  // console.log('adminRole:', adminRole);
-  // console.log('isUserAuthenticated:', isUserAuthenticated);
 
   if (!isAdminAuthenticated || adminRole !== 'admin') {
     console.log('Admin not authenticated or wrong role, redirecting to /admin/login');
@@ -82,11 +65,7 @@ export const IsAdminLogout = ({ children }) => {
   const isAdminAuthenticated = useSelector(selectIsAdminAuthenticated);
   const adminRole = useSelector(selectAdminRole);
 
-  // console.log('IsAdminLogout - isAdminAuthenticated:', isAdminAuthenticated);
-  // console.log('IsAdminLogout - adminRole:', adminRole);
-
   if (isAdminAuthenticated && adminRole === 'admin') {
-    // console.log('IsAdminLogout - Redirecting to /admin/dashboard');
     return <Navigate to="/admin/dashboard" />;
   }
   console.log('IsAdminLogout - Access granted');

@@ -84,7 +84,7 @@ if (!order) {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="fixed inset-0 bg-black opacity-50" onClick={onClose}></div>
       <div className="bg-white rounded-lg shadow-lg z-10 w-full max-w-4xl h-[500px] mx-4 flex flex-col">
-      {/* <div className="bg-white rounded-lg shadow-lg z-10 w-full max-w-4xl mx-4 max-h-[700px] flex flex-col"> */}
+        
         {/* Modal Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-[#3c73a8] text-white rounded-t-lg">
           <h2 className="text-xl font-semibold">Order #{order.orderNumber}</h2>

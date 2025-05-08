@@ -1,5 +1,3 @@
-
-
 const Order = require("../../models/OrderModel");
 const moment = require("moment");
 const ExcelJS = require("exceljs");
@@ -215,7 +213,6 @@ const getSalesReport = async (req, res, next) => {
 
     res.status(200).json(response);
   } catch (error) {
-    console.error("Error fetching sales report:", error);
     res.status(500).json({ error: error.message || "Internal server error" });
   }
 };
@@ -341,7 +338,6 @@ const downloadExcelReport = async (req, res, next) => {
     await workbook.xlsx.write(res);
     res.end();
   } catch (error) {
-    console.error("Error generating Excel report:", error);
     res.status(500).json({ error: error.message || "Internal server error" });
   }
 };
@@ -477,7 +473,6 @@ const downloadPdfReport = async (req, res, next) => {
 
     doc.end();
   } catch (error) {
-    console.error("Error generating PDF report:", error);
     res.status(500).json({ error: error.message || "Internal server error" });
   }
 };

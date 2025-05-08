@@ -59,7 +59,6 @@ const ProductCard = ({ product }) => {
       refetchWishlist();
       toast.success(response.message || "Item added to wishlist");
     } catch (error) {
-      console.error("Failed to toggle wishlist:", error);
       toast.error(error?.data?.message || "Failed to update wishlist");
     }
   };
@@ -77,7 +76,6 @@ const ProductCard = ({ product }) => {
       refetchCart();
       toast.success(response.message || "Item added to cart")
     } catch (error) {
-      console.error("Failed to add to cart:", error);
       toast.error(error?.data?.message || "Failed to add to cart");
     }
   };

@@ -1,6 +1,5 @@
 const AdminWallet = require("../../models/adminWalletModel");
 
-
 const getAdminWallet = async (req, res) => {
   try {
     const wallet = await AdminWallet.findOne({}).populate(
@@ -43,7 +42,6 @@ const getWalletTransactions = async (req, res) => {
 
     let filteredTransactions = [...wallet.transactions];
 
-    // Apply search filter
     if (search) {
       filteredTransactions = filteredTransactions.filter(
         (transaction) =>
@@ -55,19 +53,16 @@ const getWalletTransactions = async (req, res) => {
       );
     }
 
-    // Apply type filter
     if (type && type !== "all") {
       filteredTransactions = filteredTransactions.filter(
         (transaction) => transaction.type === type
       );
     }
 
-    // Sort transactions by date (newest first)
     filteredTransactions.sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
 
-    // Pagination
     const total = filteredTransactions.length;
     const paginatedTransactions = filteredTransactions.slice(
       (page - 1) * limit,

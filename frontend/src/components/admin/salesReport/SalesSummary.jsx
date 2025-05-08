@@ -1,4 +1,3 @@
-
 import { TrendingUp, ShoppingBag, CreditCard, Percent, Tag } from "lucide-react";
 
 const SalesSummary = ({ data }) => {

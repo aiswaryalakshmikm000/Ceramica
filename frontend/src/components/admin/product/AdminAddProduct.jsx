@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useAddProductMutation } from "../../../features/adminAuth/adminProductApiSlice";
 import { useGetCategoriesQuery } from "../../../features/adminAuth/AdminCategoryApiSlice";
@@ -21,7 +20,6 @@ const AdminAddProductPage = () => {
       const productId = response.product?._id || response.id;
       navigate("/admin/products");
     } catch (err) {
-      console.error("RTK Query error:", err);
       const errorMessage = err?.data?.message || "Something went wrong while adding the product.";
       toast.error(errorMessage);
     }

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -11,7 +10,7 @@ import {
   X,
   Eye,
 } from "lucide-react";
-import Breadcrumbs from "../../common/Breadcrumbs";
+import Breadcrumbs from "../../common/BreadCrumbs";
 import TransactionModal from "./TransactionModal";
 import Pagination from "../../common/Pagination";
 import { useGetAdminWalletQuery, useGetWalletTransactionsQuery } from "../../../features/adminAuth/adminWalletApiSlice";

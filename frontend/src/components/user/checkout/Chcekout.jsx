@@ -189,14 +189,12 @@ const Checkout = () => {
 
         const razorpayInstance = new Razorpay(options);
         razorpayInstance.on("payment.failed", (response) => {
-          console.log("Payment failed event:", response);
           toast.error(`Payment failed: ${response.error.description}`);
           setFailedOrderId(razorpayOrder.data.orderNumber); 
           setIsFailureModalOpen(true); 
         });
 
         razorpayInstance.on("modal.closed", () => {
-          console.log("Modal closed event triggered");
           toast.error("Payment was cancelled or closed");
           setFailedOrderId(razorpayOrder.data.orderNumber);
           setIsFailureModalOpen(true);

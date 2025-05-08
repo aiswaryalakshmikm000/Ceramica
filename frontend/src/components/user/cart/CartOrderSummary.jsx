@@ -9,7 +9,6 @@ const THRESHOLD_AMOUNT = import.meta.env.VITE_THRESHOLD_AMOUNT;
 
 const CartOrderSummary = ({ cart, subtotal, isCartEmpty, setProblematicItems }) => {
 
-  console.log("CaRTTTTTTTTTt", cart)
   const navigate = useNavigate();
   const [validateCheckout, { isLoading }] = useValidateCheckoutMutation();
 

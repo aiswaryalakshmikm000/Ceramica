@@ -11,10 +11,8 @@ const Offer = require("../../models/offerModel");
 const dotenv = require("dotenv");
 dotenv.config();
 
-// Round to two decimal places
 const roundToTwo = (num) => Number((Math.round(num * 100) / 100).toFixed(2));
 
-// Check stock availability
 const checkStock = async (productId, color, quantity) => {
   const product = await Product.findById(productId);
   if (!product) {
@@ -39,7 +37,6 @@ const checkStock = async (productId, color, quantity) => {
 
 const validateCoupon = async (couponCode, cart, userId = null, incrementUsage = false) => {
   try {
-    // Validate inputs
     if (!couponCode) {
       return { valid: false, message: 'No coupon code provided', coupon: null };
     }
@@ -47,7 +44,6 @@ const validateCoupon = async (couponCode, cart, userId = null, incrementUsage = 
       return { valid: false, message: 'Cart is empty', coupon: null };
     }
 
-    // Validate coupon code format (must be uppercase)
     if (couponCode !== couponCode?.toUpperCase()) {
       return {
         valid: false,
@@ -56,13 +52,10 @@ const validateCoupon = async (couponCode, cart, userId = null, incrementUsage = 
       };
     }
 
-    // Fetch coupon
     const couponDoc = await Coupon.findOne({ code: couponCode });
     if (!couponDoc) {
       return { valid: false, message: 'Invalid coupon code', coupon: null };
     }
-
-    // console.log("couponDoccouponDoccouponDoccouponDoc", couponDoc)
 
     // Check coupon status and dates
     const now = new Date();
@@ -125,21 +118,16 @@ const validateCoupon = async (couponCode, cart, userId = null, incrementUsage = 
       select: '_id price discount discountedPrice isListed colors',
     });
     
-    // Calculate subtotal after product and offer discounts
     const subtotal = roundToTwo(
       await cart.items.reduce(async (sumPromise, item) => {
         const sum = await sumPromise; 
         const product = item.productId;
-        // console.log("YYYYYYYYY subtotal product", product);
         if (!product || !item.inStock) return sum;
     
         const { discountedPrice } = await applyOffers(product._id, product.price); 
-        // console.log("................../////////////. discountedPrice", discountedPrice);
         return sum + discountedPrice * item.quantity;
       }, Promise.resolve(0)) 
     );
-
-    // console.log("subtotalsubtotalsubtotalsubtotalsubtotalsubtotalsubtotal", subtotal)
 
     // Check minimum purchase amount
     if (subtotal < couponDoc.minPurchaseAmount) {
@@ -154,17 +142,14 @@ const validateCoupon = async (couponCode, cart, userId = null, incrementUsage = 
     let discount = 0;
     if (couponDoc.discountType === 'flat') {
       discount = couponDoc.discountValue || 0;
-      // console.log(".............discount flattttttttttttttttttttttttt", discount)
     } else if (couponDoc.discountType === 'percentage') {
       discount = (couponDoc.discountPercentage / 100) * subtotal;
       if (couponDoc.maxDiscountAmount && discount > couponDoc.maxDiscountAmount) {
         discount = couponDoc.maxDiscountAmount || 0;
       }
-      // console.log("............discount percenttttttttttttttttttttt ", discount)
     }
 
     discount = roundToTwo(discount);
-// console.log("discountdiscountdiscountdiscount", discount)
     // Increment usage if requested (e.g., for confirmed orders)
     if (incrementUsage) {
       couponDoc.totalAppliedCount += 1;
@@ -182,14 +167,12 @@ const validateCoupon = async (couponCode, cart, userId = null, incrementUsage = 
       maxDiscountAmount: couponDoc.maxDiscountAmount || 0,
     };
 
-    // console.log("################ validatedCoupon",validatedCoupon)
     return {
       valid: true,
       message: 'Coupon validated successfully',
       coupon: validatedCoupon,
     };
   } catch (error) {
-    // console.error('Error validating coupon:', error);
     return {
       valid: false,
       message: 'Failed to validate coupon due to an internal error',
@@ -199,217 +182,6 @@ const validateCoupon = async (couponCode, cart, userId = null, incrementUsage = 
 };
 
 
-// // Apply offers to a product (used in cart or order calculations)
-// const applyOffers = async (productId, originalPrice) => {
-//   try {
-//     const product = await Product.findById(productId).populate('categoryId');
-// //  console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4 product",product)
-//     if (!product) {
-//       return { discountedPrice: originalPrice, appliedOffer: null, offerDiscount: 0 };
-//     }
-
-//     const basePrice = product.discount > 0 ? product.discountedPrice : product.price;
-//     let bestDiscount = 0;
-//     let appliedOffer = null;
-
-//     // console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4 basePrice",basePrice)
-
-//     // Check product-specific offers
-//     const productOffers = await Offer.find({
-//       targetType: 'Product',
-//       targetId: productId,
-//       status: 'active',
-//       validFrom: { $lte: new Date() },
-//       expiryDate: { $gte: new Date() },
-//     });
-
-//     for (const offer of productOffers) {
-//       let discount = 0;
-//       if (offer.discountType === 'flat') {
-//         discount = offer.discountValue;
-//         // console.log("$#%%%%%%% product flat", discount)
-//       } else if (offer.discountType === 'percentage') {
-//         discount = Math.min(
-//           basePrice * (offer.discountValue / 100),
-//           offer.maxDiscountAmount || Infinity
-//         );
-//         // console.log("$#%%%%%%% product percentage", discount)
-//       }
-//       if (discount > bestDiscount) {
-//         bestDiscount = discount;
-//         appliedOffer = offer._id;
-//       }
-//     }
-
-//     // console.log( "bestDiscount", bestDiscount)
-//     // console.log( "appliedOffer", appliedOffer)
-
-//     // Check category-specific offers
-//     const categoryOffers = await Offer.find({
-//       targetType: 'Category',
-//       targetId: product.categoryId,
-//       status: 'active',
-//       validFrom: { $lte: new Date() },
-//       expiryDate: { $gte: new Date() },
-//     });
-
-//     for (const offer of categoryOffers) {
-//       let discount = 0;
-//       if (offer.discountType === 'flat') {
-//         discount = offer.discountValue;
-//         // console.log("$#%%%%%%% category flat", discount)
-//       } else if (offer.discountType === 'percentage') {
-//         discount = Math.min(
-//           basePrice * (offer.discountValue / 100),
-//           offer.maxDiscountAmount || Infinity
-//         );
-//         // console.log("$#%%%%%%% category percentage", discount)
-//       }
-//       if (discount > bestDiscount) {
-//         bestDiscount = discount;
-//         appliedOffer = offer._id;
-//       }
-//     }
-
-//     // console.log( "after category bestDiscount", bestDiscount)
-//     // console.log( "after category  appliedOffer", appliedOffer)
-//     // console.log( "*****************************************discountedPrice", basePrice-bestDiscount)
-
-//     return ({
-//       discountedPrice: basePrice - bestDiscount,
-//       appliedOffer,
-//       offerDiscount: bestDiscount ,
-//     });
-//   } catch (error) {
-//     // console.error('Error in applyOffers:', error);
-//     return { discountedPrice: originalPrice, appliedOffer: null, offerDiscount: 0 };
-//   }
-// };
-
-// const recalculateCartTotals = async (cart, coupon = null) => {
-//   try {
-//     if (!cart?.items?.length) {
-//       return {
-//         ...cart.toObject(),
-//         totalItems: 0,
-//         totalMRP: 0,
-//         productsDiscount: 0,
-//         offerDiscount: 0,
-//         deliveryCharge: 0,
-//         totalAmount: 0,
-//         couponDiscount: 0,
-//         couponId: null,
-//         couponCode: null,
-//       };
-//     }
-
-//     // Populate product data
-//     await cart.populate('items.productId');
-
-//     const totals = await Promise.all(
-//       cart.items
-//         .filter((item) => item.inStock)
-//         .map(async (item) => {
-//           const product = item.productId;
-
-//           if (!product) return { totalItems: 0, totalMRP: 0, productsDiscount: 0, offerDiscount: 0 };
-
-//           const originalPrice = product.price || 0;
-//           const basePrice = product.discount > 0 ? product.discountedPrice : product.price;
-
-//           // Calculate product-level discount
-//           const productDiscount = product.discount > 0 ? originalPrice - basePrice : 0;
-//           // console.log("EEEEEEEEEEEEEEEEEEEEEEEEEEEE, basePrice", basePrice)
-//           // console.log("EEEEEEEEEEEEEEEEEEEEEEEEEEEE, productDiscount", productDiscount)
-//           // Apply offers dynamically
-//           const { discountedPrice, appliedOffer, offerDiscount } = await applyOffers(product._id, basePrice);
-
-//           // console.log(`$$$............  discountedPrice, appliedOffer, offerDiscount for ${basePrice}` ,  discountedPrice, appliedOffer, offerDiscount)
-
-//           // Calculate totals
-//           const totalProductDiscount = productDiscount * item.quantity;
-//           const totalOfferDiscount = offerDiscount * item.quantity;
-
-//           // console.log("totalProductDiscount", totalProductDiscount)
-//           // console.log("totalOfferDiscount", totalOfferDiscount)
-
-//           if (appliedOffer) {
-//             product.offerId = appliedOffer;
-//             await product.save();
-//           }
-
-//           return {
-//             totalItems: item.quantity,
-//             totalMRP: originalPrice * item.quantity,
-//             productsDiscount: totalProductDiscount,
-//             offerDiscount: totalOfferDiscount,
-//           };
-//         })
-//     );
-
-//     const aggregatedTotals = totals.reduce(
-//       (acc, curr) => ({
-//         totalItems: acc.totalItems + curr.totalItems,
-//         totalMRP: acc.totalMRP + curr.totalMRP,
-//         productsDiscount: acc.productsDiscount + curr.productsDiscount,
-//         offerDiscount: acc.offerDiscount + curr.offerDiscount,
-//       }),
-//       { totalItems: 0, totalMRP: 0, productsDiscount: 0, offerDiscount: 0 }
-//     );
-
-//     // console.log("AAAAaggregatedTotals", aggregatedTotals)
-
-//     let couponDiscount = 0;
-//     let couponId = null;
-//     let couponCode = null;
-//     let discountPercentage = 0;
-//     if (coupon) {
-//       couponDiscount = coupon.discount || 0;
-//       couponId = coupon._id || null;
-//       couponCode = coupon.code || null;
-//       discountPercentage = coupon.discountPercentage || 0;
-//     }
-
-//     const subtotal = roundToTwo(
-//       aggregatedTotals.totalMRP - aggregatedTotals.productsDiscount - aggregatedTotals.offerDiscount
-//     );
-
-//     // console.log("SSSSSSSSSSSSub total", subtotal)
-
-//     const deliveryCharge = subtotal >= (process.env.THRESHOLD_AMOUNT || 500) ? 0 : 60;
-
-    
-//     // console.log('deliveryCharge', deliveryCharge)
-
-//     const totalAmount = roundToTwo(Math.max(subtotal - couponDiscount + deliveryCharge, 0));
-
-//     // console.log('totalAmount', totalAmount)
-
-//     const updatedCart = {
-//       ...cart.toObject(),
-//       totalItems: aggregatedTotals.totalItems,
-//       totalMRP: roundToTwo(aggregatedTotals.totalMRP),
-//       productsDiscount: roundToTwo(aggregatedTotals.productsDiscount),
-//       offerDiscount: roundToTwo(aggregatedTotals.offerDiscount),
-//       couponDiscount: roundToTwo(couponDiscount),
-//       couponId,
-//       couponCode,
-//       discountPercentage,
-//       deliveryCharge: roundToTwo(deliveryCharge),
-//       totalAmount: roundToTwo(totalAmount),
-//     };
-
-//     // console.log('updatedCart', updatedCart)
-
-//     return updatedCart;
-//   } catch (error) {
-//     // console.error('Error in recalculateCartTotals:', error);
-//     throw error;
-//   }
-// };
-
-
-// Apply offers to a product (used in cart or order calculations)
 const applyOffers = async (productId, originalPrice) => {
   try {
     const product = await Product.findById(productId).populate('categoryId');

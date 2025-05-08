@@ -66,7 +66,6 @@ const SideBar = () => {
       dispatch(logoutAdmin());
       navigate('/admin/login');
     } catch (error) {
-      console.error('Logout failed:', error);
     } finally {
       setIsModalOpen(false);
     }

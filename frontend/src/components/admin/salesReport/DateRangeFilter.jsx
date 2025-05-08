@@ -6,7 +6,7 @@ const DateRangeFilter = ({ startDate, endDate, onDateChange }) => {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef(null)
 
-  // Format date for display
+
   const formatDate = (date) => {
     return date.toLocaleDateString("en-US", {
       year: "numeric",

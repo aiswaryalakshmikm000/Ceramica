@@ -1,5 +1,3 @@
-
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -10,11 +8,9 @@ const TopProducts = ({ dateRange, filterType }) => {
   const [products, setProducts] = useState([])
   const [viewMode, setViewMode] = useState("table")
 
-  // Format dates for API query
   const formattedStartDate = dateRange.startDate.toISOString().split("T")[0]
   const formattedEndDate = dateRange.endDate.toISOString().split("T")[0]
 
-  // Fetch top products data
   const {
     data: productsData,
     isLoading,
@@ -27,7 +23,6 @@ const TopProducts = ({ dateRange, filterType }) => {
   })
 
   useEffect(() => {
-    console.log('TopProducts data:', productsData);
     if (productsData?.products) {
       setProducts(productsData.products)
     }

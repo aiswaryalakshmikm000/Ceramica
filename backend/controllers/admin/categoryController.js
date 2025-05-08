@@ -180,7 +180,6 @@ const showCategory = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Fetched category details", category });
   } catch (error) {
-    console.error("Error fetching category:", error);
     res
       .status(error?.status || 500)
       .json({ message: error.message || "Something went wrong" });

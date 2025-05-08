@@ -1,16 +1,12 @@
-
 const Product = require("../../models/productModel");
-const productSchema = require('../../utils/validation/productValidation')
 const mongoose = require("mongoose");
 
 const { cloudinaryImageUploadMethod } = require("../../utils/cloudinary/cloudinaryUpload");
-const cloudinaryDeleteImages = require('../../utils/cloudinary/deleteImages')
 
 const addProduct = async (req, res) => {
 
   const { name, description, price, discount, offerId, categoryId, tags, colors, isFeatured } = req.body;
 
-  
   try {
     const productExist = await Product.findOne({ name: { $regex: new RegExp(`^${name}$`, "i") } });
     if (productExist) {
@@ -22,8 +18,6 @@ const addProduct = async (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
       return res.status(400).json({ message: "Images are required for color variants." });
     }
-
-   
 
     let totalImages = 0;
     const colorsWithImages = await Promise.all(
@@ -69,7 +63,6 @@ const addProduct = async (req, res) => {
 
     res.status(201).json({ message: "Product added successfully", product: newProduct });
   } catch (error) {
-    console.error("Error adding product:", error);
     res.status(500).json({
       message: "Something went wrong while adding the product.",
       error: process.env.NODE_ENV === "development" ? error.message : undefined,
@@ -83,7 +76,6 @@ const showProducts = async (req, res) => {
     const { search, categoryIds, isListed, stockFilter, page = 1, limit = 10 } = req.query;
 
     let filter = {};
-
   
     if (search) {
       filter.$or = [
@@ -127,7 +119,6 @@ const showProducts = async (req, res) => {
       products,
     });
   } catch (error) {
-    console.error("Error fetching products:", error);
     res.status(500).json({ message: "Something went wrong while fetching products." });
   }
 };
@@ -144,7 +135,6 @@ const updateProductStatus = async (req, res) => {
   try {
     const product = await Product.findById(id);
     if (!product) {
-
       return res
         .status(400)
         .json({ success: false, message: "Product not found" });
@@ -181,7 +171,6 @@ const showProduct = async (req, res) => {
 
     res.status(200).json({ success: true, message: "Product details fetched", product });
   } catch (error) {
-    console.error("Error in fetching product:", error);
     res.status(500).json({ 
       success: false, 
       message: "Fetching product failed", 

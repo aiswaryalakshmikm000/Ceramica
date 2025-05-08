@@ -1,4 +1,3 @@
-
 const Cart = require('../../models/cartModel');
 const Product = require("../../models/productModel");
 const cartService = require('../../utils/services/cartService');
@@ -66,7 +65,6 @@ const addToCart = async (req, res) => {
       cart: updatedCart,
     });
   } catch (error) {
-    console.error("Error in addToCart:", error);
     res.status(500).json({ success: false, message: 'Failed to add item to cart', error: error.message });
   }
 };
@@ -74,7 +72,6 @@ const addToCart = async (req, res) => {
 const showCart = async (req, res) => {
   try {
     const { userId } = req.params;
-    console.log('>>>>>>>>>>>>>>>>>>>>>userId', userId)
     const cart = await Cart.findOne({ userId }).populate({
       path: 'items.productId',
       select: '_id name price discount discountedPrice isListed colors',
@@ -93,7 +90,6 @@ const showCart = async (req, res) => {
     }
 
     const originalItemCount = cart.items.length;
-    console.log("######### originalItemCount", originalItemCount)
 
     cart.items = cart.items.filter((item) => {
       const product = item.productId;
@@ -108,8 +104,6 @@ const showCart = async (req, res) => {
     const removedItemCount = originalItemCount - cart.items.length;
 
     const updatedCart = await cartService.recalculateCartTotals(cart);
-
-    console.log("######### updatedCart", updatedCart)
 
     cart.set({
       items: cart.items,
@@ -166,7 +160,6 @@ const showCart = async (req, res) => {
 
     res.status(200).json(response);
   } catch (error) {
-    console.error('Error fetching cart:', error.stack);
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve cart',
@@ -267,7 +260,6 @@ const updateCart = async (req, res) => {
 
     res.status(200).json(response);
   } catch (error) {
-    console.error('Error updating cart:', error.stack);
     res.status(500).json({
       success: false,
       message: 'Failed to update cart',
@@ -348,7 +340,6 @@ const removeItemFromCart = async (req, res) => {
 
     res.status(200).json(response);
   } catch (error) {
-    console.error('Error removing item from cart:', error.stack);
     res.status(500).json({
       success: false,
       message: 'Failed to remove item from cart',
@@ -420,7 +411,6 @@ const checkoutValidation = async (req, res) => {
       data: null,
     });
   } catch (error) {
-    console.error('Error in checkout validation:', error.stack);
     res.status(500).json({
       success: false,
       message: 'Failed to validate cart for checkout',

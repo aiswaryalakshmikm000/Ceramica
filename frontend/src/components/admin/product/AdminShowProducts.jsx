@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { useShowProductsQuery, useUpdateProductStatusMutation } from "../../../features/adminAuth/adminProductApiSlice";
 import { useGetCategoriesQuery } from "../../../features/adminAuth/AdminCategoryApiSlice";
@@ -19,7 +18,7 @@ const AdminShowProducts = () => {
     stock: "",
   });
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10); // Now a state variable
+  const [limit, setLimit] = useState(10); 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState(null);
   const dropdownRef = useRef(null);

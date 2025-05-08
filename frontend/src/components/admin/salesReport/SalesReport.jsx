@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Calendar, FileSpreadsheet, FileIcon as FilePdf, BarChart4, LineChart, PieChart, ChevronDown, Filter } from "lucide-react";
 import SalesChart from "./SalesChart";
@@ -7,8 +6,7 @@ import DateRangeFilter from "./DateRangeFilter";
 import ReportTable from "./ReportTable";
 import { useGetSalesReportQuery, useDownloadExcelReportMutation, useDownloadPdfReportMutation } from "../../../features/adminAuth/adminSalesReportApiSlice";
 import { toast } from "react-toastify";
-import Breadcrumbs from "../../common/Breadcrumbs";
-
+import Breadcrumbs from "../../common/BreadCrumbs";
 const SalesReport = () => {
   const [dateFilter, setDateFilter] = useState("week");
   const [customDateRange, setCustomDateRange] = useState({
@@ -82,7 +80,6 @@ const SalesReport = () => {
       window.URL.revokeObjectURL(url);
       toast.success(`${format.toUpperCase()} report downloaded successfully!`);
     } catch (error) {
-      console.error(`Error downloading ${format} report:`, error);
       toast.error(`Failed to download ${format} report. Please try again.`);
     }
   };

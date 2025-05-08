@@ -1,4 +1,3 @@
-// Backend file (e.g., dashboardController.js)
 const mongoose = require('mongoose');
 const Order = require('../../models/OrderModel');
 const Product = require('../../models/productModel');
@@ -59,7 +58,7 @@ const getGroupFormat = (filterType) => {
     case 'daily':
       return { $hour: '$orderDate' };
     case 'weekly':
-      return { $dayOfWeek: '$orderDate' }; // 1=Sunday, 2=Monday, ..., 7=Saturday
+      return { $dayOfWeek: '$orderDate' }; 
     case 'monthly':
       return { $dayOfMonth: '$orderDate' };
     case 'yearly':
@@ -82,7 +81,7 @@ const mapResultsToDataArrays = (results, filterType, labels) => {
     if (filterType === 'daily') {
       index = result._id;
     } else if (filterType === 'weekly') {
-      index = (result._id + 5) % 7; // Adjust: 2(Monday)=0, 1(Sunday)=6
+      index = (result._id + 5) % 7; 
     } else if (filterType === 'monthly') {
       index = result._id - 1;
     } else if (filterType === 'yearly') {
@@ -101,8 +100,8 @@ const mapResultsToDataArrays = (results, filterType, labels) => {
   return { salesData, productsDiscountData, offerDiscountData, couponDiscountData, ordersData };
 };
 
-// 1. Get Dashboard Summary Stats
 
+// 1. Get Dashboard Summary Stats
 const getStatus = async (req, res) => {
   try {
     const { filterType = 'weekly' } = req.query;
@@ -112,7 +111,6 @@ const getStatus = async (req, res) => {
     }
 
     const dateFilter = getDateRangeFilter(filterType);
-    console.log('getStatus Date Filter:', dateFilter);
 
     const orderStats = await Order.aggregate([
       {
@@ -134,7 +132,6 @@ const getStatus = async (req, res) => {
       ...dateFilter,
       status: 'Delivered',
     }).select('orderNumber totalAmount orderDate status');
-    console.log('getStatus Orders:', orders);
 
     const activeUsers = await User.countDocuments({
       isBlocked: false,
@@ -146,7 +143,6 @@ const getStatus = async (req, res) => {
 
     res.status(200).json(stats);
   } catch (error) {
-    console.error('Error fetching dashboard stats:', error);
     res.status(500).json({ message: 'Server error while fetching dashboard stats' });
   }
 };
@@ -163,8 +159,6 @@ const getSales = async (req, res) => {
     const dateFilter = getDateRangeFilter(filterType);
     const labels = generateLabels(filterType, dateFilter.orderDate.$gte, dateFilter.orderDate.$lte);
     const groupFormat = getGroupFormat(filterType);
-
-    console.log('getSales Date Filter:', dateFilter);
 
     const salesData = await Order.aggregate([
       {
@@ -187,8 +181,6 @@ const getSales = async (req, res) => {
         $sort: { _id: 1 },
       },
     ]);
-
-    console.log('getSales Aggregation Results:', salesData);
 
     const { salesData: salesArray, productsDiscountData, offerDiscountData, couponDiscountData, ordersData } = mapResultsToDataArrays(
       salesData,
@@ -239,7 +231,6 @@ const getSales = async (req, res) => {
 
     res.status(200).json(response);
   } catch (error) {
-    console.error('Error fetching sales data:', error);
     res.status(500).json({ message: 'Server error while fetching sales data' });
   }
 };
@@ -318,7 +309,6 @@ const getTopProducts = async (req, res) => {
 
     res.status(200).json({ labels, products: topProducts });
   } catch (error) {
-    console.error('Error fetching top products:', error);
     res.status(500).json({ message: 'Server error while fetching top products' });
   }
 };
@@ -391,7 +381,6 @@ const getTopCategories = async (req, res) => {
 
     res.status(200).json({ labels, categories: topCategories });
   } catch (error) {
-    console.error('Error fetching top categories:', error);
     res.status(500).json({ message: 'Server error while fetching top categories' });
   }
 };

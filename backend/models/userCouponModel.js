@@ -1,4 +1,4 @@
-// backend/models/userCouponModel.js
+
 const mongoose = require("mongoose");
 
 const userCouponSchema = new mongoose.Schema(

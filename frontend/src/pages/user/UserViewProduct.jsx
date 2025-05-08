@@ -10,7 +10,7 @@ const UserViewProduct = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isAuthenticated = useSelector(selectIsUserAuthenticated);
 
-  // Function to set the timer for showing the modal
+
   const setModalTimer = () => {
     return setTimeout(() => {
       setIsModalOpen(true);
@@ -20,7 +20,7 @@ const UserViewProduct = () => {
   useEffect(() => {
     let timer;
     if (!isAuthenticated) {
-      timer = setModalTimer(); // Initial timer when component mounts
+      timer = setModalTimer(); 
     }
     return () => {
       if (timer) {

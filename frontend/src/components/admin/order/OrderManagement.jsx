@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { ArrowUp, ArrowDown, Eye } from "lucide-react";
 import OrderDetailModal from "./OrderDetailModal";
-import Breadcrumbs from "../../common/Breadcrumbs";
+import Breadcrumbs from "../../common/BreadCrumbs";
 import Pagination from "../../common/Pagination";
 import FilterSearchBar from "./FilterSearchBar";
 import StatusBadge from "../../common/StatusBadge";
