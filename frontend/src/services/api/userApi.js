@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://localhost:5000/api/user",
+  baseUrl: import.meta.env.VITE_USER_URL,
   credentials: "include", 
 });
 

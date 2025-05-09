@@ -19,7 +19,7 @@ morgan.format('custom', ':method  :url  :status  :response-time ms  :date[iso] '
 // Middleware
 app.use(morgan('custom'));
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
     credentials: true
 }));
 app.use(cookieParser());

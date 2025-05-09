@@ -3,7 +3,7 @@ import { logoutAdmin, setAdminCredentials } from "../../features/adminAuth/admin
 import { toast } from "react-toastify";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://localhost:5000/api/admin",
+  baseUrl: import.meta.env.VITE_ADMIN_URL,
   credentials: "include", 
 });
 
