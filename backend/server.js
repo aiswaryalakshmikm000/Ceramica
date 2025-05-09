@@ -16,6 +16,11 @@ connectDB()
 
 morgan.format('custom', ':method  :url  :status  :response-time ms  :date[iso] '); 
 
+app.use((req, res, next) => {
+    req.url = req.url.replace(/^\/backend/, '');
+    next();
+  });
+
 // Middleware
 app.use(morgan('custom'));
 app.use(cors({
