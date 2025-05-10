@@ -152,7 +152,7 @@ const Order = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 my-10 sm:my-14 lg:my-20 px-4 sm:px-6 lg:px-14 mx-auto max-w-7xl">
+    <div className="min-h-screen bg-white-50 my-10 sm:my-14 lg:my-20 px-4 sm:px-6 lg:px-14 mx-auto max-w-7xl">
       <div className="bg-white rounded-2xl shadow-md p-4 sm:p-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-800">My Orders</h2>

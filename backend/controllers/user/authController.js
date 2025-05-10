@@ -145,9 +145,6 @@ const login = async (req, res) => {
     const accessToken = generateAccessToken(userData);
     const refreshToken = generateRefreshToken(userData);
 
-    // Remove old refresh tokens for security
-    await RefreshToken.deleteMany({ user: userExist._id });
-
     // Save refresh token in DB
     const newRefreshToken = new RefreshToken({
       token: refreshToken,
