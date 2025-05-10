@@ -90,7 +90,8 @@ const getOrderDetails = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const order = await Order.findById(req.params.orderId).populate(
+    const { orderId }  = req.params;
+    const order = await Order.findById(orderId).populate(
       "items.productId"
     );
 
@@ -110,6 +111,8 @@ const updateOrderStatus = async (req, res) => {
       "Delivered",
       "Cancelled",
       "Payment-Pending",
+      "Return-Rejected",
+      "Returned"
     ];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
@@ -119,10 +122,10 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
-    if (order.status === "Payment-Pending") {
+    if (order.status === "Payment-Pending" || order.status === "Cancelled" || order.status === "Delivered" || order.status === "Returned") {
       return res.status(400).json({
         success: false,
-        message: "Cannot change status while order is Payment-Pending",
+        message: "Cannot change the status",
         data: {
           currentStatus: order.status,
           allowedAction: "Wait for payment to be completed or failed",
@@ -133,8 +136,9 @@ const updateOrderStatus = async (req, res) => {
     order.status = status;
 
     order.items = order.items.map((item) => {
-      item.status = status;
-
+      if(item.status === "Cancelled" || item.status === "Return-Requested" || item.status === "Returned") {
+        return item;
+      }
       if (status === "Delivered" || status === "Pending") {
         item.returnRequest = {
           isRequested: false,
@@ -146,6 +150,7 @@ const updateOrderStatus = async (req, res) => {
         };
       }
 
+      item.status = status;
       return item;
     });
 
@@ -332,11 +337,11 @@ const verifyItemReturnRequest = async (req, res) => {
         i.status === "Return-Rejected" ||
         !i.returnRequest.isRequested
     );
-    order.status = allItemsProcessed
-      ? isApproved
-        ? "Returned"
-        : "Return-Rejected"
-      : "Return-Requested";
+    // order.status = allItemsProcessed
+    //   ? isApproved
+    //     ? "Returned"
+    //     : "Return-Rejected"
+    //   : "Return-Requested";
 
     if (isApproved) {
       await Product.updateOne(

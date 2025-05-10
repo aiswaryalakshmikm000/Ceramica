@@ -1223,7 +1223,7 @@ const returnOrderItem = async (req, res) => {
     }
 
     item.status = "Return-Requested";
-    order.status = "Return-Requested";
+    // order.status = "Return-Requested";
     item.returnRequest = {
       isRequested: true,
       requestedAt: new Date(),

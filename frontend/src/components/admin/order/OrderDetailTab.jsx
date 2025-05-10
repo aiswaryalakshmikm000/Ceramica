@@ -52,12 +52,15 @@ const OrderDetailsTab = ({ order, handleStatusChange, formatDate }) => {
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#3c73a8] focus:border-[#3c73a8] sm:text-sm rounded-md"
           >
             <option value="Pending">Pending</option>
-            <option value="Payment-Pending">Payment Pending</option>
+            {/* <option value="Payment-Pending">Payment Pending</option> */}
             <option value="Confirmed">Confirmed</option>
             <option value="Shipped">Shipped</option>
             <option value="Out for Delivery">Out for Delivery</option>
             <option value="Delivered">Delivered</option>
             <option value="Cancelled">Cancelled</option>
+            {/* <option value="Return-Rejected">Return Rejected</option> */}
+            <option value="Returned">Returned</option>
+            {/* <option value="Return-Requested">Return Requested</option> */}
           </select>
         </div>
       </div>

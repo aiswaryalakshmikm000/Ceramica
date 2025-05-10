@@ -201,7 +201,7 @@ const editProduct = async (req, res) => {
       name: { $regex: new RegExp(`^${name}$`, "i") },
     });
     if (productWithSameName) {
-      return res.status(400).json({ message: "Product with same name already exists" });
+      return res.status(400).json({ success: false, message: "Product with same name already exists" });
     }
 
     const parsedColors = colors ? JSON.parse(colors) : productExist.colors;

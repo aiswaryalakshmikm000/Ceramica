@@ -65,7 +65,7 @@ const FilterSearchBar = ({
               <option value="Delivered">Delivered</option>
               <option value="Cancelled">Cancelled</option>
               <option value="Return-Requested">Return Requested</option>
-              <option value="Return-Approved">Return Approved</option>
+              <option value="Returned">Returned</option>
               <option value="Return-Rejected">Return Rejected</option>
             </select>
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
